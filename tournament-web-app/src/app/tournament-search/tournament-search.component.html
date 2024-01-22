@@ -1,0 +1,37 @@
+
+<div class="bar">
+   <span class="spacer"></span>
+<form [formGroup]="searchForm"><mat-form-field  appearance="outline">
+            <input  matInput placeholder="evento" formControlName="search" >
+        </mat-form-field></form>
+    <button mat-fab  class="search-button" color="primary" aria-label="Example icon button with a delete icon" (click)="onSearch()">
+        <mat-icon>search</mat-icon>
+    </button>
+    <span class="spacer"></span>
+</div>
+
+@for( tournament of tournamentList; track tournament.id){
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>
+                <a routerLink="/tournament/{{tournament.id}}">{{tournament.data().label}}</a>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="bar">
+                <div>fecha:{{tournament.data().eventDate.toDate() | date: 'dd/MM/yyyy'}}</div>
+                <span class="spacer"></span>
+                <img mat-card-sm-image [src]="tournament.data().imageUrl" >  
+            </div>            
+        </mat-card-content>         
+    </mat-card>     
+} @empty{
+    <div>No row to show: {{tournamentList.length}}</div>
+}
+
+@if (isLoggedIn()) {
+    <a routerLink="/tournamentNew">
+        <button mat-raised-button color="primary">Crear un nuevo evento</button>
+    </a>
+}
+

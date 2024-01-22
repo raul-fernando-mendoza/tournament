@@ -1,0 +1,45 @@
+<mat-grid-list cols="4" rowHeight="2.5em">
+@for( e of evaluationReferences; track e.id){
+
+    @for( j of evaluatorReferences; track j.id){
+        <mat-grid-tile>
+            {{e.evaluation.label}}
+        </mat-grid-tile>
+        <mat-grid-tile>
+            {{j.evaluator.label}}
+        </mat-grid-tile>        
+        
+        @for(  eg of getEvaluationGradesFor(e.id, j.id); track eg.id){
+            <mat-grid-tile>
+                @if( eg.evaluationGrade.isCompleted ){
+                    <a [routerLink]="['performance',performanceId,'evaluationgrade',eg.id]">
+                        <button mat-button>Completado:{{eg.evaluationGrade.grade }}</button>
+                    </a>
+                }
+                @else{
+                    <a [routerLink]="['performance',performanceId,'evaluationgrade',eg.id]">
+                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                    </a>                    
+                }
+            </mat-grid-tile>
+
+            <mat-grid-tile>
+                @if( performance && !(performance.isReleased)  ){
+                    <button mat-icon-button color="accent" (click)="onRemoveEvaluationGrade(e.id, j.id)"><mat-icon>delete</mat-icon></button>
+                }
+            </mat-grid-tile>            
+        }
+        @empty{
+            <mat-grid-tile>
+                @if( performance && !(performance.isReleased)  ){
+                 <button mat-button-icon (click)="onAddEvaluationGrade(e.id, j.id)"><mat-icon>note_add</mat-icon></button>   
+                }
+            </mat-grid-tile>
+            <mat-grid-tile>
+                <!-- delete spacer-->
+            </mat-grid-tile>
+        }
+        
+    }
+}
+</mat-grid-list>

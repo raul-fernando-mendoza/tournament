@@ -1,0 +1,22 @@
+<!--
+<div>LIST COMPONENT</div>
+<div>parentCollection:{{parentCollection}} </div>
+<div>collection:{{collection}}</div>
+<div>readonly:{{isOwner}}</div>
+-->
+<div class="container">
+    
+
+@for( e of list; track e.id){
+    <div>
+        <a [routerLink]="'/' + collection + '/' + e.id + '/' + encode(parentCollection)" >
+            <button mat-button>{{e.obj.label}}</button>
+        </a>
+    </div>
+}
+@empty{
+    <div>No hay registros</div>
+}    
+
+
+</div>

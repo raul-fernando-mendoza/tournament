@@ -1,0 +1,153 @@
+<a routerLink="/"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
+<h1>Torneo:</h1>
+<form [formGroup]="form">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title> 
+                <div class="bar">
+                    <mat-form-field>
+                        <input matInput placeholder="nombre" formControlName="label" (change)="onNameChange($event)">
+                    </mat-form-field>
+                    <span class="spacer"></span>
+                    @if( id ){            
+                        <button 
+                        mat-icon-button
+                        (click)="onDelete()">
+                        <mat-icon>delete</mat-icon>
+                        </button> 
+                    }  
+                </div>                   
+            </mat-card-title>
+        </mat-card-header>  
+        <mat-card-content>
+            <mat-form-field color="accent" appearance="fill">
+                <mat-label>Fecha del evento</mat-label>
+                <input matInput [matDatepicker]="picker1" formControlName="eventDate"  (change)="onChange($event, id,'eventDate')">
+                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field color="accent" appearance="fill">
+                <mat-label>Hora del evento</mat-label>            
+                <input matInput formControlName="eventTime" [format]="24" [ngxTimepicker]="picker" (change)="onChange($event,id,'eventTime')">
+                <ngx-material-timepicker #picker></ngx-material-timepicker> 
+            </mat-form-field>              
+            <mat-form-field>
+                <input matInput placeholder="image" formControlName="imageUrl" (change)="onChange($event, id,'imageUrl')">
+            </mat-form-field>
+            <img mat-card-sm-image [src]="tournament?.imageUrl" >
+   
+            
+            @if( id ){
+                <mat-divider></mat-divider>
+                <h2>Categorias<a [routerLink]=" '/tournament/'+ id + '/categoryNew' ">
+                    <button mat-button-icon color="primary"><mat-icon>add</mat-icon></button>
+                </a></h2>
+                @for( c of categoryReferences; track c.id){
+                <a class="categoryref" [routerLink]=" '/tournament/'+ id + '/category/' + c.id">
+                    <button mat-button>{{c.category.label}}</button>
+                </a>  
+                }                
+
+               
+                <mat-divider></mat-divider>
+                <h2>Evaluaciones<a [routerLink]=" '/tournament/'+ id + '/evaluationNew' ">
+                    <button mat-button-icon color="primary"><mat-icon>add</mat-icon></button>
+                </a></h2>
+                @for( e of evaluationReferences; track e.id){
+                    <a class="evaluationref" [routerLink]=" '/tournament/'+ id + '/evaluation/' + e.id">
+                        <button mat-button>{{e.evaluation.label}}</button>
+                    </a>  
+                }                
+    
+                  
+                <mat-divider></mat-divider>
+                <h2>Jurado<a [routerLink]=" '/tournament/'+ id + '/evaluatorNew' ">
+                    <button mat-button-icon color="primary"><mat-icon>add</mat-icon></button>
+                </a></h2>
+                @for( e of evaluatorReferences; track e.id){
+                    <a class="evaluationref" [routerLink]=" '/tournament/'+ id + '/evaluator/' + e.id">
+                        <button mat-button>{{e.evaluator.label}}</button>
+                    </a>  
+                }                
+    
+                <mat-divider></mat-divider>        
+                <app-medals-list [tournamentId]="id"></app-medals-list>
+
+                <mat-divider></mat-divider>
+                <h2>Registrados<a [routerLink]=" '/tournament/'+id+'/performanceNew/'">
+                    <button mat-button-icon color="primary"><mat-icon>add</mat-icon></button>
+                </a></h2>
+                
+                @for( r of performanceLinks; track r.id ){
+                    <mat-grid-list cols="3" rowHeight="2em">
+                        <mat-grid-tile>
+                            <a class="performanceLink" [routerLink]="'/tournament/'+id+'/performance/'+r.id">
+                                <button mat-button>{{r.performance.label}}</button>
+                            </a>                        
+                        </mat-grid-tile>
+                        <mat-grid-tile>
+                            <a class="performanceLink" [routerLink]="'/tournament/'+id+'/performance/'+r.id">
+                                <button mat-button>{{r.performance.owner}}</button>
+                            </a>                            
+                        </mat-grid-tile>
+                        <mat-grid-tile>
+                            <button mat-button mat-raised-button (click)="onAccept( r.id )">Adicionar al programa</button>
+                        </mat-grid-tile>
+
+                    </mat-grid-list>
+                }
+                @empty{
+                    Por favor adicione performances al evento.
+                }    
+
+                 
+                <mat-divider></mat-divider>
+                <h2>Programa</h2>
+                @for( p of programLinks; track p.performance; let index = $index ){
+                    <mat-grid-list cols="10" rowHeight="2.5em">
+                        <mat-grid-tile colspan="1" [style.background]="performanceColor">
+                            <button mat-icon-button (click)="onProgramUp(p.id)">
+                                <mat-icon>arrow_upward</mat-icon>
+                            </button>                              
+                            <span>{{index + 1}}</span>
+                            <button mat-icon-button (click)="onProgramDown(p.id)">
+                                <mat-icon>arrow_downward</mat-icon>
+                            </button>                            
+                        </mat-grid-tile> 
+                        <mat-grid-tile colspan="5" [style.background]="performanceColor">
+                            <a class="performanceLink" [routerLink]="'/tournament/'+id+'/performance/'+p.id">
+                                <button mat-button>{{p.performance.label}}</button>
+                            </a>  
+                            <span> | </span>
+                            <a class="performanceLink" [routerLink]="'/tournament/'+id+'/performance/'+p.id">
+                                <button mat-button>{{p.performance.owner}}</button>
+                            </a>                                  
+                            <button mat-button-icon [matMenuTriggerFor]="menu"><mat-icon>more_vert</mat-icon></button>
+                            <mat-menu #menu="matMenu">
+                                <button mat-icon-button (click)="onReject( p.id )">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                      
+
+                            </mat-menu>                                               
+                        </mat-grid-tile>
+                        <mat-grid-tile colspan="4" [style.background]="performanceColor">
+                            @if( p.performance.grade ){
+                                {{ p.performance.grade }}
+                                @if( !p.performance.isReleased ){
+                                    <button mat-button-icon (click)="onPerformanceReleaseGrade(p.id)"><mat-icon>done</mat-icon></button>
+                                }
+                            }    
+                        </mat-grid-tile>
+
+                    </mat-grid-list>
+                    <app-evaluationgrade-list [tournamentId]="id" [performanceId]="p.id"></app-evaluationgrade-list>
+                }
+                @empty{
+                    Por favor adicione performances al programa.
+                }
+            }    
+            
+        </mat-card-content>        
+    </mat-card>    
+</form>

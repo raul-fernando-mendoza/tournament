@@ -1,0 +1,24 @@
+<a [routerLink]="['/','tournament',tournamentId]">
+    <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
+</a>
+<h1>Calificacion</h1>
+@if( performance ){
+    <h2>Performance:{{performance.label}}</h2> 
+    @if( evaluationGrade ){ 
+        grade:{{evaluationGrade.grade}}  
+        
+        <h1>form</h1>
+        <div [formGroup]="evaluationGradeForm">
+            <div formArrayName="aspects">
+                <div *ngFor="let aspect of aspects.controls; let i=index">
+                    <div class="question" (click)="showText(evaluationGrade.aspectGrades[i].description)">{{evaluationGrade.aspectGrades[i].label}} </div>
+                    <app-star-slider [formControlName]="i" (valueChange)="onChangeStarts(i)" ></app-star-slider>
+                </div>
+            </div>
+        </div>
+        @if( performance ){
+            <button mat-button-icon (click)="onSubmit()" [disabled]="performance.isReleased"><mat-icon>done</mat-icon></button>
+        }
+        
+    }
+}

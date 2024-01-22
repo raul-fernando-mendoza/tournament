@@ -1,0 +1,75 @@
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav  #drawer class="sidenav" fixedInViewport
+        [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+        [mode]="(isHandset$ | async) ? 'over' : 'side'"
+        [opened]="(isHandset$ | async) === false">
+        <mat-toolbar color="accent">            
+            <button *ngIf="drawer.opened"
+                type="button"
+                aria-label="Toggle sidenav"
+                mat-icon-button
+                (click)="drawer.toggle()">
+                <mat-icon  aria-label="Side nav toggle icon">menu</mat-icon>
+            </button>
+            
+        </mat-toolbar>        
+        <mat-list role="list">
+            <mat-list-item>
+                <button *ngIf="(isHandset$ | async) === false" mat-stroked-button  aria-label="logout" >
+                    Nosotros
+                </button>       
+                <button *ngIf="(isHandset$ | async) === true" mat-stroked-button  (click)="drawer.toggle()"  aria-label="nosotros" >
+                    Nos
+                </button>                         
+            </mat-list-item>
+        </mat-list>
+    </mat-sidenav>    
+
+    <mat-sidenav-content>
+        <mat-toolbar color="accent">
+            @if (!drawer.opened){
+                <button  
+                    type="button"
+                    aria-label="Toggle sidenav"
+                    mat-icon-button
+                    (click)="drawer.toggle()">
+                    <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+                    
+                </button>
+            }
+           
+           
+            <a [routerLink]="['']"  mat-icon-button>
+                <mat-icon>home</mat-icon>
+            </a>             
+        
+            <div class="spacer"></div>
+            @if ( isLoggedIn() ){
+                <span>
+                    @if ( !(isHandset$ | async) ) {
+                        <span class="login-name">{{ displayName }}</span>
+                    }
+                    @else{
+                        <span class="login-name"><mat-icon>person</mat-icon></span>
+                    }    
+                    <button mat-stroked-button  aria-label="logout" (click)="logout()" *ngIf="isLoggedIn()">
+                        logout
+                    </button>    
+                </span>             
+            }    
+            @else{
+                <span>
+                    <button mat-stroked-button  aria-label="login" (click)="login()" >
+                        Ingresar
+                    </button>
+                    
+                    <button mat-stroked-button  aria-label="register" (click)="Register()">
+                        Registrarte
+                    </button>  
+                </span>
+            }
+        </mat-toolbar>
+    
+        <router-outlet></router-outlet>
+    </mat-sidenav-content>
+</mat-sidenav-container>

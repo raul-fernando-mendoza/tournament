@@ -1,0 +1,57 @@
+<a [routerLink]="'/tournament/' + tournamentId">
+    <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
+</a>
+<!--
+<div>eventCategoryExam COMPONENT</div>
+<div>parentCollection:{{parentCollection}} </div>
+<div>id:{{id}}</div>
+-->
+
+<form [formGroup]="form">
+<mat-card>
+    <mat-card-header>
+            <mat-card-title>
+                <mat-form-field> 
+                    <input matInput placeholder="label" formControlName="label" (change)="onChange($event,'label')">
+                </mat-form-field> 
+            </mat-card-title>
+            <button 
+            mat-icon-button
+            (click)="onDelete()">
+            <mat-icon>delete</mat-icon>
+            </button>   
+    </mat-card-header>
+    <mat-card-content>
+        <mat-form-field> 
+            <input matInput placeholder="email" formControlName="owner" (change)="onChange($event,'owner')">
+        </mat-form-field>        
+        <mat-form-field appearance="fill" >
+            <mat-label>category</mat-label>
+            <mat-select formControlName="categoryId" (selectionChange)="onCategoryChange($event)">
+                <mat-option *ngFor="let c of categories" [value]="c.id">
+                {{ c.label }}
+                </mat-option>                 
+            </mat-select>
+        </mat-form-field>    
+            <mat-form-field appearance="fill" >
+                <mat-label>Acceptado</mat-label>
+                <mat-select formControlName="isAccepted" (selectionChange)="onIsAcceptedChange($event)">
+                    <mat-option [value]="true">
+                    Si
+                    </mat-option>  
+                    <mat-option [value]="false">
+                    No
+                    </mat-option>                                      
+                </mat-select>
+            </mat-form-field>  
+
+            @if( !id ){
+                <mat-card-actions>
+                    <button mat-button (click)="onCancel()">Cancel</button>
+                    <button mat-raised-button color="accent" (click)="onSubmit()" type="submit" [disabled]="submitting || !form.valid">submit</button>
+                </mat-card-actions>              
+            }
+            
+    </mat-card-content>
+</mat-card>    
+</form>               
