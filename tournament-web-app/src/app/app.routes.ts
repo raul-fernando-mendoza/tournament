@@ -8,6 +8,7 @@ import { AspectComponent } from './aspect/aspect-component';
 import { EvaluatorComponent } from './evaluator/evaluator-component';
 import { PerformanceComponent } from './performance/performance-component';
 import { EvaluationGradeComponent } from './evaluationgrade/evaluationgrade-component';
+import { MedalsListComponent } from './medals-list/medals-list.component';
 
 export const routes: Routes = [
     { path:"loginForm",component:LoginFormComponent},    
@@ -35,6 +36,9 @@ export const routes: Routes = [
     
     { path:"tournament/:tournamentId/performance/:performanceId/evaluationgrade/:id",component:EvaluationGradeComponent},
 
+    { path:"tournament/:tournamentId/medals",component:MedalsListComponent},
+
+    
     { path:"",pathMatch:'full',component:TournamentSearchComponent}
 
 ];

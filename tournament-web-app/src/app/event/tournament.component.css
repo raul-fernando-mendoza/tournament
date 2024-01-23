@@ -13,3 +13,13 @@ mat-form-field{
 .evaluationref{
     display:block; 
 }
+.medalref{
+    display:block; 
+}
+.grade{
+    font-size: large;
+    margin-right: 1em;
+}
+.medal{
+    font-size: large;
+}

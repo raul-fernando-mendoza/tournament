@@ -1,2 +1,16 @@
-<h1>Medallas</h1>
-{{ tournamentId }}
+<a [routerLink]="'/tournament/'+tournamentId">
+    <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
+</a>
+<h1>Medallas<button mat-button-icon (click)="addMedal()"><mat-icon>add</mat-icon></button></h1>
+@for(medal of medalsGroups; track medal){
+    <form [formGroup]="medal">
+        <mat-form-field> 
+            <input matInput placeholder="label" formControlName="label" (change)="onChange()">
+        </mat-form-field>                 
+        <mat-form-field> 
+            <input matInput placeholder="callificacion minima" formControlName="minValue" (change)="onChange()">
+        </mat-form-field>                 
+    </form>
+}    
+
+

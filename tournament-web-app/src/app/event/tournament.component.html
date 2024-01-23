@@ -37,7 +37,7 @@
             <img mat-card-sm-image [src]="tournament?.imageUrl" >
    
             
-            @if( id ){
+            @if( id && tournament){
                 <mat-divider></mat-divider>
                 <h2>Categorias<a [routerLink]=" '/tournament/'+ id + '/categoryNew' ">
                     <button mat-button-icon color="primary"><mat-icon>add</mat-icon></button>
@@ -71,7 +71,16 @@
                 }                
     
                 <mat-divider></mat-divider>        
-                <app-medals-list [tournamentId]="id"></app-medals-list>
+                <h2>Premios<a [routerLink]="['/','tournament',id,'medals']">
+                    <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                </a></h2>  
+                @if(tournament){ 
+                    @for( medal of tournament.medals; track medal){
+                        <a class="medalref" [routerLink]="['/','tournament',id,'medals']">
+                            <button mat-button>{{medal.label}} {{medal.minGrade}}</button>
+                        </a>                      
+                    }               
+                }
 
                 <mat-divider></mat-divider>
                 <h2>Registrados<a [routerLink]=" '/tournament/'+id+'/performanceNew/'">
@@ -133,9 +142,12 @@
                         </mat-grid-tile>
                         <mat-grid-tile colspan="4" [style.background]="performanceColor">
                             @if( p.performance.grade ){
-                                {{ p.performance.grade }}
+                                <span class="grade">{{ p.performance.grade }}</span>
                                 @if( !p.performance.isReleased ){
                                     <button mat-button-icon (click)="onPerformanceReleaseGrade(p.id)"><mat-icon>done</mat-icon></button>
+                                }
+                                @else{
+                                    <span class="medal">{{ businesslogic.getMedal(tournament, p.performance)?.label }}</span>                                    
                                 }
                             }    
                         </mat-grid-tile>
@@ -146,7 +158,12 @@
                 @empty{
                     Por favor adicione performances al programa.
                 }
-            }    
+            }  
+            @else{
+                <mat-divider></mat-divider>
+                <button mat-button-icon (click)="onSubmit()"><mat-icon>done</mat-icon></button>
+            }
+
             
         </mat-card-content>        
     </mat-card>    

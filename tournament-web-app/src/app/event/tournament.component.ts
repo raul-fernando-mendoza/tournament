@@ -23,7 +23,6 @@ import { MatGridListModule} from '@angular/material/grid-list';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatMenuModule} from '@angular/material/menu';
-import { MedalsListComponent } from '../medals-list/medals-list.component';
 
 interface CategoryReference{
   id:string
@@ -55,8 +54,6 @@ interface PerformanceReference{
   ,ReactiveFormsModule
   ,MatFormFieldModule
   ,MatInputModule
-  ,MatButtonModule
-  ,MatIconModule
   ,MatCardModule
   ,RouterModule
   ,MatDatepickerModule
@@ -68,7 +65,6 @@ interface PerformanceReference{
   ,EvaluationgradeListComponent
   ,MatDividerModule
   ,MatMenuModule
-  ,MedalsListComponent
   ],
   templateUrl: './tournament.component.html',
   styleUrl: './tournament.component.css'
@@ -107,7 +103,7 @@ export class TournamentComponent{
     ,public authService:AuthService
     ,private router: Router
     ,public pathService:PathService
-    ,private businesslogic:BusinesslogicService){
+    ,public businesslogic:BusinesslogicService){
 
     var thiz = this
     this.activatedRoute.paramMap.subscribe( {

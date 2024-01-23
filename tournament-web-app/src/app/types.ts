@@ -1,5 +1,9 @@
 import { Timestamp, WhereFilterOp } from "firebase/firestore/lite"
 
+export class Medal{
+    label!:string 
+    minGrade!:number    
+}
 
 export interface Tournament{
     label?:string
@@ -10,10 +14,7 @@ export interface Tournament{
     creatorUid?:string
     imageUrl?:string|null
     program?:Array<string>
-    medals?:Array<{
-        label:string
-        minGrade:number
-    }>
+    medals?:Array<Medal>
 
 }
 export class TournamentObj implements Tournament{
@@ -25,10 +26,7 @@ export class TournamentObj implements Tournament{
     creatorUid: string = ""
     imageUrl: string | null = null
     program:Array<string> = []
-    medals:Array<{
-        label:string
-        minGrade:number
-    }> = []
+    medals:Array<Medal> = []
 }
 export class TournamentCollection{
     static readonly collectionName:string = 'tournament';

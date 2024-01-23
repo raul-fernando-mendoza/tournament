@@ -1,13 +1,122 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FirebaseService } from '../firebase.service';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { Medal, Tournament, TournamentCollection } from '../types';
 
 @Component({
   selector: 'app-medals-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule
+    ,MatIconModule
+    ,MatButtonModule      
+    ,FormsModule
+    ,ReactiveFormsModule
+    ,MatFormFieldModule
+    ,MatInputModule
+    ,RouterModule],
   templateUrl: './medals-list.component.html',
-  styleUrl: './medals-list.component.css'
+  styleUrl: './medals-list.component.css',
+
 })
 export class MedalsListComponent {
-  @Input() tournamentId!:string
+  tournamentId:string | null = null
+  tournament!:Tournament
+
+  constructor( public firebaseService:FirebaseService 
+    ,private fb:FormBuilder
+    ,private activatedRoute: ActivatedRoute    
+    ,private router: Router
+  ){
+    var thiz = this
+    this.activatedRoute.paramMap.subscribe({
+        next(paramMap){
+          thiz.tournamentId = null
+          if( paramMap.get('tournamentId')!=null ){
+            thiz.tournamentId = paramMap.get('tournamentId')
+            thiz.update()
+          }
+        }
+      })
+  }
+
+  form = new FormGroup({
+    medals: new FormArray([
+      this.fb.group({
+        label:['todos',Validators.required],
+        minValue:['6.0',Validators.required]
+      })
+    ]),
+  });  
+
+  get medalsGroups(): FormGroup[] {
+    let formArray:FormArray  = this.form.get('medals') as FormArray
+    let formGroups:FormGroup[] = (formArray.controls) as FormGroup[]
+    return formGroups
+  }
+
+  update(){
+    this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( (data)=>{
+      this.tournament = data 
+      let medals = this.form.get('medals') as FormArray
+      medals.clear()
+      if( medals ){
+        this.tournament.medals?.map( medal =>
+          medals.push(
+            this.fb.group({
+              label:[medal.label,Validators.required],
+              minValue:[medal.minGrade,Validators.required]
+            })
+          )
+        )
+      }      
+    },
+    reason =>{
+      alert("Error updating medals")
+    })    
+  }
+
+  addMedal() {
+    let medals = this.form.get('medals') as FormArray
+    if( medals ){
+      medals.push(
+        this.fb.group({
+          label:['',Validators.required],
+          minValue:['',Validators.required]
+        })
+      );
+    }
+  }
+
+  onChange() {
+    let obj:Tournament = {
+      medals:[] = []
+    }
+    for( let i = 0; i<this.medalsGroups.length;i++){
+      let medalGrp = this.medalsGroups.at(i)
+      let label = medalGrp?.controls["label"].value
+      let minValue = medalGrp?.controls["minValue"].value
+      let medal:Medal = {
+        label: label,
+        minGrade: Number(minValue)
+      }
+      obj.medals![i] = medal
+    }
+    this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+      console.log("medals list updated")
+    },
+    reason =>{
+      alert("Error updating medals")
+    })
+      
+ 
+  }
+
+
 }

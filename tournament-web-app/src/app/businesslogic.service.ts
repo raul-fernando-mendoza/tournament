@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { FirebaseService } from './firebase.service';
-import { TournamentObj } from './types';
+import { Medal, Performance, PerformanceObj, TournamentObj } from './types';
 import { AuthService } from './auth.service';
+import { MedalsListComponent } from './medals-list/medals-list.component';
 
 @Injectable({
   providedIn: 'root'
@@ -27,4 +28,13 @@ export class BusinesslogicService {
       })    
     })
   }  
+  getMedal( tournament:TournamentObj, performance:PerformanceObj):Medal | null{
+    tournament.medals.sort( (a,b)=>a.minGrade > b.minGrade ? -1 : 1)
+    for(let i=0; i<tournament.medals.length; i++){
+      if( performance.grade > tournament.medals[i].minGrade){
+        return tournament.medals[i]
+      }
+    }
+    return null
+  }
 }
