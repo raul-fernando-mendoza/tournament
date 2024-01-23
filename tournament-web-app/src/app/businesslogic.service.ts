@@ -31,7 +31,7 @@ export class BusinesslogicService {
   getMedal( tournament:TournamentObj, performance:PerformanceObj):Medal | null{
     tournament.medals.sort( (a,b)=>a.minGrade > b.minGrade ? -1 : 1)
     for(let i=0; i<tournament.medals.length; i++){
-      if( performance.grade > tournament.medals[i].minGrade){
+      if( performance.grade >= tournament.medals[i].minGrade){
         return tournament.medals[i]
       }
     }
