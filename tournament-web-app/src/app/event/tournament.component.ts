@@ -137,6 +137,7 @@ export class TournamentComponent{
         if( this.authService.getUserUid()!= null && this.tournament?.creatorUid != null ){
           this.isAdmin = (this.authService.getUserUid() == this.tournament?.creatorUid) 
         } 
+
         this.getCategories()
         this.getEvaluations()
         this.getEvaluators()
@@ -406,4 +407,22 @@ export class TournamentComponent{
     })
 
   }
+  formatTimestamp(t:any):string{
+    
+    let d:Date = new Date(t.seconds)
+    return this.formatDate(d)
+  }
+  formatDate(d:Date):string {
+    var 
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+  
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+  
+    return [year, month, day].join('-');
+  }  
 }

@@ -1,8 +1,9 @@
-mat-form-field{
-    display:block;
-    width: 80%; 
+mat-card{
+    width:100%;
 }
-
+mat-form-field{
+    width:80%;  
+}
 .performanceLink{
     display:block;
 }
