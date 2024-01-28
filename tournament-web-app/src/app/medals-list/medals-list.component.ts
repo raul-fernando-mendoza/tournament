@@ -30,6 +30,8 @@ export class MedalsListComponent {
   tournamentId:string | null = null
   tournament!:TournamentObj
 
+  isAdding = false
+
   constructor( public firebaseService:FirebaseService 
     ,private fb:FormBuilder
     ,private activatedRoute: ActivatedRoute    
@@ -51,8 +53,7 @@ export class MedalsListComponent {
     medals: new FormArray([]),
   });  
 
-  isAdding = false
-  getMedalsGroups(): FormGroup[] {
+  getGroups(): FormGroup[] {
     let formArray:FormArray  = this.form.get('medals') as FormArray
     let formGroups:FormGroup[] = (formArray.controls) as FormGroup[]
     return formGroups
@@ -69,7 +70,7 @@ export class MedalsListComponent {
             this.fb.group({
               id:[medal.id,Validators.required],
               label:[medal.label,Validators.required],
-              minValue:[medal.minGrade,Validators.required]
+              minGrade:[medal.minGrade,Validators.required]
             })
           )
         )
@@ -80,45 +81,78 @@ export class MedalsListComponent {
     })    
   }
 
-  addMedal() {
+  onAdd() {
     let medals = this.form.get('medals') as FormArray
     if( medals ){
       medals.push(
         this.fb.group({
-          id:[null,Validators.required],
+          id:[null],
           label:['',Validators.required],
-          minValue:['',Validators.required]
+          minGrade:['',Validators.required]
         })
       );
     }
     this.isAdding = true
-    
   }
-
-  onChange(id:string){
-    let obj:Tournament = {
-      medals:[] = []
-    }
-    for( let i = 0; i<this.getMedalsGroups().length;i++){
-      let medalGrp = this.getMedalsGroups().at(i)
-      let id= medalGrp?.controls["id"].value
-      let label = medalGrp?.controls["label"].value
-      let minValue = medalGrp?.controls["minValue"].value
-      let medal:Medal = {
-        id:id,
+  onSubmit(){
+    let FGs = this.getGroups()
+    let categoryGrp = FGs[ FGs.length -1 ]
+    let id = categoryGrp?.controls["id"].value
+    let label = categoryGrp?.controls["label"].value.trim()
+    let minGrade = categoryGrp?.controls["minGrade"].value
+    let medal:Medal = { 
+      id:uuidv4(),
         label: label,
-        minGrade: Number(minValue)
+        minGrade: Number(minGrade)
       }
-      obj.medals![i] = medal
+    this.tournament.medals.push( medal )
+    this.tournament.medals.sort( (a,b)=>{
+      return a.minGrade >= b.minGrade ? -1 : 1
+    }) 
+    let obj:Tournament = {
+      medals:this.tournament.medals
     }
     this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
       console.log("medals list updated")
+      this.isAdding = false
+      this.update()
     },
     reason =>{
       alert("Error updating medals")
     })
+  }
+
+  onSave(id:string) {
+    console.log("on save")
+    if( id ){
+
+      let FGs = this.getGroups()
+      let idx = FGs.findIndex( FG => FG.controls["id"].value == id )
+      if( idx >= 0 ){
+        let categoryGrp = FGs[idx]
+        let label =  categoryGrp?.controls["label"].value.trim()
+        let minGrade =  Number(categoryGrp?.controls["minGrade"].value)
       
+        this.tournament.medals[ idx ].label = label
+        this.tournament.medals[ idx ].minGrade = minGrade
+
+        this.tournament.medals.sort( (a,b)=>{
+          return a.minGrade >= b.minGrade ? -1 : 1
+        }) 
+
+        let obj:Tournament = {
+          medals:this.tournament.medals
+        }        
  
+        this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+          console.log("medals list updated")
+          this.update()
+        },
+        reason =>{
+          alert("Error updating medals")
+        })
+      }
+    }
   }
 
   onDelete(id:string) {
@@ -136,9 +170,28 @@ export class MedalsListComponent {
         this.update()
       },
       reason =>{
-        alert("Error deleting medal")
+        alert("Error updating categories")
       })
     }
+  }
+  onCancelAdd(){
+    let FGs = this.getGroups()
+    FGs.splice( FGs.length-1,1)
+    this.isAdding =false
+  }  
+
+  onChange( id:string ){
+    let FGs = this.getGroups()
+    FGs.map( fg =>{
+      if( fg.controls["id"].value != id){
+        fg.disable()
+      } 
+    })
+    return true
+  }
+
+  onCancelEdit(){
+    this.update()
   }  
 
 }

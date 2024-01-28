@@ -1,24 +1,38 @@
 <a [routerLink]="'/tournament/'+tournamentId">
     <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
 </a>
-<h1>Medallas<button mat-button-icon (click)="addMedal()"><mat-icon>add</mat-icon></button></h1>
-@for(medal of getMedalsGroups(); track medal){
-    <form [formGroup]="medal">
+<h1>Medals<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
+@for(g of getGroups(); track g){
+    <form [formGroup]="g">
+         
+         @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
         <mat-form-field> 
-            <input matInput placeholder="label" formControlName="label" (change)="onChange(medal.controls['id'].value)">
+            <input matInput placeholder="label" formControlName="label" (change)="onChange(g.controls['id'].value)">
         </mat-form-field>                 
         <mat-form-field> 
-            <input matInput placeholder="callificacion minima" formControlName="minValue" (change)="onChange(medal.controls['id'].value)">
+            <input matInput placeholder="calificacion minima" formControlName="minGrade" (change)="onChange(g.controls['id'].value)">
         </mat-form-field>  
-        @if( isAdding ){
-            <button mat-button (click)="onDelete(medal.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
-        } 
-        @else{
-            
         }
-        
+        @else{
+                {{ g.controls['label'].value }}
+                {{ g.controls['minGrade'].value }}
+        }
+        @if( isAdding && g.controls['id'].value == null ){
+            <button id="done" name="done" mat-button (click)="onSubmit()"><mat-icon>done</mat-icon></button>
+            <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
+        }        
+        @if( !isAdding && g.controls['id'].value != null && g.enabled && !g.dirty  ){
+            <button mat-button (click)="onDelete(g.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
+        }
+        @if( !isAdding && g.controls['id'].value != null && g.dirty ){
+            <button mat-button (click)="onSave(g.controls['id'].value)"><mat-icon>done</mat-icon></button>
+            <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
+        }
 
     </form>
+
+    
 }    
+
 
 
