@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../firebase.service';
-import { PerformanceCollection, PerformanceObj, Performance, Category, CategoryCollection, EvaluationGradeCollection, EvaluationGradeObj, TournamentCollection, EvaluationCollection, EvaluationObj, EvaluatorCollection, EvaluatorObj, Evaluation, Evaluator, AspectObj, AspectGrade, AspectCollection} from '../types'
+import { PerformanceCollection, PerformanceObj, Performance, Category, EvaluationGradeCollection, EvaluationGradeObj, TournamentCollection, EvaluationCollection, EvaluationObj, EvaluatorCollection, EvaluatorObj, Evaluation, Evaluator, AspectObj, AspectGrade, AspectCollection} from '../types'
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
@@ -98,34 +98,7 @@ export class PerformanceComponent implements OnInit{
         this.form.controls.owner.setValue( this.authService.getUserEmail() )
       }
     })
-    .then( ()=>{
-      return this.getCategories()      
-    })  
   }
-
-  getCategories():Promise<void>{
-    return new Promise<void>((resolve, reject) =>{
-      this.categories.length = 0
-      this.firebaseService.getDocuments(TournamentCollection.collectionName + "/" + this.tournamentId + "/" + CategoryCollection.collectionName ).then( set =>{
-        set.map( doc =>{
-          let category = doc.data() as Category
-          let obj = {
-            id:doc.id,
-            label:category.label!
-          }
-          this.categories.push(obj)
-        })
-        resolve()
-      },
-      reason =>{
-        alert("Error reading categories:" + reason)
-        reject()
-      })
-    })
-  }
-
-
-
   update(){
     if ( this.id ){
       this.firebaseService.getDocument(

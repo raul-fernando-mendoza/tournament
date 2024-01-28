@@ -46,14 +46,16 @@
 
                 @if( id && tournament ){
                     <mat-divider></mat-divider>
-                    <h2>Categorias<a [routerLink]=" '/tournament/'+ id + '/categoryNew' ">
-                        <button mat-button-icon color="primary"><mat-icon>add</mat-icon></button>
-                    </a></h2>
-                    @for( c of categoryReferences; track c.id){
-                    <a class="categoryref" [routerLink]=" '/tournament/'+ id + '/category/' + c.id">
-                        <button mat-button>{{c.category.label}}</button>
-                    </a>  
-                    }                
+                    <h2>Categorias<a [routerLink]="['/','tournament',id,'categories']">
+                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                    </a></h2>  
+                    @if(tournament){ 
+                        @for( category of tournament.categories; track category){
+                            <a class="medalref" [routerLink]="['/','tournament',id,'category']">
+                                <button mat-button>{{category.label}}</button>
+                            </a>                      
+                        }               
+                    }             
 
                 
                     <mat-divider></mat-divider>

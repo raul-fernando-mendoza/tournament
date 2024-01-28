@@ -2,14 +2,22 @@
     <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
 </a>
 <h1>Medallas<button mat-button-icon (click)="addMedal()"><mat-icon>add</mat-icon></button></h1>
-@for(medal of medalsGroups; track medal){
+@for(medal of getMedalsGroups(); track medal){
     <form [formGroup]="medal">
         <mat-form-field> 
-            <input matInput placeholder="label" formControlName="label" (change)="onChange()">
+            <input matInput placeholder="label" formControlName="label" (change)="onChange(medal.controls['id'].value)">
         </mat-form-field>                 
         <mat-form-field> 
-            <input matInput placeholder="callificacion minima" formControlName="minValue" (change)="onChange()">
-        </mat-form-field>                 
+            <input matInput placeholder="callificacion minima" formControlName="minValue" (change)="onChange(medal.controls['id'].value)">
+        </mat-form-field>  
+        @if( isAdding ){
+            <button mat-button (click)="onDelete(medal.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
+        } 
+        @else{
+            
+        }
+        
+
     </form>
 }    
 

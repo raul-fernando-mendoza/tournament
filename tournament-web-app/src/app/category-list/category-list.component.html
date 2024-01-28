@@ -1,0 +1,34 @@
+<a [routerLink]="'/tournament/'+tournamentId">
+    <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
+</a>
+<h1>Category<button mat-button-icon (click)="add()"><mat-icon>add</mat-icon></button></h1>
+@for(category of getCategoryGroups(); track category){
+    <form [formGroup]="category">
+         
+            @if( (!isAdding && category.controls['id'].value) || category.controls['id'].value == null ){
+            <mat-form-field>    
+                <input matInput placeholder="label" formControlName="label" (change)="onChange(category.controls['id'].value)">
+            </mat-form-field>
+            }
+            @else{
+                {{ category.controls['label'].value }}
+            }
+        @if( isAdding && category.controls['id'].value == null ){
+            <button id="done" name="done" mat-button (click)="onSubmit()"><mat-icon>done</mat-icon></button>
+            <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
+        }        
+        @if( !isAdding && category.controls['id'].value != null && category.enabled && !category.dirty  ){
+            <button mat-button (click)="onDelete(category.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
+        }
+        @if( !isAdding && category.controls['id'].value != null && category.dirty ){
+            <button mat-button (click)="onSave(category.controls['id'].value)"><mat-icon>done</mat-icon></button>
+            <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
+        }
+
+    </form>
+
+    
+}    
+
+
+

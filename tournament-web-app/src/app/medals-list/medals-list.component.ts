@@ -7,7 +7,8 @@ import { FirebaseService } from '../firebase.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Medal, Tournament, TournamentCollection } from '../types';
+import { Medal, Tournament, TournamentCollection, TournamentObj } from '../types';
+import { v4 as uuidv4, v4 } from 'uuid';
 
 @Component({
   selector: 'app-medals-list',
@@ -27,7 +28,7 @@ import { Medal, Tournament, TournamentCollection } from '../types';
 })
 export class MedalsListComponent {
   tournamentId:string | null = null
-  tournament!:Tournament
+  tournament!:TournamentObj
 
   constructor( public firebaseService:FirebaseService 
     ,private fb:FormBuilder
@@ -47,15 +48,11 @@ export class MedalsListComponent {
   }
 
   form = new FormGroup({
-    medals: new FormArray([
-      this.fb.group({
-        label:['todos',Validators.required],
-        minValue:['6.0',Validators.required]
-      })
-    ]),
+    medals: new FormArray([]),
   });  
 
-  get medalsGroups(): FormGroup[] {
+  isAdding = false
+  getMedalsGroups(): FormGroup[] {
     let formArray:FormArray  = this.form.get('medals') as FormArray
     let formGroups:FormGroup[] = (formArray.controls) as FormGroup[]
     return formGroups
@@ -70,6 +67,7 @@ export class MedalsListComponent {
         this.tournament.medals?.map( medal =>
           medals.push(
             this.fb.group({
+              id:[medal.id,Validators.required],
               label:[medal.label,Validators.required],
               minValue:[medal.minGrade,Validators.required]
             })
@@ -87,22 +85,27 @@ export class MedalsListComponent {
     if( medals ){
       medals.push(
         this.fb.group({
+          id:[null,Validators.required],
           label:['',Validators.required],
           minValue:['',Validators.required]
         })
       );
     }
+    this.isAdding = true
+    
   }
 
-  onChange() {
+  onChange(id:string){
     let obj:Tournament = {
       medals:[] = []
     }
-    for( let i = 0; i<this.medalsGroups.length;i++){
-      let medalGrp = this.medalsGroups.at(i)
+    for( let i = 0; i<this.getMedalsGroups().length;i++){
+      let medalGrp = this.getMedalsGroups().at(i)
+      let id= medalGrp?.controls["id"].value
       let label = medalGrp?.controls["label"].value
       let minValue = medalGrp?.controls["minValue"].value
       let medal:Medal = {
+        id:id,
         label: label,
         minGrade: Number(minValue)
       }
@@ -118,5 +121,24 @@ export class MedalsListComponent {
  
   }
 
+  onDelete(id:string) {
+
+    let idx:number = this.tournament.medals.findIndex( c => c.id == id)
+
+    if( idx >= 0){
+      this.tournament.medals.splice(idx,1)
+      let obj:Tournament = {
+        medals:[] = this.tournament.medals
+      }
+  
+      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+        console.log("medals list updated")
+        this.update()
+      },
+      reason =>{
+        alert("Error deleting medal")
+      })
+    }
+  }  
 
 }
