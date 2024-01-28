@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../firebase.service';
-import { PerformanceCollection, PerformanceObj, Performance, Category, EvaluationGradeCollection, EvaluationGradeObj, TournamentCollection, EvaluationCollection, EvaluationObj, EvaluatorCollection, EvaluatorObj, Evaluation, Evaluator, AspectObj, AspectGrade, AspectCollection} from '../types'
+import { PerformanceCollection, PerformanceObj, Performance, TournamentCollection, EvaluatorCollection, EvaluatorObj, Evaluation, Evaluator, AspectGrade} from '../types'
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 

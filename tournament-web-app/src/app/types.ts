@@ -12,6 +12,19 @@ export interface Category{
     description:string
 }
 
+export interface Aspect{
+    id:string
+    label:string
+    description?:string
+}
+
+export interface Evaluation{
+    id:string
+    label:string
+    description?:string    
+    aspect:Array<string>
+}
+
 export interface Tournament{
     label?:string
     eventDate?:Timestamp
@@ -23,7 +36,7 @@ export interface Tournament{
     program?:Array<string>
     categories?:Array<Category>
     medals?:Array<Medal>
-
+    evaluations?:Array<Evaluation>
 }
 export class TournamentObj implements Tournament{
     label: string = ""
@@ -36,6 +49,7 @@ export class TournamentObj implements Tournament{
     program:Array<string> = []
     categories:Array<Category> = []
     medals:Array<Medal> = []
+    evaluations:Array<Evaluation> = []
 }
 export class TournamentCollection{
     static readonly collectionName:string = 'tournament';
@@ -43,29 +57,9 @@ export class TournamentCollection{
 
 
 
-export interface Evaluation{
-    label?:string
-    aspect?:Array<string>
-}
-export class EvaluationObj{
-    label:string = ""
-    aspect:Array<string> = []
-}
-export class EvaluationCollection{
-    static readonly collectionName:string = "evaluation"
-}
 
-export interface Aspect{
-    label?:string
-    description?:string | null
-}
-export class AspectObj implements Aspect{
-    label:string = ""
-    description: string | null =  null
-}
-export class AspectCollection{
-    static readonly collectionName:string = "aspect"
-}
+
+
 
 export interface Evaluator{
     label?:string

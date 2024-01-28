@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../firebase.service';
-import { AspectCollection, AspectGrade, AspectObj, EvaluationCollection, EvaluationGradeCollection, EvaluationGradeObj, EvaluationObj, EvaluatorCollection, EvaluatorObj, PerformanceCollection, PerformanceObj, TournamentCollection } from '../types';
+import {  AspectGrade,  EvaluationGradeCollection, EvaluationGradeObj, EvaluatorCollection, EvaluatorObj, PerformanceCollection, PerformanceObj, TournamentCollection } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,10 +18,6 @@ interface EvaluatorReference{
   evaluator:EvaluatorObj
 }
 
-interface EvaluationReference{
-  id:string
-  evaluation:EvaluationObj
-}
 
 @Component({
   selector: 'app-evaluationgrade-list',
@@ -36,6 +32,8 @@ interface EvaluationReference{
   styleUrl: './evaluationgrade-list.component.css'
 })
 export class EvaluationgradeListComponent implements OnInit {
+  ngOnInit(): void {}
+  /*
   @Input() tournamentId!:string
   @Input() performanceId!:string 
 
@@ -194,5 +192,5 @@ export class EvaluationgradeListComponent implements OnInit {
     let result:Array<EvaluationGradeReference> = this.evaluationGradesReferences.filter( er=> er.evaluationGrade.evaluationId == evaluationId && er.evaluationGrade.evaluatorId == evaluatorId)
     return result
   }
-
+*/
 }

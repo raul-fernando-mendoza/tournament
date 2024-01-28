@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FirebaseService } from '../firebase.service';
-import { EvaluationCollection, Performance, EvaluationGradeCollection, EvaluationGradeObj, EvaluationObj, EvaluatorCollection, EvaluatorObj, Filter, PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj} from '../types'
+import { Performance, EvaluationGradeCollection, EvaluationGradeObj, EvaluatorCollection, EvaluatorObj, Filter, PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj} from '../types'
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -24,10 +24,6 @@ import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluation
 import {MatDividerModule} from '@angular/material/divider';
 import {MatMenuModule} from '@angular/material/menu';
 
-interface EvaluationReference{
-  id:string
-  evaluation:EvaluationObj
-}
 
 interface EvaluatorReference{
   id:string
@@ -83,7 +79,6 @@ export class TournamentComponent{
 
   collection = TournamentCollection.collectionName
 
-  evaluationReferences:Array<EvaluationReference> = []
   evaluatorReferences:Array<EvaluatorReference> = []
 
   performanceLinks:Array<PerformanceReference> = []
@@ -131,8 +126,6 @@ export class TournamentComponent{
         if( this.authService.getUserUid()!= null && this.tournament?.creatorUid != null ){
           this.isAdmin = (this.authService.getUserUid() == this.tournament?.creatorUid) 
         } 
-
-        this.getEvaluations()
         this.getEvaluators()
         this.getPerformances()
       })
@@ -165,7 +158,8 @@ export class TournamentComponent{
         tags: tags,
         program: [],
         medals: [],
-        categories: []
+        categories: [],
+        evaluations: []
       }
 
       this.firebaseService.setDocument( this.collection, id, tournament).then( ()=>{
@@ -342,21 +336,6 @@ export class TournamentComponent{
       }  
     }
   }
-  getEvaluations():Promise<void>{
-    return new Promise<void>( (resolve, reject)=>{
-      this.firebaseService.getDocuments( TournamentCollection.collectionName + "/" + this.id + "/" + EvaluationCollection.collectionName ).then( set =>{
-        this.evaluationReferences.length = 0
-        set.map( doc =>{
-          let e:EvaluationObj = doc.data() as EvaluationObj
-          let j:EvaluationReference = {
-            id: doc.id,
-            evaluation: e
-          }
-          this.evaluationReferences.push( j )
-        })
-      })
-    })
-  }  
   getEvaluators():Promise<void>{
     return new Promise<void>( (resolve, reject)=>{
       this.firebaseService.getDocuments( TournamentCollection.collectionName + "/" + this.id + "/" + EvaluatorCollection.collectionName ).then( set =>{
