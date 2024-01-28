@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginFormComponent } from './login-form/login-form.component';
-import { TournamentComponent } from './event/tournament.component';
+import { TournamentComponent } from './tournament/tournament.component';
 import { EvaluationComponent } from './evaluation/evaluation-component';
 import { TournamentSearchComponent } from './tournament-search/tournament-search.component';
 import { AspectComponent } from './aspect/aspect-component';

@@ -5,7 +5,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input'; 
 import {MatCardModule} from '@angular/material/card'; 
-import { TournamentComponent } from '../event/tournament.component';
+import { TournamentComponent } from '../tournament/tournament.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FirebaseService } from '../firebase.service';
