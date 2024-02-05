@@ -21,7 +21,10 @@
             <mat-card-content>
             @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
             <mat-form-field> 
-                <input matInput placeholder="owner" formControlName="owner" (change)="onChange(g.controls['id'].value)">
+                <input matInput placeholder="Nombre completo" formControlName="fullname" (change)="onChange(g.controls['id'].value)">
+            </mat-form-field>             
+            <mat-form-field> 
+                <input matInput placeholder="email" formControlName="email" (change)="onChange(g.controls['id'].value)">
             </mat-form-field>             
             <mat-form-field appearance="fill" >
                 <mat-label>category</mat-label>
@@ -42,7 +45,8 @@
             }
             @else{
 
-                    <span class="owner">{{ g.controls['owner'].value }}</span>
+                    <span class="fullname">{{ g.controls['fullname'].value }}</span>
+                    <span class="email">{{ g.controls['email'].value }}</span>
             }
             @if( isAdding && g.controls['id'].value == null ){
                 <button id="done" name="done" mat-button (click)="onSubmit()"><mat-icon>done</mat-icon></button>

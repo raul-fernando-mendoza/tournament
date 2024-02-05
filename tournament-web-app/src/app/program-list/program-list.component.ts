@@ -17,6 +17,7 @@ import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluation
 interface PerformanceReference{
   id:string
   performance:PerformanceObj
+  medal:string
 }
 @Component({
   selector: 'app-program-list',
@@ -75,7 +76,7 @@ export class ProgramListComponent implements OnDestroy{
           this.readPerformances()
         },
         'error':(reason) =>{
-          alert("Error snapshot on Tournament:" + reason)
+          alert("Error leyendo el torneo:" + reason)
         },
         'complete':() =>{
           console.log("onsnapshot on tournament has completed")
@@ -88,21 +89,25 @@ export class ProgramListComponent implements OnDestroy{
     this.performances.length = 0
 
     this.tournament.program.map( programId =>{
+      console.log("reading program:" + programId)
       let unsubscribe =this.firebaseFullService.onsnapShotDoc( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") , programId,
         {
           'next':(doc) =>{
             let performance = doc.data() as PerformanceObj
+            console.log("reading performance:" + performance.label)
             let idx = this.tournament.program.findIndex( e => e == doc.id)
+            let medal = this.getMedalForPerformance( performance.grade )
             if(  idx >=0 ){
               let performanceRef:PerformanceReference={
                 id:doc.id,
-                performance:performance
+                performance:performance,
+                medal:medal
               }
               this.performances[idx] = performanceRef
             }
           },
           'error':(reason) =>{
-            alert("there has been an error reading performances:" + reason)
+            alert("ha habido un error levendo el programa:" + reason)
           },
           'complete':() =>{
             console.log("reading program as ended")
@@ -123,7 +128,7 @@ export class ProgramListComponent implements OnDestroy{
         console.log("program updated")
       },
       reason =>{
-        alert("Error updating program" + reason)
+        alert("Error moviendo performance arriba" + reason)
       })
     }
   }
@@ -139,11 +144,12 @@ export class ProgramListComponent implements OnDestroy{
         console.log("program updated")
       },
       reason =>{
-        alert("Error updating program" + reason)
+        alert("Error moviendo performance abajo" + reason)
       })
     }
   }
   getMedalForPerformance(grade:number):string{
+    console.log( "getting medal for:" + grade)
     for( let i = 0; i < this.tournament.medals.length; i++){
       if( grade >= this.tournament.medals[i].minGrade ){
         return this.tournament.medals[i].label
@@ -152,19 +158,16 @@ export class ProgramListComponent implements OnDestroy{
     return ""
   } 
   onRelease(performanceId:string){
-    let idx = this.tournament.program.findIndex( e => e == performanceId)
-    if( idx < (this.tournament.program.length - 1)){
-      let obj:Performance = {
-        isReleased:true
-      }
-      this.firebaseService.updateDocument( [TournamentCollection.collectionName, this.tournamentId,
-                                            PerformanceCollection.collectionName].join("/"), performanceId, obj).then( ()=>{
-        console.log("Performance release updated")
-      },
-      reason =>{
-        alert("Error actualizando la liberacion")
-      })
+    let obj:Performance = {
+      isReleased:true
     }
+    this.firebaseService.updateDocument( [TournamentCollection.collectionName, this.tournamentId,
+                                          PerformanceCollection.collectionName].join("/"), performanceId, obj).then( ()=>{
+      console.log("Performance release updated")
+    },
+    reason =>{
+      alert("Error actualizando la liberacion")
+    })
   }   
 
 }

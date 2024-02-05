@@ -83,7 +83,8 @@ export class PerformanceListComponent {
           id:[e.id],
           label:[p.label],
           categoryId:[p.categoryId,Validators.required],
-          owner:[p.owner,Validators.required]
+          fullname:[p.fullname,Validators.required],
+          email:[p.email,Validators.required],
         })        
         this.getGroups().push(g)
       })
@@ -97,7 +98,8 @@ export class PerformanceListComponent {
         id:[null],
         label:[""],
         categoryId:["",Validators.required],
-        owner:["",Validators.required]
+        fullname:["",Validators.required],
+        email:["",Validators.required]
       })
     );
     this.isAdding = true
@@ -108,11 +110,13 @@ export class PerformanceListComponent {
     let lastGrp = FGs[ FGs.length -1 ]
     let label = lastGrp.controls["label"].value
     let categoryId = lastGrp.controls["categoryId"].value
-    let owner = lastGrp.controls["owner"].value
+    let fullname = lastGrp.controls["fullname"].value
+    let email = lastGrp.controls["email"].value
 
     let obj:PerformanceObj = {
       categoryId: categoryId,
-      owner: owner,
+      fullname: fullname,
+      email:email,
       label: label,
       isAccepted: false,
       grade: 0,
@@ -138,12 +142,14 @@ export class PerformanceListComponent {
       let id = grp.controls["id"].value
       let label =  grp.controls["label"].value.trim()
       let categoryId =  grp.controls["categoryId"].value.trim()
-      let owner =  grp.controls["owner"].value.trim()
+      let fullname =  grp.controls["fullname"].value.trim()
+      let email = grp.controls["email"].value.trim()
     
       let obj:Performance = {
         label:label,
         categoryId:categoryId,
-        owner:owner
+        fullname:fullname,
+        email:email
       }        
 
       this.firebaseService.updateDocument( [TournamentCollection.collectionName,this.id,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{

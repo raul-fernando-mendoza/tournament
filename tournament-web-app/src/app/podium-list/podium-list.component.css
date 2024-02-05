@@ -10,7 +10,7 @@ mat-card{
     display:block;
     font-size: large;
 }
-.owner{
+.fullname{
     display: block;
 }
 .info{

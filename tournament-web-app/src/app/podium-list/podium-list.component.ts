@@ -101,7 +101,7 @@ export class PodiumListComponent implements OnDestroy{
               if( idx < 0){
                 this.performances.push(performanceRef)
               }
-              this.performances.sort( (a,b)=>a.performance.grade > b.performance.grade ? 1: -1)
+              this.performances.sort( (a,b)=>a.performance.grade > b.performance.grade ? -1: 1)
             }
           },
           'error':(reason) =>{

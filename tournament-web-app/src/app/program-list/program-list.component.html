@@ -13,13 +13,13 @@
                 <button mat-icon-button (click)="onPerformanceDown(p.id)"><mat-icon>arrow_downward</mat-icon></button>
             </mat-grid-tile>
             <mat-grid-tile><span class="label">{{ p.performance.label }}</span></mat-grid-tile>
-            <mat-grid-tile><span class="owner">{{ p.performance.owner }}</span></mat-grid-tile>
-            <mat-grid-tile>score:{{ p.performance.grade }}
+            <mat-grid-tile><span class="fullname">{{ p.performance.fullname }}</span></mat-grid-tile>
+            <mat-grid-tile><span class="score">score:{{ p.performance.grade }}</span>
                 @if( !p.performance.isReleased ){
-                    <button mat-icon-button (click)="onRelease(p.id)"><mat-icon>done</mat-icon></button>
+                    <button mat-mini-fab color="accent" (click)="onRelease(p.id)"><mat-icon>done</mat-icon></button>
                 }                
             </mat-grid-tile>
-            <mat-grid-tile><span>{{ getMedalForPerformance(p.performance.grade) }}</span></mat-grid-tile>    
+            <mat-grid-tile><span>{{ p.medal }}</span></mat-grid-tile>    
         </mat-grid-list>        
         <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance"></app-evaluationgrade-list>
     } 

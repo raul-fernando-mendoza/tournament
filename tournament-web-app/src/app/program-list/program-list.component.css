@@ -10,9 +10,15 @@ mat-card{
     display:block;
     font-size: large;
 }
-.owner{
+.fullname{
+    display: block;
+}
+.email{
     display: block;
 }
 .info{
     margin-left: 3em;
+}
+.score{
+    margin-right: 0.5em;
 }

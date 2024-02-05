@@ -4,27 +4,25 @@
             <mat-grid-list cols="4" rowHeight="3em">
             <mat-grid-tile>{{e.label}}</mat-grid-tile>
             <mat-grid-tile>{{j.label}}</mat-grid-tile>
-            @if( !getEvaluationRefence(e.id,j.id) ){
-                <mat-grid-tile><button mat-icon-button (click)="onAddEvaluationGrade(e.id,j.id)"><mat-icon>playlist_add</mat-icon></button></mat-grid-tile>
-            }
-            @else{
+            @for(r of getEvaluationRefence(e.id,j.id); track r;){
                 <mat-grid-tile>
-                    @if( getEvaluationRefence(e.id,j.id)!.evaluationGrade.isCompleted == false){
+                    @if( !r.evaluationGrade.isCompleted ){
                         @if( !performance.isReleased ){
-                            <a [routerLink]="['/tournament',tournamentId,'performance',performanceId,'evaluationGrade',getEvaluationRefence(e.id,j.id)!.id]"><button mat-icon-button><mat-icon>edit</mat-icon></button></a>            
+                            <a [routerLink]="['/tournament',tournamentId,'performance',performanceId,'evaluationGrade',r.id]"><button mat-icon-button><mat-icon>edit</mat-icon></button></a>            
                         }
                     }
                     @else{
-                        {{ getEvaluationRefence(e.id,j.id)!.evaluationGrade.grade }}
-                        <a [routerLink]="['/tournament',tournamentId,'performance',performanceId,'evaluationGrade',getEvaluationRefence(e.id,j.id)!.id]"><button mat-icon-button><mat-icon>rate_review</mat-icon></button></a>            
+                        {{ r.evaluationGrade.grade }}
+                        <a [routerLink]="['/tournament',tournamentId,'performance',performanceId,'evaluationGrade',r.id]"><button mat-icon-button><mat-icon>rate_review</mat-icon></button></a>            
                     }
                 </mat-grid-tile>
             }
-            <mat-grid-tile>
-                @if( getEvaluationRefence(e.id,j.id) ){
-                    <button mat-icon-button (click)="onRemoveEvaluationGrade(e.id,j.id)" color="warn"><mat-icon>delete</mat-icon></button>
+            @empty{
+                @if( !performance.isReleased ){
+                    <mat-grid-tile><button mat-icon-button (click)="onAddEvaluationGrade(e.id,j.id)"><mat-icon>playlist_add</mat-icon></button></mat-grid-tile>
+                    <mat-grid-tile></mat-grid-tile>
                 }
-            </mat-grid-tile>
+            }
             </mat-grid-list>
         }
     }

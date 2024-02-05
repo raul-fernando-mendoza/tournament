@@ -15,10 +15,8 @@ import { Timestamp } from "firebase/firestore/lite"
 import { AuthService } from '../auth.service';
 import { v4 as uuidv4 } from 'uuid';
 import { NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
-import { ListComponent } from '../list/list-component';
 import { PathService } from '../path.service';
 import { BusinesslogicService } from '../businesslogic.service';
-import { ListFilteredComponent } from '../listfiltered/listfiltered-component';
 import { MatGridListModule} from '@angular/material/grid-list';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
 import {MatDividerModule} from '@angular/material/divider';
@@ -46,8 +44,6 @@ interface PerformanceReference{
   ,MatDatepickerModule
   ,MatNativeDateModule
   ,NgxMaterialTimepickerModule
-  ,ListComponent
-  ,ListFilteredComponent
   ,MatGridListModule
   ,EvaluationgradeListComponent
   ,MatDividerModule

@@ -4,14 +4,14 @@
 @if( tournament ){
     <h1>{{  tournament.label }}</h1>
 
-    <h1>Programa</h1>
-    @for(p of performances; track p;let idx = $index, e = $even){
-        <mat-grid-list cols="5" rowHeight="2em" [style.background]="performanceColor">
+    <h2>Podium</h2>
+    @for(p of performances; track p;let idx = $index, isEven = $even){
+        <mat-grid-list cols="5" rowHeight="2em" [style.background]="isEven?performanceColor:''">
             <mat-grid-tile>
                 {{ idx + 1}}
             </mat-grid-tile>
             <mat-grid-tile><span class="label">{{ p.performance.label }}</span></mat-grid-tile>
-            <mat-grid-tile><span class="owner">{{ p.performance.owner }}</span></mat-grid-tile>
+            <mat-grid-tile><span class="fullname">{{ p.performance.fullname }}</span></mat-grid-tile>
             <mat-grid-tile>score:{{ p.performance.grade }}</mat-grid-tile>
             <mat-grid-tile><span>{{ getMedalForPerformance(p.performance.grade) }}</span></mat-grid-tile>    
         </mat-grid-list>        

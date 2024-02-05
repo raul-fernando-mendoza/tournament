@@ -97,12 +97,12 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
     this.unsubscribers.push( unsubscribe )                                        
   }  
 
-  getEvaluationRefence( evaluationId:string, jurorId:string ):EvaluationGradeReference|null{
+  getEvaluationRefence( evaluationId:string, jurorId:string ):EvaluationGradeReference[]{
     let idx = this.evaluationGradesReferences.findIndex( e => (e.evaluationGrade.evaluationId == evaluationId && e.evaluationGrade.jurorId==jurorId) )
     if( idx >=0 ){
-      return this.evaluationGradesReferences[idx]
+      return [this.evaluationGradesReferences[idx]]
     }
-    return null
+    return []
   }
   onAddEvaluationGrade(evaluationId:string, jurorId:string){
     let evaluationGrade:EvaluationGradeObj = {
@@ -191,128 +191,4 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
       }
     }
   }
-/*
-  getEvaluationGrades(){
-    this.evaluationGradesReferences.length = 0
-    this.firebaseService.getDocuments( [TournamentCollection.collectionName, this.tournamentId
-                                      , PerformanceCollection.collectionName, this.performanceId
-                                      , EvaluationGradeCollection.collectionName].join("/") ).then( set =>{
-      set.map( doc =>{
-        let eg = doc.data() as EvaluationGradeObj
-        let obj:EvaluationGradeReference = {
-          id:doc.id,
-          evaluationGrade:eg
-        }
-        this.evaluationGradesReferences.push(obj)
-      })
-
-  }
-/*
-  getEvaluations():Promise<void>{
-    return new Promise<void>((resolve, reject) =>{
-      this.evaluationReferences.length = 0
-      this.firebaseService.getDocuments([TournamentCollection.collectionName,this.tournamentId
-                                        ,EvaluationCollection.collectionName].join("/") ).then( set =>{
-        set.map( doc =>{
-          let evaluation = doc.data() as EvaluationObj
-          let obj:EvaluationReference = {
-            id:doc.id,
-            evaluation:evaluation
-          }
-          this.evaluationReferences.push(obj)
-        })
-        resolve()
-      },
-      reason =>{
-        alert("Error reading evaluations:" + reason)
-        reject()
-      })
-    })
-  }  
-
-  getEvaluators():Promise<void>{
-    return new Promise<void>((resolve, reject) =>{
-      this.jurorReferences.length = 0
-      this.firebaseService.getDocuments( [TournamentCollection.collectionName,this.tournamentId
-                                          ,EvaluatorCollection.collectionName].join("/") ).then( set =>{
-        set.map( doc =>{
-          let evaluator = doc.data() as EvaluatorObj
-          let obj = {
-            id:doc.id,
-            evaluator:evaluator
-          }
-          this.jurorReferences.push(obj)
-        })
-        resolve()
-      },
-      reason =>{
-        alert("Error reading evaluators:" + reason)
-        reject()
-      })
-    })
-
-  }
-
-  onAddEvaluationGrade(evaluationId:string, evaluatorId:string){
-    let evaluationGrade:EvaluationGradeObj = {
-      evaluationId: evaluationId,
-      evaluatorId: evaluatorId,
-      isCompleted: false,
-      aspectGrades: [],
-      grade: 10,
-      overwriteGrade: null
-    }
-    
-    
-    //get all the aspects from evaluation and add them to the aspects
-    this.firebaseService.getDocuments( TournamentCollection.collectionName + "/" + this.tournamentId + "/" + EvaluationCollection.collectionName + "/" + evaluationId + "/" + AspectCollection.collectionName).then( set =>{
-      set.map( doc =>{
-        let aspect = doc.data() as AspectObj
-        let aspectGrade:AspectGrade = {
-          label: aspect.label,
-          description: aspect.description,
-          grade: 1,
-          overwriteGrade: null
-        }
-        evaluationGrade.aspectGrades.push( aspectGrade )
-      })
-    },reason =>{
-      alert("ERROR retriving evaluation" + reason)
-    }).then( () =>{
-      let newId = uuidv4()
-      this.firebaseService.setDocument([TournamentCollection.collectionName,this.tournamentId
-                                        ,PerformanceCollection.collectionName,this.performanceId
-                                        ,EvaluationGradeCollection.collectionName].join("/"), newId, evaluationGrade).then( ()=>{
-        console.log( "evaluation has been created")
-        this.update()
-      },
-      reason =>{
-        alert( "ERROR adding evaluationGrade:" + reason)
-      })
-    })
-  }
-  onRemoveEvaluationGrade(evaluationId:string, evaluatorId:string){
-
-
-    let idx = this.evaluationGradesReferences.findIndex( er=>{
-      return er.evaluationGrade.evaluationId == evaluationId && er.evaluationGrade.evaluatorId == evaluatorId 
-    })
-      
-    if( idx >= 0){
-      this.firebaseService.deleteDocument( [TournamentCollection.collectionName,this.tournamentId
-        ,PerformanceCollection.collectionName,this.performanceId
-        ,EvaluationGradeCollection.collectionName].join("/"), this.evaluationGradesReferences[idx].id ).then( ()=>{
-        console.log("evaluationGrade has been deleted")
-        this.update()
-      },
-      reason =>{
-        alert("ERROR removing evaluationGrade" + reason)
-      })
-    }
-  }
-  getEvaluationGradesFor(evaluationId:string, evaluatorId:string):EvaluationGradeReference[]{
-    let result:Array<EvaluationGradeReference> = this.evaluationGradesReferences.filter( er=> er.evaluationGrade.evaluationId == evaluationId && er.evaluationGrade.evaluatorId == evaluatorId)
-    return result
-  }
-*/
 }
