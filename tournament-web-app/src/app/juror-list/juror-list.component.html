@@ -1,0 +1,38 @@
+<a [routerLink]="'/tournament/'+tournamentId">
+    <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
+</a>
+<h1>Jurados<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
+@for(g of getGroups(); track g){
+    <form [formGroup]="g">
+         
+         @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
+        <mat-form-field> 
+            <input matInput placeholder="Nombre del jurado" formControlName="label" (change)="onChange(g.controls['id'].value)">
+        </mat-form-field>                 
+        <mat-form-field> 
+            <input matInput placeholder="email" formControlName="email" (change)="onChange(g.controls['id'].value)">
+        </mat-form-field>  
+        }
+        @else{
+                {{ g.controls['label'].value }}
+                {{ g.controls['email'].value }}
+        }
+        @if( isAdding && g.controls['id'].value == null ){
+            <button id="done" name="done" mat-button (click)="onSubmit()"><mat-icon>done</mat-icon></button>
+            <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
+        }        
+        @if( !isAdding && g.controls['id'].value != null && g.enabled && !g.dirty  ){
+            <button mat-button (click)="onDelete(g.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
+        }
+        @if( !isAdding && g.controls['id'].value != null && g.dirty ){
+            <button mat-button (click)="onSave(g.controls['id'].value)"><mat-icon>done</mat-icon></button>
+            <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
+        }
+
+    </form>
+
+    
+}    
+
+
+

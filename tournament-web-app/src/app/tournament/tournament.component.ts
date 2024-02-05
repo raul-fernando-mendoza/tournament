@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FirebaseService } from '../firebase.service';
-import { Performance, EvaluationGradeCollection, EvaluationGradeObj, EvaluatorCollection, EvaluatorObj, Filter, PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj} from '../types'
+import { Performance, EvaluationGradeCollection, EvaluationGradeObj, Filter, PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj} from '../types'
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -25,10 +25,6 @@ import {MatDividerModule} from '@angular/material/divider';
 import {MatMenuModule} from '@angular/material/menu';
 
 
-interface EvaluatorReference{
-  id:string
-  evaluator:EvaluatorObj
-}
 
 interface PerformanceReference{
   id:string
@@ -79,8 +75,6 @@ export class TournamentComponent{
 
   collection = TournamentCollection.collectionName
 
-  evaluatorReferences:Array<EvaluatorReference> = []
-
   performanceLinks:Array<PerformanceReference> = []
 
   programLinks:Array<PerformanceReference> = []
@@ -126,7 +120,6 @@ export class TournamentComponent{
         if( this.authService.getUserUid()!= null && this.tournament?.creatorUid != null ){
           this.isAdmin = (this.authService.getUserUid() == this.tournament?.creatorUid) 
         } 
-        this.getEvaluators()
         this.getPerformances()
       })
     }
@@ -159,7 +152,8 @@ export class TournamentComponent{
         program: [],
         medals: [],
         categories: [],
-        evaluations: []
+        evaluations: [],
+        jurors: []
       }
 
       this.firebaseService.setDocument( this.collection, id, tournament).then( ()=>{
@@ -336,21 +330,6 @@ export class TournamentComponent{
       }  
     }
   }
-  getEvaluators():Promise<void>{
-    return new Promise<void>( (resolve, reject)=>{
-      this.firebaseService.getDocuments( TournamentCollection.collectionName + "/" + this.id + "/" + EvaluatorCollection.collectionName ).then( set =>{
-        this.evaluatorReferences.length = 0
-        set.map( doc =>{
-          let e:EvaluatorObj = doc.data() as EvaluatorObj
-          let j:EvaluatorReference = {
-            id: doc.id,
-            evaluator: e
-          }
-          this.evaluatorReferences.push( j )
-        })
-      })
-    })
-  }  
   
   onPerformanceReleaseGrade(performanceId:string){
     let obj:Performance = {

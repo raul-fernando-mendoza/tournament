@@ -1,46 +1,31 @@
-<!--
-<mat-grid-list cols="4" rowHeight="2.5em">
-@for( e of evaluationReferences; track e.id){
-
-    @for( j of evaluatorReferences; track j.id){
-        <mat-grid-tile>
-            {{e.evaluation.label}}
-        </mat-grid-tile>
-        <mat-grid-tile>
-            {{j.evaluator.label}}
-        </mat-grid-tile>        
-        
-        @for(  eg of getEvaluationGradesFor(e.id, j.id); track eg.id){
+@if( performance ){
+    @for( e of tournament.evaluations; track e; ){
+        @for(j of tournament.jurors;track j;){
+            <mat-grid-list cols="4" rowHeight="3em">
+            <mat-grid-tile>{{e.label}}</mat-grid-tile>
+            <mat-grid-tile>{{j.label}}</mat-grid-tile>
+            @if( !getEvaluationRefence(e.id,j.id) ){
+                <mat-grid-tile><button mat-icon-button (click)="onAddEvaluationGrade(e.id,j.id)"><mat-icon>playlist_add</mat-icon></button></mat-grid-tile>
+            }
+            @else{
+                <mat-grid-tile>
+                    @if( getEvaluationRefence(e.id,j.id)!.evaluationGrade.isCompleted == false){
+                        @if( !performance.isReleased ){
+                            <a [routerLink]="['/tournament',tournamentId,'performance',performanceId,'evaluationGrade',getEvaluationRefence(e.id,j.id)!.id]"><button mat-icon-button><mat-icon>edit</mat-icon></button></a>            
+                        }
+                    }
+                    @else{
+                        {{ getEvaluationRefence(e.id,j.id)!.evaluationGrade.grade }}
+                        <a [routerLink]="['/tournament',tournamentId,'performance',performanceId,'evaluationGrade',getEvaluationRefence(e.id,j.id)!.id]"><button mat-icon-button><mat-icon>rate_review</mat-icon></button></a>            
+                    }
+                </mat-grid-tile>
+            }
             <mat-grid-tile>
-                @if( eg.evaluationGrade.isCompleted ){
-                    <a [routerLink]="['performance',performanceId,'evaluationgrade',eg.id]">
-                        <button mat-button>Completado:{{eg.evaluationGrade.grade }}</button>
-                    </a>
-                }
-                @else{
-                    <a [routerLink]="['performance',performanceId,'evaluationgrade',eg.id]">
-                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                    </a>                    
+                @if( getEvaluationRefence(e.id,j.id) ){
+                    <button mat-icon-button (click)="onRemoveEvaluationGrade(e.id,j.id)" color="warn"><mat-icon>delete</mat-icon></button>
                 }
             </mat-grid-tile>
-
-            <mat-grid-tile>
-                @if( performance && !(performance.isReleased)  ){
-                    <button mat-icon-button color="accent" (click)="onRemoveEvaluationGrade(e.id, j.id)"><mat-icon>delete</mat-icon></button>
-                }
-            </mat-grid-tile>            
+            </mat-grid-list>
         }
-        @empty{
-            <mat-grid-tile>
-                @if( performance && !(performance.isReleased)  ){
-                 <button mat-button-icon (click)="onAddEvaluationGrade(e.id, j.id)"><mat-icon>note_add</mat-icon></button>   
-                }
-            </mat-grid-tile>
-            <mat-grid-tile>
-            </mat-grid-tile>
-        }
-        
     }
 }
-</mat-grid-list>
--->

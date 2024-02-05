@@ -1,0 +1,71 @@
+<a [routerLink]="['/','tournament',id]">
+    <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
+</a>
+@if( tournament ){
+    <h1>{{  tournament.label }}</h1>
+
+    <h1>Performances<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
+    @for(g of getGroups(); track g){
+        <mat-card [formGroup]="g">
+            <mat-card-header>
+                @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
+                    <mat-form-field> 
+                        <input matInput placeholder="Nombre del performance" formControlName="label" (change)="onChange(g.controls['id'].value)">
+                    </mat-form-field> 
+                    <button mat-button color="warn" (click)="onDelete(g.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
+                }
+                @else{
+                    <span class="label">{{ g.controls['label'].value }}</span>
+                }
+            </mat-card-header>
+            <mat-card-content>
+            @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
+            <mat-form-field> 
+                <input matInput placeholder="owner" formControlName="owner" (change)="onChange(g.controls['id'].value)">
+            </mat-form-field>             
+            <mat-form-field appearance="fill" >
+                <mat-label>category</mat-label>
+                <mat-select formControlName="categoryId" (selectionChange)="onChange(g.controls['id'].value)">
+                    <mat-option *ngFor="let c of tournament.categories" [value]="c.id">
+                    {{ c.label }}
+                    </mat-option>                 
+                </mat-select>
+            </mat-form-field>                          
+            <p class="info">   
+                @if( isInProgram(g.controls["id"].value)  ){
+                    El Performance ha sido aceptado y ha sido adicionado al programa
+                }
+                @else{
+                    El performance esta en proceso de aceptación
+                }
+            </p>
+            }
+            @else{
+
+                    <span class="owner">{{ g.controls['owner'].value }}</span>
+            }
+            @if( isAdding && g.controls['id'].value == null ){
+                <button id="done" name="done" mat-button (click)="onSubmit()"><mat-icon>done</mat-icon></button>
+                <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
+            }        
+        </mat-card-content>
+        <mat-card-actions align="end">            
+            @if( !isAdding && g.controls['id'].value != null && g.enabled && !g.dirty  ){
+                @if( !isInProgram(g.controls["id"].value) ){
+                    <button mat-raised-button color="primary" (click)="onAddToProgram(g.controls['id'].value)">Addiciona al programa</button>
+                }
+                @else{
+                    <button mat-raised-button color="accent" (click)="onRemoveFromProgram(g.controls['id'].value)">remover del programa</button>
+                }
+            }
+            @if( !isAdding && g.controls['id'].value != null && g.dirty ){
+                <button mat-button (click)="onSave(g.controls['id'].value)"><mat-icon>done</mat-icon></button>
+                <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
+            }
+        </mat-card-actions>
+        </mat-card>
+        <mat-divider></mat-divider>
+    }    
+}
+
+

@@ -1,0 +1,18 @@
+mat-form-field{
+    width:80%;
+    margin-left: 2em;
+}
+mat-card{
+    margin: 5px;
+    border:1px solid black;
+}
+.label{
+    display:block;
+    font-size: large;
+}
+.owner{
+    display: block;
+}
+.info{
+    margin-left: 3em;
+}

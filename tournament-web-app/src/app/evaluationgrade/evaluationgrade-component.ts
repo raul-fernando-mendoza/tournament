@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../firebase.service';
-import { EvaluationGradeObj, TournamentCollection, EvaluationGradeCollection, PerformanceCollection, PerformanceObj, EvaluationGrade} from '../types'
+import { EvaluationGradeObj, TournamentCollection, EvaluationGradeCollection, PerformanceCollection, PerformanceObj, EvaluationGrade, TournamentObj} from '../types'
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
@@ -18,6 +18,7 @@ import { BusinesslogicService } from '../businesslogic.service';
 import { StarSliderComponent } from '../star-slider/star-slider.component';
 import { DescriptionApplyDialog } from './description-apply-dlg';
 import { MatDialog } from '@angular/material/dialog';
+import { resolve } from 'path';
 
 @Component({
   selector: 'app-evaluationgrade-component',
@@ -40,13 +41,13 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrl: './evaluationgrade-component.css'
 })
 export class EvaluationGradeComponent implements OnInit{
-  id:string | null = null
   tournamentId!:string
   performanceId!:string 
+  evaluationGradeId!:string
 
+  tournament!:TournamentObj
   performance!:PerformanceObj
   evaluationGrade!:EvaluationGradeObj
-  
 
   collection = EvaluationGradeCollection.collectionName
   submitting = false
@@ -75,21 +76,13 @@ export class EvaluationGradeComponent implements OnInit{
       var thiz = this
       this.activatedRoute.paramMap.subscribe({
           next(paramMap){
-            thiz.id = null
-            if( paramMap.get('tournamentId')!=null ){
-              var str : string | null = paramMap.get('tournamentId')
-              if ( str != null){
-                thiz.tournamentId = decodeURIComponent(str)              
-              }
-            }    
-            if( paramMap.get('performanceId')!=null ){
-              var str : string | null = paramMap.get('performanceId')
-              if ( str != null){
-                thiz.performanceId = decodeURIComponent(str)              
-              }
-            }               
-            if( paramMap.get('id')!=null ){
-              thiz.id = paramMap.get('id')
+            let tournamentId = paramMap.get('tournamentId')
+            let performanceId = paramMap.get('performanceId')
+            let evaluationGradeId = paramMap.get('evaluationGradeId')
+            if( tournamentId && performanceId && evaluationGradeId ){
+              thiz.tournamentId = tournamentId
+              thiz.performanceId = performanceId
+              thiz.evaluationGradeId = evaluationGradeId
               thiz.update()
             }
           }
@@ -105,37 +98,40 @@ export class EvaluationGradeComponent implements OnInit{
     this.aspects.push(this.fb.control(''));
   }   
 
-  getPerformance():Promise<void>{
-    return  this.firebaseService.getDocument( TournamentCollection.collectionName +  "/" + this.tournamentId + "/" + PerformanceCollection.collectionName, this.performanceId).then( data =>{
-      this.performance = data as PerformanceObj
-    },
-    reason =>{
-      alert("Error reading evalutors:" + reason)
-    })
-  }
 
   update(){
-    if ( this.id ){
-      this.getPerformance().then( () =>{
-        this.firebaseService.getDocument(
-          [TournamentCollection.collectionName,this.tournamentId
-          ,PerformanceCollection.collectionName,this.performanceId
-          ,EvaluationGradeCollection.collectionName].join("/"),
-          this.id).then( data =>{
-            this.evaluationGrade = data as EvaluationGradeObj
-            this.aspects.controls.length = 0
-            this.evaluationGrade.aspectGrades.map( aspect =>{
-              let newControl = this.fb.control([aspect.grade])
-              if( this.performance.isReleased ){
-                newControl.disable()
-              }
-              this.aspects.push(newControl);
-
-            })
-
-          }) 
-      })
-    }
+    this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( data =>{
+      this.tournament = data as TournamentObj
+    },
+    reason =>{
+      alert("Error reading tournament:" + reason)
+    })
+    this.firebaseService.getDocument( [TournamentCollection.collectionName, this.tournamentId,
+                                        PerformanceCollection.collectionName].join("/"), this.performanceId).then( data =>{
+      this.performance = data as PerformanceObj                                          
+    },
+    reason =>{
+      alert("error reading performance:" + reason)
+    })
+   
+    this.firebaseService.getDocument(
+      [TournamentCollection.collectionName,this.tournamentId
+      ,PerformanceCollection.collectionName,this.performanceId
+      ,EvaluationGradeCollection.collectionName].join("/"),
+      this.evaluationGradeId).then( data =>{
+        this.evaluationGrade = data as EvaluationGradeObj
+        this.aspects.controls.length = 0
+        this.evaluationGrade.aspectGrades.map( aspect =>{
+          let newControl = this.fb.control([aspect.grade])
+          if( this.performance.isReleased ){
+            newControl.disable()
+          }
+          this.aspects.push(newControl);
+        })
+      },
+      reason=>{
+        alert("Error: reading evaluationGrade:" + reason )
+    }) 
   }
   onCancel(){
     this.router.navigate(['/' + `${TournamentCollection.collectionName}/${this.tournamentId}/${PerformanceCollection.collectionName}/${this.performanceId}`])
@@ -172,8 +168,9 @@ export class EvaluationGradeComponent implements OnInit{
     this.firebaseService.updateDocument( [TournamentCollection.collectionName,this.tournamentId
       ,PerformanceCollection.collectionName,this.performanceId
       ,EvaluationGradeCollection.collectionName].join("/"),
-      this.id, obj).then( () =>{
-        this.router.navigate( ["/", TournamentCollection.collectionName, this.tournamentId])
+      this.evaluationGradeId, obj).then( () =>{
+        this.router.navigate( ["/", TournamentCollection.collectionName, this.tournamentId,
+                                    'program'])
       },
       reason=>{
         alert("ERROR salvando calificacion:" + reason)

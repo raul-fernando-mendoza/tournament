@@ -1,34 +1,23 @@
 <a [routerLink]="'/tournament/'+tournamentId">
     <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
 </a>
-<h1>Evaluaciones<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
-@for(g of getGroups(); track g){
-    <mat-card>
-        <mat-card-content>
-            <form [formGroup]="g">
+@if( tournament && evaluation ){
+    <h1>Aspectos<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
+    @for(g of getGroups(); track g){
+        <form [formGroup]="g">
             
             @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
             <mat-form-field> 
-                <input matInput placeholder="label" formControlName="label" (change)="onChange(g.controls['id'].value)">
+                <input matInput placeholder="Nombre del aspecto" formControlName="label" (change)="onChange(g.controls['id'].value)">
             </mat-form-field>                 
             <mat-form-field> 
                 <textarea matInput placeholder="description" formControlName="description" (change)="onChange(g.controls['id'].value)"></textarea>
             </mat-form-field>  
-                @if( g.controls['id'].value ) {
-                <h2>Aspectos<a [routerLink]="['/','tournament',tournamentId,'evaluations',g.controls['id'].value,'aspects']">
-                    <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                </a></h2>             
-                }
             }
             @else{
                     {{ g.controls['label'].value }}
-                    <p>
                     {{ g.controls['description'].value }}
-                    </p>
             }
-            </form>
-        </mat-card-content>
-        <mat-card-actions>
             @if( isAdding && g.controls['id'].value == null ){
                 <button id="done" name="done" mat-button (click)="onSubmit()"><mat-icon>done</mat-icon></button>
                 <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
@@ -40,11 +29,9 @@
                 <button mat-button (click)="onSave(g.controls['id'].value)"><mat-icon>done</mat-icon></button>
                 <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
             }
-        </mat-card-actions> 
-    </mat-card>
 
-    
-}    
-
+        </form>
+    }    
+}
 
 

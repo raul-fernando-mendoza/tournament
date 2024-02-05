@@ -15,15 +15,22 @@ export interface Category{
 export interface Aspect{
     id:string
     label:string
-    description?:string
+    description:string | null
 }
 
 export interface Evaluation{
     id:string
     label:string
     description?:string    
-    aspect:Array<string>
+    aspects:Array<Aspect>
 }
+
+export class Juror{
+    id!:string
+    label!:string
+    email?:string
+}
+
 
 export interface Tournament{
     label?:string
@@ -37,6 +44,7 @@ export interface Tournament{
     categories?:Array<Category>
     medals?:Array<Medal>
     evaluations?:Array<Evaluation>
+    jurors?:Array<Juror>
 }
 export class TournamentObj implements Tournament{
     label: string = ""
@@ -50,27 +58,10 @@ export class TournamentObj implements Tournament{
     categories:Array<Category> = []
     medals:Array<Medal> = []
     evaluations:Array<Evaluation> = []
+    jurors:Array<Juror> = []
 }
 export class TournamentCollection{
     static readonly collectionName:string = 'tournament';
-}
-
-
-
-
-
-
-
-export interface Evaluator{
-    label?:string
-    email?:string
-}
-export class EvaluatorObj implements Evaluator{
-    label:string = ""
-    email:string = "" 
-}
-export class EvaluatorCollection{
-    static readonly collectionName:string = "evaluator"
 }
 
 export interface Performance{
@@ -112,7 +103,7 @@ export class AspectGrade {
 
 export interface EvaluationGrade{
     evaluationId?:string
-    evaluatorId?:string
+    jurorId?:string
     isCompleted?:boolean
     grade?:number
     overwriteGrade?:number | null
@@ -120,7 +111,7 @@ export interface EvaluationGrade{
 }
 export class EvaluationGradeObj implements EvaluationGrade{
     evaluationId!:string
-    evaluatorId!:string 
+    jurorId!:string 
     isCompleted:boolean = false
     grade:number = 10
     overwriteGrade:number | null = null

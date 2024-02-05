@@ -1,18 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {FormArray, FormBuilder,  FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FirebaseService } from '../firebase.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Evaluation, Tournament, TournamentCollection, TournamentObj } from '../types';
-import { v4 as uuidv4 } from 'uuid';
-import { MatCardModule } from '@angular/material/card';
+import { Aspect, Evaluation, Tournament, TournamentCollection, TournamentObj } from '../types';
+import { v4 as uuidv4, v4 } from 'uuid';
 
 @Component({
-  selector: 'app-evaluation-list',
+  selector: 'app-aspect-list',
   standalone: true,
   imports: [
     CommonModule
@@ -22,106 +21,99 @@ import { MatCardModule } from '@angular/material/card';
     ,ReactiveFormsModule
     ,MatFormFieldModule
     ,MatInputModule
-    ,RouterModule
-    ,MatCardModule    
-  ], 
-  templateUrl: './evaluation-list.component.html',
-  styleUrl: './evaluation-list.component.css',
+    ,RouterModule],
+  templateUrl: './aspect-list.component.html',
+  styleUrl: './aspect-list.component.css',
 
 })
-export class EvaluationListComponent {
-  tournamentId:string | null = null
+export class AspectListComponent {
+  tournamentId!:string
+  evaluationId!:string 
   tournament!:TournamentObj
+  evaluation!:Evaluation
 
   isAdding = false
 
   constructor( public firebaseService:FirebaseService 
     ,private fb:FormBuilder
     ,private activatedRoute: ActivatedRoute    
-    ,private router: Router
   ){
     var thiz = this
     this.activatedRoute.paramMap.subscribe({
         next(paramMap){
-          thiz.tournamentId = null
-          if( paramMap.get('tournamentId')!=null ){
-            thiz.tournamentId = paramMap.get('tournamentId')
+          let tournamentId = paramMap.get('tournamentId')
+          let evaluationId = paramMap.get("evaluationId")
+          if(tournamentId && evaluationId){
+            thiz.tournamentId = tournamentId
+            thiz.evaluationId = evaluationId
             thiz.update()
           }
+          
         }
       })
   }
 
-  form = new FormGroup({
-    evaluations: new FormArray([]),
-  });  
+  formArray= new FormArray([])
 
   getGroups(): FormGroup[] {
-    let formArray:FormArray  = this.form.get('evaluations') as FormArray
-    let formGroups:FormGroup[] = (formArray.controls) as FormGroup[]
+    let formGroups:FormGroup[] = (this.formArray.controls) as FormGroup[]
     return formGroups
   }
 
   update(){
     this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( (data)=>{
       this.tournament = data 
-      let fa = this.form.get('evaluations') as FormArray
-      fa.clear()
-      if( fa ){
-        this.tournament.evaluations?.map( evaluation =>
-          fa.push(
-            this.fb.group({
-              id:[evaluation.id],
-              label:[evaluation.label,Validators.required],
-              description:[evaluation.description]
-            })
-          )
+      this.formArray.clear()
+      let idx = this.tournament.evaluations.findIndex( e => e.id == this.evaluationId)
+      this.evaluation = this.tournament.evaluations[idx]
+      this.evaluation.aspects.map( aspect =>{
+        this.getGroups().push(
+          this.fb.group({
+            id:[aspect.id,Validators.required],
+            label:[aspect.label,Validators.required],
+            description:[aspect.description,Validators.required]
+          })
         )
-      }      
+      })
+
     },
     reason =>{
-      alert("Error updating evaluations")
+      alert("Error updating aspects")
     })    
   }
 
   onAdd() {
-    let fa = this.form.get('evaluations') as FormArray
-    if( fa ){
-      fa.push(
-        this.fb.group({
-          id:[null],
-          label:['',Validators.required],
-          description:['',Validators.required]
-        })
-      );
-    }
+    this.getGroups().push(
+      this.fb.group({
+        id:[null],
+        label:['',Validators.required],
+        description:['',Validators.required]
+      })
+    );
     this.isAdding = true
   }
   onSubmit(){
     let FGs = this.getGroups()
-    let grp = FGs[ FGs.length -1 ]
-    let label = grp?.controls["label"].value.trim()
-    let description = grp?.controls["description"].value
-    let evaluation:Evaluation = {
-      id: uuidv4(),
-      label: label,
-      description: description,
-      aspects: []
-    }
-    this.tournament.evaluations.push( evaluation )
-    this.tournament.evaluations.sort( (a,b)=>{
-      return a.label >= b.label ? 1 : -1
-    }) 
+    let lastGrp = FGs[ FGs.length -1 ]
+    let label = lastGrp.controls["label"].value.trim()
+    let description = lastGrp.controls["description"].value.trim()
+    let aspect:Aspect = { 
+        id:uuidv4(),
+        label: label,
+        description: description
+      }
+    this.evaluation.aspects.push( aspect )
+
     let obj:Tournament = {
       evaluations:this.tournament.evaluations
     }
     this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-      console.log("evaluations list updated")
+      console.log("aspects list updated")
       this.isAdding = false
       this.update()
     },
     reason =>{
-      alert("Error updating evaluations")
+      alert("Error updating aspects:" + reason)
     })
   }
 
@@ -133,26 +125,22 @@ export class EvaluationListComponent {
       let idx = FGs.findIndex( FG => FG.controls["id"].value == id )
       if( idx >= 0 ){
         let grp = FGs[idx]
-        let label =  grp?.controls["label"].value.trim()
-        let description =  grp?.controls["description"].value
+        let label =  grp.controls["label"].value.trim()
+        let description =  grp.controls["description"].value.trim()
       
-        this.tournament.evaluations[ idx ].label = label
-        this.tournament.evaluations[ idx ].description = description
-
-        this.tournament.evaluations.sort( (a,b)=>{
-          return a.label >= b.label ? 1 : -1
-        }) 
+        this.evaluation.aspects[ idx ].label = label
+        this.evaluation.aspects[ idx ].description = description
 
         let obj:Tournament = {
           evaluations:this.tournament.evaluations
         }        
  
         this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-          console.log("evaluations list updated")
+          console.log("aspects list updated")
           this.update()
         },
         reason =>{
-          alert("Error updating evaluations")
+          alert("Error updating aspects" + reason)
         })
       }
     }
@@ -160,16 +148,16 @@ export class EvaluationListComponent {
 
   onDelete(id:string) {
 
-    let idx:number = this.tournament.evaluations.findIndex( c => c.id == id)
+    let idx:number = this.evaluation.aspects.findIndex( c => c.id == id)
 
     if( idx >= 0){
-      this.tournament.evaluations.splice(idx,1)
+      this.evaluation.aspects.splice(idx,1)
       let obj:Tournament = {
         evaluations:[] = this.tournament.evaluations
       }
   
       this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-        console.log("evaluations list updated")
+        console.log("aspects list updated")
         this.update()
       },
       reason =>{
