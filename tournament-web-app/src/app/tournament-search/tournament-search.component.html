@@ -29,9 +29,5 @@
     <div>No row to show: {{tournamentList.length}}</div>
 }
 
-@if (isLoggedIn()) {
-    <a routerLink="/tournamentNew">
-        <button mat-raised-button color="primary">Crear un nuevo evento</button>
-    </a>
-}
+<button mat-raised-button (click)="onCreateTournament()" color="primary">Crear un nuevo evento</button>
 

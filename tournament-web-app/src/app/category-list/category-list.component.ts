@@ -1,13 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FirebaseService } from '../firebase.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Medal,Category, Tournament, TournamentCollection, TournamentObj } from '../types';
+import { Category, Tournament, TournamentCollection, TournamentObj } from '../types';
 import { v4 as uuidv4, v4 } from 'uuid';
 
 @Component({
@@ -35,7 +35,6 @@ export class CategoryListComponent {
   constructor( public firebaseService:FirebaseService 
     ,private fb:FormBuilder
     ,private activatedRoute: ActivatedRoute    
-    ,private router: Router
   ){
     var thiz = this
     this.activatedRoute.paramMap.subscribe({

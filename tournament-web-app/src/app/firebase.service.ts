@@ -68,13 +68,13 @@ export class FirebaseService {
     return new Promise<Array<any>>((resolve, reject) =>{
 
       var q
-      if( filter ){
+      if( filter && filter.length>0){
 
         if( filter.length == 1){
           q = query(collection(db, collectionPath), 
           and(where(filter[0].field, filter[0].operator, filter[0].value))) 
         }
-        else{
+        else {
           q = query(collection(db, collectionPath), 
             and(where(filter[0].field, filter[0].operator, filter[0].value),
                 where(filter[1].field, filter[1].operator, filter[1].value) 

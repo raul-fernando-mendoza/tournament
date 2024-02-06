@@ -7,11 +7,12 @@ import { FirebaseService } from '../firebase.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Performance, PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj } from '../types';
+import { Performance, PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj, Filter } from '../types';
 import { v4 as uuidv4, v4 } from 'uuid';
 import {MatSelectModule} from '@angular/material/select';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatCardModule} from '@angular/material/card';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-performance-list',
@@ -38,10 +39,12 @@ export class PerformanceListComponent {
   tournament!:TournamentObj
 
   isAdding = false
+  isAdmin = false
 
   constructor( public firebaseService:FirebaseService 
     ,private fb:FormBuilder
     ,private activatedRoute: ActivatedRoute    
+    ,private auth:AuthService
   ){
     var thiz = this
     this.activatedRoute.paramMap.subscribe({
@@ -65,7 +68,9 @@ export class PerformanceListComponent {
   update(){
     this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( (data)=>{
       this.tournament = data 
-     
+      if( this.auth.getUserUid() == this.tournament.creatorUid){
+        this.isAdmin = true
+      }
     },
     reason =>{
       alert("Error reading tournament:" + reason)
@@ -76,7 +81,16 @@ export class PerformanceListComponent {
 
   readPerformances(){
     this.formArray.clear()
-    this.firebaseService.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/")).then( set =>{
+    let filter:Array<Filter> = []
+    if( !this.isAdmin ){
+      let userFilter:Filter = {
+        field: 'email',
+        operator: '==',
+        value: this.auth.getUserEmail()
+      }
+      filter.push( userFilter )
+    }
+    this.firebaseService.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"), filter).then( set =>{
       set.map( e =>{
         let p = e.data() as PerformanceObj
         let g = this.fb.group({
@@ -85,7 +99,11 @@ export class PerformanceListComponent {
           categoryId:[p.categoryId,Validators.required],
           fullname:[p.fullname,Validators.required],
           email:[p.email,Validators.required],
-        })        
+        }) 
+        if( !this.isAdmin ){
+          g.controls["email"].setValue( this.auth.getUserEmail() )       
+          g.controls["email"].disable()
+        }
         this.getGroups().push(g)
       })
       this.getGroups().sort( (a,b) => a.controls["label"].value > b.controls["label"].value ? 1 : -1)
@@ -93,15 +111,19 @@ export class PerformanceListComponent {
   }
 
   onAdd() {
-    this.getGroups().push(
-      this.fb.group({
-        id:[null],
-        label:[""],
-        categoryId:["",Validators.required],
-        fullname:["",Validators.required],
-        email:["",Validators.required]
-      })
-    );
+
+    let g = this.fb.group({
+      id:[null],
+      label:[""],
+      categoryId:["",Validators.required],
+      fullname:["",Validators.required],
+      email:["",Validators.required]
+    })
+    if( !this.isAdmin ){
+      g.controls["email"].setValue( this.auth.getUserEmail() )       
+      g.controls["email"].disable()
+    }
+    this.getGroups().push(g);
     this.isAdding = true
   }
   onSubmit(){

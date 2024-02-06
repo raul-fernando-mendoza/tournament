@@ -55,11 +55,13 @@
         </mat-card-content>
         <mat-card-actions align="end">            
             @if( !isAdding && g.controls['id'].value != null && g.enabled && !g.dirty  ){
-                @if( !isInProgram(g.controls["id"].value) ){
-                    <button mat-raised-button color="primary" (click)="onAddToProgram(g.controls['id'].value)">Addiciona al programa</button>
-                }
-                @else{
-                    <button mat-raised-button color="accent" (click)="onRemoveFromProgram(g.controls['id'].value)">remover del programa</button>
+                @if( isAdmin ){
+                    @if( !isInProgram(g.controls["id"].value) ){
+                        <button mat-raised-button color="primary" (click)="onAddToProgram(g.controls['id'].value)">Addiciona al programa</button>
+                    }
+                    @else{
+                        <button mat-raised-button color="accent" (click)="onRemoveFromProgram(g.controls['id'].value)">remover del programa</button>
+                    }
                 }
             }
             @if( !isAdding && g.controls['id'].value != null && g.dirty ){

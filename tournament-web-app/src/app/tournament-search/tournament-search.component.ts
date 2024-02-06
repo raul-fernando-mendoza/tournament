@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FirebaseService } from '../firebase.service';
 import { AuthService } from '../auth.service';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { TournamentCollection, TournamentObj } from '../types';
 import { PathService } from '../path.service';
 
@@ -47,7 +47,8 @@ export class TournamentSearchComponent implements AfterViewInit{
   constructor( private fb:FormBuilder,
     private firebaseService:FirebaseService,
     private authService:AuthService,
-    public pathService:PathService){
+    public pathService:PathService,
+    private router: Router){
 
   }
   ngAfterViewInit(): void {
@@ -78,5 +79,14 @@ export class TournamentSearchComponent implements AfterViewInit{
     let id=this.parentCollection[1]
     console.log("isReadonly called")
     this.authService.isloggedIn()
-  })  
+  }) 
+  
+  onCreateTournament(){
+    if( this.authService.isloggedIn() ){
+      this.router.navigate(['/tournamentNew'])
+    }
+    else{
+      this.router.navigate(['/loginForm'])
+    }
+  }
 }
