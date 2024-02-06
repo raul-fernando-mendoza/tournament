@@ -86,7 +86,7 @@ export class TournamentSearchComponent implements AfterViewInit{
       this.router.navigate(['/tournamentNew'])
     }
     else{
-      this.router.navigate(['/loginForm'])
+      this.router.navigate(['/loginForm/tournamentNew'])
     }
   }
 }

@@ -92,12 +92,10 @@ export class LoginFormComponent {
 
   }
   navigateIntended(){
-    var intendedParameters:{[key: string]: string|null} = {}
-    for (const property in this.route.snapshot.paramMap.keys) {
-      let propertyName = this.route.snapshot.paramMap.keys[property]
-      intendedParameters[propertyName]=this.route.snapshot.paramMap.get(propertyName) 
+    if( this.intendedPath ){
+      let url:string = decodeURIComponent( this.intendedPath )
+      this.router.navigate(["/" + url]);    
     }
-    this.router.navigate([this.intendedPath, intendedParameters]);    
   }
   onLoginWithEmail(){
     

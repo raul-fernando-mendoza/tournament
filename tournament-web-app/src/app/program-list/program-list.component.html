@@ -8,9 +8,13 @@
     @for(p of performances; track p;let idx = $index, e = $even){
         <mat-grid-list cols="5" rowHeight="2em" [style.background]="performanceColor">
             <mat-grid-tile>
+                @if(isAdmin){
                 <button mat-icon-button (click)="onPerformanceUp(p.id)"><mat-icon>arrow_upward</mat-icon></button>
+                }
                 {{ idx }}
+                @if(isAdmin){
                 <button mat-icon-button (click)="onPerformanceDown(p.id)"><mat-icon>arrow_downward</mat-icon></button>
+                }
             </mat-grid-tile>
             <mat-grid-tile><span class="label">{{ p.performance.label }}</span></mat-grid-tile>
             <mat-grid-tile><span class="fullname">{{ p.performance.fullname }}</span></mat-grid-tile>

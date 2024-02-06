@@ -54,7 +54,7 @@ interface PerformanceReference{
 })
 export class TournamentComponent{
 
-  id :string | null= null
+  tournamentId :string | null= null
   tournament:TournamentObj| null = null
   submitting = false
   isAdmin = false
@@ -87,9 +87,9 @@ export class TournamentComponent{
     var thiz = this
     this.activatedRoute.paramMap.subscribe( {
       next(paramMap){
-        thiz.id = null
+        thiz.tournamentId = null
         if( paramMap.get('id') )
-          thiz.id = paramMap.get('id')
+          thiz.tournamentId = paramMap.get('id')
           thiz.update()
         }
 
@@ -97,8 +97,8 @@ export class TournamentComponent{
 
   }
   update(){
-    if( this.id != null){
-      this.firebaseService.getDocument( TournamentCollection.collectionName, this.id).then( data =>{
+    if( this.tournamentId != null){
+      this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( data =>{
         this.tournament = data as TournamentObj
         this.form.controls.label.setValue( this.tournament.label )
         var t:any = this.tournament.eventDate
@@ -122,7 +122,7 @@ export class TournamentComponent{
   }
 
   onSubmit(){
-    if( !this.id ){
+    if( !this.tournamentId ){
       let id = uuidv4();
       let d:Date = this.form.controls.eventDate.value!
       let t:Timestamp = new Timestamp(d.getSeconds(), 0)
@@ -168,7 +168,7 @@ export class TournamentComponent{
 
 
     var label = this.form.controls.label.value!
-    if( this.id && label ){
+    if( this.tournamentId && label ){
         
       const matches = label.match(/(\b[^\s]+\b)/g);
       if( matches ){
@@ -180,7 +180,7 @@ export class TournamentComponent{
           label: this.form.controls.label.value!,
           tags: tags
         }
-        this.firebaseService.updateDocument(TournamentCollection.collectionName, this.id, obj).then(data=>{
+        this.firebaseService.updateDocument(TournamentCollection.collectionName, this.tournamentId, obj).then(data=>{
           console.log("update name")
         },
         reason =>{
@@ -205,7 +205,7 @@ export class TournamentComponent{
     if( !confirm("Esta seguro de querer borrar:" +  this.tournament!.label) ){
       return
     }        
-    this.firebaseService.deleteDocument( this.collection , this.id! ).then( ()=>{
+    this.firebaseService.deleteDocument( this.collection , this.tournamentId! ).then( ()=>{
       console.log( "category removed")
       this.router.navigate([""])
     },
@@ -223,7 +223,7 @@ export class TournamentComponent{
   }
 
   getPerformances():Promise<void>{
-    return this.firebaseService.getDocuments( TournamentCollection.collectionName + "/" + this.id + "/" + PerformanceCollection.collectionName ).then( set =>{
+    return this.firebaseService.getDocuments( TournamentCollection.collectionName + "/" + this.tournamentId + "/" + PerformanceCollection.collectionName ).then( set =>{
         this.programLinks.length = 0
         this.performanceLinks.length = 0
         set.map( doc =>{
@@ -248,7 +248,7 @@ export class TournamentComponent{
         })
         //now recalculate the percentage for the Performance
         this.tournament!.program.map( performanceId =>{
-          this.firebaseService.getDocuments([TournamentCollection.collectionName, this.id
+          this.firebaseService.getDocuments([TournamentCollection.collectionName, this.tournamentId
             ,PerformanceCollection.collectionName, performanceId
             ,EvaluationGradeCollection.collectionName].join("/") ).then( set =>{
               let total = 0
@@ -273,7 +273,7 @@ export class TournamentComponent{
   }
 
   onAccept( id:string ){
-    this.firebaseService.unionArrayElementDoc( this.collection + "/" + this.id, "program", id).then( ()=>{
+    this.firebaseService.unionArrayElementDoc( this.collection + "/" + this.tournamentId, "program", id).then( ()=>{
       console.log("update programa")
       this.update()
     },
@@ -282,7 +282,7 @@ export class TournamentComponent{
     })
   }
   onReject( id:string ){
-    this.firebaseService.removeArrayElementDoc( this.collection + "/" + this.id, "program", id).then( ()=>{
+    this.firebaseService.removeArrayElementDoc( this.collection + "/" + this.tournamentId, "program", id).then( ()=>{
       console.log("update programa")
       this.update()
     },
@@ -299,7 +299,7 @@ export class TournamentComponent{
         let obj:Tournament ={
           program:this.tournament.program
         }
-        this.firebaseService.updateDocument( this.collection, this.id, obj).then( ()=>{
+        this.firebaseService.updateDocument( this.collection, this.tournamentId, obj).then( ()=>{
           this.update()
         },
         reason =>{
@@ -317,7 +317,7 @@ export class TournamentComponent{
         let obj:Tournament ={
           program:this.tournament.program
         }
-        this.firebaseService.updateDocument( this.collection, this.id, obj).then( ()=>{
+        this.firebaseService.updateDocument( this.collection, this.tournamentId, obj).then( ()=>{
           this.update()
         },
         reason =>{
@@ -331,7 +331,7 @@ export class TournamentComponent{
     let obj:Performance = {
       isReleased:true
     }
-    this.firebaseService.updateDocument( [TournamentCollection.collectionName, this.id
+    this.firebaseService.updateDocument( [TournamentCollection.collectionName, this.tournamentId
       ,PerformanceCollection.collectionName].join("/"), performanceId, obj).then( ()=>{
         this.update()
     },
@@ -357,5 +357,15 @@ export class TournamentComponent{
         day = '0' + day;
   
     return [year, month, day].join('-');
-  }  
+  } 
+  onPerformancesEdit(){
+    let parts = ['tournament',this.tournamentId,'performances']
+    let url = encodeURIComponent( parts.join("/") )
+    if( this.authService.isloggedIn() ){
+      this.router.navigate(parts)
+    }
+    else{
+      this.router.navigate(['/loginForm', url])
+    }
+  } 
 }

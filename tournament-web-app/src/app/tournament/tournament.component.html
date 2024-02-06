@@ -1,11 +1,15 @@
 <a routerLink="/"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
-<h1>Torneo:</h1>
+<h1>Torneo:
+    @if( tournamentId && tournament && isAdmin){
+        <button mat-icon-button color="warn" (click)="onDelete()"><mat-icon>delete</mat-icon></button>
+    }
+</h1>    
 <form [formGroup]="form">
    
     <mat-card>
         <mat-card-header>
             <mat-card-title-group>
-            @if( id && tournament && isAdmin == false){
+            @if( tournamentId && tournament && isAdmin == false){
                     <mat-card-title>{{ tournament.label }}</mat-card-title>
                     <img mat-card-lg-image [src]="tournament.imageUrl" >
             }
@@ -14,7 +18,7 @@
           
         <mat-card-content>
             
-            @if( !id || (isAdmin && tournament)){
+            @if( !tournamentId || (isAdmin && tournament)){
                 <div class="bar">
                     <mat-form-field>
                         <mat-label>Nombre del evento</mat-label>
@@ -29,18 +33,18 @@
                 </div>
                 <mat-form-field>
                     <mat-label>Image</mat-label>
-                    <input matInput placeholder="image" formControlName="imageUrl" (change)="onChange($event, id,'imageUrl')">
+                    <input matInput placeholder="image" formControlName="imageUrl" (change)="onChange($event, tournamentId,'imageUrl')">
                 </mat-form-field>   
               
                 <mat-form-field color="accent" appearance="fill">
                     <mat-label>Fecha del evento</mat-label>
-                    <input matInput [matDatepicker]="picker1" formControlName="eventDate"  (change)="onChange($event, id,'eventDate')">
+                    <input matInput [matDatepicker]="picker1" formControlName="eventDate"  (change)="onChange($event, tournamentId,'eventDate')">
                     <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
                     <mat-datepicker #picker1></mat-datepicker>
                 </mat-form-field>
                 <mat-form-field color="accent" appearance="fill">
                     <mat-label>Hora del evento</mat-label>            
-                    <input matInput formControlName="eventTime" [format]="24" [ngxTimepicker]="picker" (change)="onChange($event,id,'eventTime')">
+                    <input matInput formControlName="eventTime" [format]="24" [ngxTimepicker]="picker" (change)="onChange($event,tournamentId,'eventTime')">
                     <ngx-material-timepicker #picker></ngx-material-timepicker> 
                 </mat-form-field>              
             }
@@ -50,11 +54,11 @@
                 <h2>Hora:{{tournament.eventTime}}</h2>                
                 }
             }
-            @if( id && tournament ){
+            @if( tournamentId && tournament ){
                 <mat-divider></mat-divider>
                 <h2>Categorias
                 @if( isAdmin ){    
-                    <a [routerLink]="['/','tournament',id,'categories']">
+                    <a [routerLink]="['/','tournament',tournamentId,'categories']">
                         <button mat-button-icon><mat-icon>edit</mat-icon></button>
                     </a>  
                 }
@@ -67,7 +71,7 @@
                 <mat-divider></mat-divider>
                 <h2>Evaluaciones
                 @if(isAdmin){
-                    <a [routerLink]="['/','tournament',id,'evaluations']">
+                    <a [routerLink]="['/','tournament',tournamentId,'evaluations']">
                         <button mat-button-icon><mat-icon>edit</mat-icon></button>
                     </a>
                 }
@@ -79,7 +83,7 @@
                 @if(isAdmin){
                     <mat-divider></mat-divider>
                     <h2>Jurado
-                    <a [routerLink]="['/','tournament',id,'jurors']">
+                    <a [routerLink]="['/','tournament',tournamentId,'jurors']">
                         <button mat-button-icon><mat-icon>edit</mat-icon></button>
                     </a>
                     </h2>  
@@ -91,7 +95,7 @@
                 <mat-divider></mat-divider>        
                 <h2>Premios
                 @if(isAdmin){
-                    <a [routerLink]="['/','tournament',id,'medals']">
+                    <a [routerLink]="['/','tournament',tournamentId,'medals']">
                         <button mat-button-icon><mat-icon>edit</mat-icon></button>
                     </a>
                 }
@@ -99,13 +103,13 @@
                 @for( medal of tournament.medals; track medal){
                     <span class="item">{{medal.label}} {{medal.minGrade}}</span>
                 }    
-                <h2>Performances<a [routerLink]="['/','tournament',id,'performances']">
-                    <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                </a></h2> 
-                <h2>Program<a [routerLink]="['/','tournament',id,'program']">
+                <h2>Performances
+                    <button mat-button-icon (click)="onPerformancesEdit()"><mat-icon>edit</mat-icon></button>
+                </h2> 
+                <h2>Program<a [routerLink]="['/','tournament',tournamentId,'program']">
                     <button mat-button-icon><mat-icon>edit</mat-icon></button>
                 </a></h2>  
-                <h2>Podium<a [routerLink]="['/','tournament',id,'podium']">
+                <h2>Podium<a [routerLink]="['/','tournament',tournamentId,'podium']">
                     <button mat-button-icon><mat-icon>emoji_events</mat-icon></button>
                 </a></h2>                                                             
             }  
@@ -113,7 +117,7 @@
 
         </mat-card-content>   
         <mat-card-actions>
-            @if( !id ){
+            @if( !tournamentId ){
                 <button mat-button-icon (click)="onSubmit()"><mat-icon>done</mat-icon></button>
             }
         </mat-card-actions>

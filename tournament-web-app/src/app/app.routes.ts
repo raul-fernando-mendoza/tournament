@@ -13,6 +13,7 @@ import { ProgramListComponent } from './program-list/program-list.component';
 import { PodiumListComponent } from './podium-list/podium-list.component';
 
 export const routes: Routes = [
+    { path:"loginForm/:intendedPath",component:LoginFormComponent}, 
     { path:"loginForm",component:LoginFormComponent},    
     { path:"registerForm",component:LoginFormComponent},
     { path:"tournamentNew",component:TournamentComponent},
