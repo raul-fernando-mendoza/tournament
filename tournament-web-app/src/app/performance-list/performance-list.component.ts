@@ -34,7 +34,7 @@ import {MatCardModule} from '@angular/material/card';
 
 })
 export class PerformanceListComponent {
-  id!:string
+  tournamentId!:string
   tournament!:TournamentObj
 
   isAdding = false
@@ -48,7 +48,7 @@ export class PerformanceListComponent {
         next(paramMap){
           let tournamentId = paramMap.get('tournamentId')
           if( tournamentId!=null ){
-            thiz.id = tournamentId
+            thiz.tournamentId = tournamentId
             thiz.update()
           }
         }
@@ -63,7 +63,7 @@ export class PerformanceListComponent {
   }
 
   update(){
-    this.firebaseService.getDocument( TournamentCollection.collectionName, this.id).then( (data)=>{
+    this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( (data)=>{
       this.tournament = data 
      
     },
@@ -76,7 +76,7 @@ export class PerformanceListComponent {
 
   readPerformances(){
     this.formArray.clear()
-    this.firebaseService.getDocuments( [TournamentCollection.collectionName,this.id, PerformanceCollection.collectionName].join("/")).then( set =>{
+    this.firebaseService.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/")).then( set =>{
       set.map( e =>{
         let p = e.data() as PerformanceObj
         let g = this.fb.group({
@@ -124,7 +124,7 @@ export class PerformanceListComponent {
       isReleased: false
     }
     let id=uuidv4()
-    this.firebaseService.setDocument( [TournamentCollection.collectionName,this.id,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{
+    this.firebaseService.setDocument( [TournamentCollection.collectionName,this.tournamentId,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{
       console.log("performances added")
       this.isAdding = false
       this.update()
@@ -152,7 +152,7 @@ export class PerformanceListComponent {
         email:email
       }        
 
-      this.firebaseService.updateDocument( [TournamentCollection.collectionName,this.id,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{
+      this.firebaseService.updateDocument( [TournamentCollection.collectionName,this.tournamentId,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{
         console.log("performances list updated")
         this.update()
       },
@@ -163,18 +163,29 @@ export class PerformanceListComponent {
   }
 
   onDelete(id:string) {
-    let FGs = this.getGroups()
-    let idx = FGs.findIndex( FG => FG.controls["id"].value == id )
 
-    if( idx >= 0 ){
-      this.firebaseService.deleteDocument( [TournamentCollection.collectionName,this.id,PerformanceCollection.collectionName].join("/"), id).then( ()=>{
-        console.log("performances list updated")
-        this.update()
+    let programIdx = this.tournament.program.findIndex( e => e == id )
+    //remove from the program if it is there
+    if( programIdx>=0 ){
+      this.tournament.program.splice(programIdx, 1)
+      let obj:Tournament = {
+        program: this.tournament.program
+      }
+      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj ).then( ()=>{
+        console.log("Performance removed from program")
       },
-      reason =>{
-        alert("Error updating categories")
+      reason=>{
+        alert("ERROR: eliminando performance del programa:" + reason)
       })
     }
+
+    this.firebaseService.deleteDocument( [TournamentCollection.collectionName,this.tournamentId,PerformanceCollection.collectionName].join("/"), id).then( ()=>{
+      console.log("performances list updated")
+      this.update()
+    },
+    reason =>{
+      alert("Error deleting performances" + reason)
+    })
   }
   onCancelAdd(){
     let FGs = this.getGroups()
@@ -205,7 +216,7 @@ export class PerformanceListComponent {
       let obj:Tournament = {
         program:this.tournament.program
       }
-      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.id, obj).then( ()=>{
+      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
         this.update()
       },
       reason =>{
@@ -223,7 +234,7 @@ export class PerformanceListComponent {
       let obj:Tournament = {
         program:this.tournament.program
       }
-      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.id, obj).then( ()=>{
+      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
         this.update()
       },
       reason =>{

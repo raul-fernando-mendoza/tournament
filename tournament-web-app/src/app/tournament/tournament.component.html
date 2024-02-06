@@ -43,75 +43,73 @@
                     <input matInput formControlName="eventTime" [format]="24" [ngxTimepicker]="picker" (change)="onChange($event,id,'eventTime')">
                     <ngx-material-timepicker #picker></ngx-material-timepicker> 
                 </mat-form-field>              
-
-                @if( id && tournament ){
-                    <mat-divider></mat-divider>
-                    <h2>Categorias<a [routerLink]="['/','tournament',id,'categories']">
-                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                    </a></h2>  
-                    @if(tournament){ 
-                        @for( category of tournament.categories; track category){
-                            <a class="medalref" [routerLink]="['/','tournament',id,'category']">
-                                <button mat-button>{{category.label}}</button>
-                            </a>                      
-                        }               
-                    }             
-
-                
-                    <mat-divider></mat-divider>
-                    <h2>Evaluaciones<a [routerLink]="['/','tournament',id,'evaluations']">
-                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                    </a></h2>  
-                    @if(tournament){ 
-                        @for( e of tournament.evaluations; track e){
-                            <a class="medalref" [routerLink]="['/','tournament',id,'evaluations']">
-                                <button mat-button>{{e.label}}</button>
-                            </a>                      
-                        }               
-                    }             
-        
-                    
-                    <mat-divider></mat-divider>
-                    <h2>Jurado<a [routerLink]="['/','tournament',id,'jurors']">
-                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                    </a></h2>  
-                    @if(tournament){ 
-                        @for( j of tournament.jurors; track j){
-                            <a class="medalref" [routerLink]="['/','tournament',id,'jurors']">
-                                <button mat-button>{{j.label}}</button>
-                            </a>                      
-                        }               
-                    }                 
-        
-                    <mat-divider></mat-divider>        
-                    <h2>Premios<a [routerLink]="['/','tournament',id,'medals']">
-                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                    </a></h2>  
-                    @if(tournament){ 
-                        @for( medal of tournament.medals; track medal){
-                            <a class="medalref" [routerLink]="['/','tournament',id,'medals']">
-                                <button mat-button>{{medal.label}} {{medal.minGrade}}</button>
-                            </a>                      
-                        }               
-                    }
-                    <h2>Performances<a [routerLink]="['/','tournament',id,'performances']">
-                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                    </a></h2> 
-                    <h2>Program<a [routerLink]="['/','tournament',id,'program']">
-                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                    </a></h2>  
-                    <h2>Podium<a [routerLink]="['/','tournament',id,'podium']">
-                        <button mat-button-icon><mat-icon>emoji_events</mat-icon></button>
-                    </a></h2>                                                             
-                }    
-                              
-            }  
+            }
             @else{
                 @if( tournament ){
                 <h2>Fecha:{{tournament.eventDate.toDate() | date: 'dd/MM/yyyy'}}</h2>
                 <h2>Hora:{{tournament.eventTime}}</h2>                
                 }
             }
+            @if( id && tournament ){
+                <mat-divider></mat-divider>
+                <h2>Categorias
+                @if( isAdmin ){    
+                    <a [routerLink]="['/','tournament',id,'categories']">
+                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                    </a>  
+                }
+                </h2>
+                @for( category of tournament.categories; track category){
+                    <span class="item">{{category.label}}</span>
+                }               
+
+            
+                <mat-divider></mat-divider>
+                <h2>Evaluaciones
+                @if(isAdmin){
+                    <a [routerLink]="['/','tournament',id,'evaluations']">
+                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                    </a>
+                }
+                </h2>  
+                @for( e of tournament.evaluations; track e){
+                    <span class="item">{{e.label}}</span>
+                }               
+    
+                @if(isAdmin){
+                    <mat-divider></mat-divider>
+                    <h2>Jurado
+                    <a [routerLink]="['/','tournament',id,'jurors']">
+                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                    </a>
+                    </h2>  
+                    @for( j of tournament.jurors; track j){
+                        <span class="item">{{j.label}}</span>
+                    }               
+                }
+    
+                <mat-divider></mat-divider>        
+                <h2>Premios
+                @if(isAdmin){
+                    <a [routerLink]="['/','tournament',id,'medals']">
+                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                    </a>
+                }
+                </h2>  
+                @for( medal of tournament.medals; track medal){
+                    <span class="item">{{medal.label}} {{medal.minGrade}}</span>
+                }    
+                <h2>Performances<a [routerLink]="['/','tournament',id,'performances']">
+                    <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                </a></h2> 
+                <h2>Program<a [routerLink]="['/','tournament',id,'program']">
+                    <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                </a></h2>  
+                <h2>Podium<a [routerLink]="['/','tournament',id,'podium']">
+                    <button mat-button-icon><mat-icon>emoji_events</mat-icon></button>
+                </a></h2>                                                             
+            }  
+
 
         </mat-card-content>   
         <mat-card-actions>

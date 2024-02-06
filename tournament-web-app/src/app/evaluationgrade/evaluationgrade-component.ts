@@ -57,8 +57,8 @@ export class EvaluationGradeComponent implements OnInit{
     evaluatorId:['',Validators.required],
     isCompleted:[false]
   })
-  isAdmin:boolean=false
-  isOwner:boolean=false
+  isAdmin = false
+  canEdit:boolean=false
 
   evaluationGradeForm = this.fb.group({
     aspects:this.fb.array([]),
@@ -69,7 +69,7 @@ export class EvaluationGradeComponent implements OnInit{
     ,private activatedRoute: ActivatedRoute    
     ,private router: Router
     ,public pathService: PathService
-    ,private authService: AuthService 
+    ,private auth: AuthService 
     ,private bussinesslogicService:BusinesslogicService
     ,public dialog: MatDialog   
     ){
@@ -102,36 +102,54 @@ export class EvaluationGradeComponent implements OnInit{
   update(){
     this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( data =>{
       this.tournament = data as TournamentObj
+      if( this.tournament.creatorUid == this.auth.getUserUid() ){
+        this.isAdmin = true
+      }
     },
     reason =>{
       alert("Error reading tournament:" + reason)
-    })
-    this.firebaseService.getDocument( [TournamentCollection.collectionName, this.tournamentId,
-                                        PerformanceCollection.collectionName].join("/"), this.performanceId).then( data =>{
+    }).then( () =>{
+      return this.firebaseService.getDocument( [TournamentCollection.collectionName, this.tournamentId,
+        PerformanceCollection.collectionName].join("/"), this.performanceId).then( data =>{
       this.performance = data as PerformanceObj                                          
-    },
-    reason =>{
+      },
+      reason =>{
       alert("error reading performance:" + reason)
+      })
+
+    }).then( () =>{
+      return this.firebaseService.getDocument(
+        [TournamentCollection.collectionName,this.tournamentId
+        ,PerformanceCollection.collectionName,this.performanceId
+        ,EvaluationGradeCollection.collectionName].join("/"),
+        this.evaluationGradeId).then( data =>{
+          this.evaluationGrade = data as EvaluationGradeObj
+
+
+          let idx = this.tournament.jurors.findIndex( e => e.email == this.auth.getUserEmail())
+          if( idx >=0 ){
+            let jurorId = this.tournament.jurors[idx].id
+            if( this.evaluationGrade.jurorId == jurorId || this.tournament.creatorUid == this.auth.getUserUid()){
+              this.canEdit = true
+            }
+
+          }    
+
+          this.aspects.controls.length = 0
+          this.evaluationGrade.aspectGrades.map( aspect =>{
+            let newControl = this.fb.control([aspect.grade])
+            if( !(this.isAdmin || this.canEdit) || this.performance.isReleased  ){
+              newControl.disable()
+            }
+            this.aspects.push(newControl);
+          })
+        },
+        reason=>{
+          alert("Error: reading evaluationGrade:" + reason )
+      }) 
+  
     })
    
-    this.firebaseService.getDocument(
-      [TournamentCollection.collectionName,this.tournamentId
-      ,PerformanceCollection.collectionName,this.performanceId
-      ,EvaluationGradeCollection.collectionName].join("/"),
-      this.evaluationGradeId).then( data =>{
-        this.evaluationGrade = data as EvaluationGradeObj
-        this.aspects.controls.length = 0
-        this.evaluationGrade.aspectGrades.map( aspect =>{
-          let newControl = this.fb.control([aspect.grade])
-          if( this.performance.isReleased ){
-            newControl.disable()
-          }
-          this.aspects.push(newControl);
-        })
-      },
-      reason=>{
-        alert("Error: reading evaluationGrade:" + reason )
-    }) 
   }
   onCancel(){
     this.router.navigate(['/' + `${TournamentCollection.collectionName}/${this.tournamentId}/${PerformanceCollection.collectionName}/${this.performanceId}`])
@@ -156,7 +174,7 @@ export class EvaluationGradeComponent implements OnInit{
     for(let i=0; i<this.evaluationGrade.aspectGrades.length; i++){
       total += this.evaluationGrade.aspectGrades[i].grade
     }
-    this.evaluationGrade.grade = Number.parseFloat((10.0*(total/this.evaluationGrade.aspectGrades.length)).toFixed(2))
+    this.evaluationGrade.grade = Number.parseFloat((10.0*(total/this.evaluationGrade.aspectGrades.length)).toFixed(1))
   }  
   onSubmit(){
     this.updateGrade()

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { collection, connectFirestoreEmulator, doc, DocumentData, DocumentSnapshot, Firestore, FirestoreError, getDocs, getFirestore, onSnapshot, query, QuerySnapshot, Unsubscribe } from "firebase/firestore";
+import { collection, connectFirestoreEmulator, doc, DocumentData, DocumentSnapshot, Firestore, FirestoreError, where, getFirestore, onSnapshot, query, QuerySnapshot, Unsubscribe, WhereFilterOp, QueryFieldFilterConstraint } from "firebase/firestore";
 import { app, db } from '../environments/environment'
 
 export const fulldb:Firestore  = getFirestore(app);
@@ -25,8 +25,14 @@ export class FirebaseFullService {
     next?: ((snapshot: QuerySnapshot<DocumentData>) => void) | undefined;
     error?: ((error: FirestoreError) => void) | undefined;
     complete?: (() => void) | undefined;
-  }):Unsubscribe{
-    const q = query( collection(fulldb ,collectionPath) )
+  }, filter?:QueryFieldFilterConstraint):Unsubscribe{
+    let q
+    if( filter ){
+      q = query( collection(fulldb ,collectionPath), filter )
+    }
+    else{
+      q = query( collection(fulldb ,collectionPath) )
+    }
     return onSnapshot( q , observer )  
   }  
   

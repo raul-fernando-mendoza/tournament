@@ -17,6 +17,10 @@ mat-form-field{
 .medalref{
     display:block; 
 }
+.item{
+    display:block;
+    margin:1em;
+}
 .grade{
     font-size: large;
     margin-right: 1em;

@@ -4,7 +4,7 @@
 @if( tournament ){
     <h1>{{  tournament.label }}</h1>
 
-    <h1>Programa</h1>
+    <h2>Programa</h2>
     @for(p of performances; track p;let idx = $index, e = $even){
         <mat-grid-list cols="5" rowHeight="2em" [style.background]="performanceColor">
             <mat-grid-tile>
@@ -14,15 +14,25 @@
             </mat-grid-tile>
             <mat-grid-tile><span class="label">{{ p.performance.label }}</span></mat-grid-tile>
             <mat-grid-tile><span class="fullname">{{ p.performance.fullname }}</span></mat-grid-tile>
-            <mat-grid-tile><span class="score">score:{{ p.performance.grade }}</span>
-                @if( !p.performance.isReleased ){
-                    <button mat-mini-fab color="accent" (click)="onRelease(p.id)"><mat-icon>done</mat-icon></button>
+            <mat-grid-tile>
+                @if( isAdmin || p.performance.isReleased  ){
+                    <span class="score">score:{{ p.performance.grade }}</span>
+                }
+                @if( isAdmin && !p.performance.isReleased ){ 
+                    <button mat-mini-fab color="accent" (click)="onRelease(p)"><mat-icon>done</mat-icon></button>
                 }                
             </mat-grid-tile>
-            <mat-grid-tile><span>{{ p.medal }}</span></mat-grid-tile>    
+            <mat-grid-tile>
+                @if( isAdmin || p.performance.isReleased  ){
+                    <span>{{ p.medal }}</span>
+                }
+            </mat-grid-tile>    
         </mat-grid-list>        
         <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance"></app-evaluationgrade-list>
     } 
+    @empty{
+        Por favor adicione performances al programa desde la lista de performances 
+    }
 
 }
 

@@ -262,7 +262,7 @@ export class TournamentComponent{
               })
               if( gradesCnt > 0){
                 let idx = this.programLinks.findIndex( e => e.id==performanceId )
-                this.programLinks[idx].performance.grade = Number((total/gradesCnt).toFixed(2))
+                this.programLinks[idx].performance.grade = Number((total/gradesCnt).toFixed(1))
               }
           })
         })
@@ -288,7 +288,7 @@ export class TournamentComponent{
     },
     reason =>{
       alert("Error updating programa:" + reason)
-    })
+    }) 
   }  
   onProgramUp(linkId:string){
     if( this.tournament ){

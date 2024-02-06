@@ -1,6 +1,6 @@
 @if( performance ){
     @for( e of tournament.evaluations; track e; ){
-        @for(j of tournament.jurors;track j;){
+        @for(j of getJurors();track j;){
             <mat-grid-list cols="4" rowHeight="3em">
             <mat-grid-tile>{{e.label}}</mat-grid-tile>
             <mat-grid-tile>{{j.label}}</mat-grid-tile>
@@ -12,15 +12,30 @@
                         }
                     }
                     @else{
-                        {{ r.evaluationGrade.grade }}
-                        <a [routerLink]="['/tournament',tournamentId,'performance',performanceId,'evaluationGrade',r.id]"><button mat-icon-button><mat-icon>rate_review</mat-icon></button></a>            
+                        
+                        @if( isAdmin ){
+                            {{ r.evaluationGrade.grade }}
+                            <a [routerLink]="['/tournament',tournamentId,'performance',performanceId,'evaluationGrade',r.id]"><button mat-icon-button><mat-icon>rate_review</mat-icon></button></a>            
+                        }
+                        completado
                     }
+                </mat-grid-tile>
+                <mat-grid-tile>
+                    @if( isAdmin && !performance.isReleased){
+                        <button mat-icon-button color="warn" (click)="onRemoveEvaluationGrade(e.id,j.id)"><mat-icon>delete</mat-icon></button>
+                    }                    
                 </mat-grid-tile>
             }
             @empty{
                 @if( !performance.isReleased ){
-                    <mat-grid-tile><button mat-icon-button (click)="onAddEvaluationGrade(e.id,j.id)"><mat-icon>playlist_add</mat-icon></button></mat-grid-tile>
-                    <mat-grid-tile></mat-grid-tile>
+                    <mat-grid-tile>
+                        @if( isAdmin ){
+                            <button mat-icon-button (click)="onAddEvaluationGrade(e.id,j.id)"><mat-icon>playlist_add</mat-icon></button>
+                        }
+                    </mat-grid-tile>
+                    <mat-grid-tile>
+
+                    </mat-grid-tile>
                 }
             }
             </mat-grid-list>

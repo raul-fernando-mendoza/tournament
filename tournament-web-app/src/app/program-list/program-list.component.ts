@@ -7,18 +7,21 @@ import { FirebaseService } from '../firebase.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import {  Performance, PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj } from '../types';
+import {  EvaluationGradeCollection, EvaluationGradeObj, Performance, PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj } from '../types';
 import {MatGridListModule} from '@angular/material/grid-list';
 import { FirebaseFullService } from '../firebasefull.service';
 import { Unsubscribe } from 'firebase/auth';
-import { doc } from 'firebase/firestore';
+import { doc, DocumentData, QuerySnapshot } from 'firebase/firestore';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
+import { AuthService } from '../auth.service';
 
 interface PerformanceReference{
   id:string
   performance:PerformanceObj
   medal:string
+  idx:number
 }
+
 @Component({
   selector: 'app-program-list',
   standalone: true,
@@ -44,13 +47,18 @@ export class ProgramListComponent implements OnDestroy{
   performances:Array<PerformanceReference> = []
 
   performanceColor = 'lightblue'
-  
-  unsubscribers:Array<Unsubscribe> = []
+  isAdmin = false
+  tournament_unsubscribe:Unsubscribe = ()=>{}
+  performance_unsubscribers:Array<Unsubscribe> = []
+  evaluation_unsubscribers:Array<Unsubscribe> = []
+
+  evaluationGradesReferences: any;
 
   constructor( public firebaseService:FirebaseService 
     ,private firebaseFullService:FirebaseFullService
     ,private fb:FormBuilder
-    ,private activatedRoute: ActivatedRoute    
+    ,private activatedRoute: ActivatedRoute  
+    ,private auth:AuthService  
   ){
     var thiz = this
     this.activatedRoute.paramMap.subscribe({
@@ -64,56 +72,82 @@ export class ProgramListComponent implements OnDestroy{
       })
   }
   ngOnDestroy(): void {
-    this.unsubscribers.map( unsubscribe =>{
+    if( this.tournament_unsubscribe ){
+      this.tournament_unsubscribe()
+    }    
+    this.performance_unsubscribers.map( unsubscribe =>{
       unsubscribe()
     })
+    this.evaluation_unsubscribers.map( unsubscribe =>{
+      unsubscribe()
+    })    
   }
   update(){
-    let unsubscribe = this.firebaseFullService.onsnapShotDoc( TournamentCollection.collectionName, this.tournamentId,
+    if( this.tournament_unsubscribe ){
+      this.tournament_unsubscribe()
+    }
+    this.tournament_unsubscribe =this.firebaseFullService.onsnapShotDoc( TournamentCollection.collectionName,this.tournamentId,
       {
-        'next':(doc) =>{
-          this.tournament = doc.data() as TournamentObj 
-          this.readPerformances()
+        'next':(doc) =>{      
+            this.performances.length = 0
+            this.tournament = doc.data() as TournamentObj 
+            if( this.tournament.creatorUid == this.auth.getUserUid() ){
+              this.isAdmin = true
+            }
+            this.readPerformances()
         },
         'error':(reason) =>{
-          alert("Error leyendo el torneo:" + reason)
+          alert("ha habido un error leyendo el programa:" + reason)
         },
         'complete':() =>{
-          console.log("onsnapshot on tournament has completed")
+          console.log("reading program as ended")
         }
-    })
-    this.unsubscribers.push( unsubscribe )
+      }
+    )
+
   }
 
   readPerformances(){
-    this.performances.length = 0
+    this.performance_unsubscribers.map( unsub => unsub() )
+    this.evaluation_unsubscribers.map( unsub => unsub() )
+    this.performances.length = 0  
 
+    
     this.tournament.program.map( programId =>{
       console.log("reading program:" + programId)
       let unsubscribe =this.firebaseFullService.onsnapShotDoc( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") , programId,
         {
           'next':(doc) =>{
             let performance = doc.data() as PerformanceObj
+
             console.log("reading performance:" + performance.label)
             let idx = this.tournament.program.findIndex( e => e == doc.id)
-            let medal = this.getMedalForPerformance( performance.grade )
+            
             if(  idx >=0 ){
               let performanceRef:PerformanceReference={
                 id:doc.id,
                 performance:performance,
-                medal:medal
+                medal:"",
+                idx:idx
               }
               this.performances[idx] = performanceRef
+              if( performance.isReleased == false ){
+                let grade = this.recalculateGrade( performanceRef )
+              }
+              else{
+                performanceRef.medal = this.getMedalForPerformance( performanceRef.performance.grade )
+              }
             }
+            
           },
           'error':(reason) =>{
-            alert("ha habido un error levendo el programa:" + reason)
+            alert("ha habido un error leyendo el programa:" + reason)
           },
           'complete':() =>{
             console.log("reading program as ended")
           }
       })
-      this.unsubscribers.push( unsubscribe )
+      this.performance_unsubscribers.push( unsubscribe )
     })
   }
   onPerformanceUp(performanceId:string){
@@ -149,25 +183,68 @@ export class ProgramListComponent implements OnDestroy{
     }
   }
   getMedalForPerformance(grade:number):string{
-    console.log( "getting medal for:" + grade)
+    console.log("calculating medasl for:" + grade)
     for( let i = 0; i < this.tournament.medals.length; i++){
       if( grade >= this.tournament.medals[i].minGrade ){
-        return this.tournament.medals[i].label
+        return this.tournament.medals[i].label  
       }
     }
     return ""
   } 
-  onRelease(performanceId:string){
+  onRelease(performanceRef:PerformanceReference){
     let obj:Performance = {
+      grade:performanceRef.performance.grade,
       isReleased:true
     }
     this.firebaseService.updateDocument( [TournamentCollection.collectionName, this.tournamentId,
-                                          PerformanceCollection.collectionName].join("/"), performanceId, obj).then( ()=>{
+                                          PerformanceCollection.collectionName].join("/"), performanceRef.id, obj).then( ()=>{
       console.log("Performance release updated")
     },
     reason =>{
       alert("Error actualizando la liberacion")
     })
   }   
+  
 
+  recalculateGrade(performanceRef:PerformanceReference){
+      let unsubscribe = this.firebaseFullService.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId
+                                        , PerformanceCollection.collectionName, performanceRef.id
+                                        , EvaluationGradeCollection.collectionName].join("/"),
+        {
+          'next':(snapshot: QuerySnapshot<DocumentData>) =>{
+            let evaluationGrades:Array<EvaluationGradeObj> = []
+            snapshot.docs.map( doc =>{
+              let evaluationGrade = doc.data() as EvaluationGradeObj
+              evaluationGrades.push( evaluationGrade ) 
+            })
+            let average = this.calculateAverage( evaluationGrades )
+            performanceRef.performance.grade = Number(average.toFixed(1))
+            performanceRef.medal = this.getMedalForPerformance(performanceRef.performance.grade)
+          },
+          'error':(reason) =>{
+            alert("there has been an error reading performances:" + reason)
+          },
+          'complete':() =>{
+            console.log("reading program as ended")
+        }
+    })
+    this.evaluation_unsubscribers.push(unsubscribe)                                        
+  }  
+
+  calculateAverage(evaluationGrades:Array<EvaluationGradeObj>):Number{
+    let total = 0
+    let cnt = 0
+    evaluationGrades.map( evaluationGrade =>{
+      if( evaluationGrade.isCompleted ){
+        total += evaluationGrade.grade
+        cnt += 1
+      }
+    })
+    if( cnt > 0 ){
+      let newGrade = Number((total/cnt).toFixed(1))
+      return newGrade
+    }
+    return 0
+  }
+  
 }
