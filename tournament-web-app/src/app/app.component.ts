@@ -12,7 +12,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../environments/environment';
-
+import {MatMenuModule} from '@angular/material/menu';
 
 
 
@@ -27,7 +27,8 @@ import { auth } from '../environments/environment';
     MatIconModule,
     MatToolbarModule,
     MatButtonModule,
-    RouterModule
+    RouterModule,
+    MatMenuModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -84,5 +85,13 @@ export class AppComponent {
 
   isLoggedIn(){
     return this.authService.isloggedIn()
+  }  
+  onCreateTournament(){
+    if( this.authService.isloggedIn() ){
+      this.router.navigate(['/tournamentNew'])
+    }
+    else{
+      this.router.navigate(['/loginForm/tournamentNew'])
+    }
   }  
 }

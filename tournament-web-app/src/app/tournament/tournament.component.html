@@ -101,7 +101,10 @@
                 }
                 </h2>  
                 @for( medal of tournament.medals; track medal){
-                    <span class="item">{{medal.label}} {{medal.minGrade}}</span>
+                    <span class="item">{{medal.label}}</span>
+                    <p>
+                    {{medal.description}}
+                    </p>
                 }    
                 <h2>Performances
                     <button mat-button-icon (click)="onPerformancesEdit()"><mat-icon>edit</mat-icon></button>

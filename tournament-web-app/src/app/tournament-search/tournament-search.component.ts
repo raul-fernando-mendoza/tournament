@@ -81,12 +81,5 @@ export class TournamentSearchComponent implements AfterViewInit{
     this.authService.isloggedIn()
   }) 
   
-  onCreateTournament(){
-    if( this.authService.isloggedIn() ){
-      this.router.navigate(['/tournamentNew'])
-    }
-    else{
-      this.router.navigate(['/loginForm/tournamentNew'])
-    }
-  }
+
 }

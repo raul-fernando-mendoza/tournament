@@ -19,7 +19,7 @@
                     Nosotros
                 </button>       
                 <button *ngIf="(isHandset$ | async) === true" mat-stroked-button  (click)="drawer.toggle()"  aria-label="nosotros" >
-                    Nos
+                    Nosotros
                 </button>                         
             </mat-list-item>
         </mat-list>
@@ -43,31 +43,23 @@
                 <mat-icon>home</mat-icon>
             </a>             
         
-            <div class="spacer"></div>
+            <span class="spacer"></span>    
+            <button mat-raised-button (click)="onCreateTournament()" color="primary">Crear tu propio evento</button>
+
+            <button mat-icon-button [matMenuTriggerFor]="menu"><mat-icon>person</mat-icon></button>
+            <mat-menu #menu="matMenu">
+           
             @if ( isLoggedIn() ){
-                <span>
                     @if ( !(isHandset$ | async) ) {
                         <span class="login-name">{{ displayName }}</span>
                     }
-                    @else{
-                        <span class="login-name"><mat-icon>person</mat-icon></span>
-                    }    
-                    <button mat-stroked-button  aria-label="logout" (click)="logout()" *ngIf="isLoggedIn()">
-                        logout
-                    </button>    
-                </span>             
+                    <button mat-menu-item  aria-label="logout" (click)="logout()" *ngIf="isLoggedIn()">logout</button>    
             }    
             @else{
-                <span>
-                    <button mat-stroked-button  aria-label="login" (click)="login()" >
-                        Ingresar
-                    </button>
-                    
-                    <button mat-stroked-button  aria-label="register" (click)="Register()">
-                        Registrarte
-                    </button>  
-                </span>
+                    <button mat-menu-item  aria-label="login" (click)="login()" >Ingresar</button>
+                    <button mat-menu-item  aria-label="register" (click)="Register()">Registrarte</button>  
             }
+            </mat-menu>             
         </mat-toolbar>
     
         <router-outlet></router-outlet>

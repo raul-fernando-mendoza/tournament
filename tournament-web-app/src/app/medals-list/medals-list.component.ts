@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Medal, Tournament, TournamentCollection, TournamentObj } from '../types';
 import { v4 as uuidv4, v4 } from 'uuid';
+import {MatGridListModule} from '@angular/material/grid-list';
 
 
 @Component({
@@ -23,6 +24,7 @@ import { v4 as uuidv4, v4 } from 'uuid';
     ,MatFormFieldModule
     ,MatInputModule
     ,RouterModule
+    ,MatGridListModule
   ],
   templateUrl: './medals-list.component.html',
   styleUrl: './medals-list.component.css',
@@ -72,6 +74,7 @@ export class MedalsListComponent {
             this.fb.group({
               id:[medal.id,Validators.required],
               label:[medal.label,Validators.required],
+              description:[medal.description,Validators.required],
               minGrade:[medal.minGrade,Validators.required]
             })
           )
@@ -90,6 +93,7 @@ export class MedalsListComponent {
         this.fb.group({
           id:[null],
           label:['',Validators.required],
+          description:['',Validators.required],
           minGrade:['',Validators.required]
         })
       );
@@ -102,10 +106,12 @@ export class MedalsListComponent {
     let id = categoryGrp?.controls["id"].value
     let label = categoryGrp?.controls["label"].value.trim()
     let minGrade = categoryGrp?.controls["minGrade"].value
+    let description = categoryGrp?.controls["description"].value.trim()
     let medal:Medal = { 
       id:uuidv4(),
         label: label,
-        minGrade: Number(minGrade)
+        minGrade: Number(minGrade),
+        description:description
       }
     this.tournament.medals.push( medal )
     this.tournament.medals.sort( (a,b)=>{
@@ -134,9 +140,11 @@ export class MedalsListComponent {
         let categoryGrp = FGs[idx]
         let label =  categoryGrp?.controls["label"].value.trim()
         let minGrade =  Number(categoryGrp?.controls["minGrade"].value)
+        let description =  categoryGrp?.controls["description"].value.trim()
       
         this.tournament.medals[ idx ].label = label
         this.tournament.medals[ idx ].minGrade = minGrade
+        this.tournament.medals[ idx ].description = description
 
         this.tournament.medals.sort( (a,b)=>{
           return a.minGrade >= b.minGrade ? -1 : 1

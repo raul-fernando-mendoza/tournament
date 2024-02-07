@@ -3,19 +3,32 @@
 </a>
 <h1>Medallas<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
 @for(g of getGroups(); track g){
-    <form [formGroup]="g">
-         
+    <form [formGroup]="g"> 
          @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
-        <mat-form-field> 
-            <input matInput placeholder="label" formControlName="label" (change)="onChange(g.controls['id'].value)">
-        </mat-form-field>                 
-        <mat-form-field> 
-            <input matInput placeholder="calificacion minima" formControlName="minGrade" (change)="onChange(g.controls['id'].value)">
-        </mat-form-field>  
+            <mat-grid-list cols="5" rowHeight="7em">
+                <mat-grid-tile colspan="4">
+                    <mat-form-field> 
+                        <input matInput placeholder="label" formControlName="label" (change)="onChange(g.controls['id'].value)">
+                    </mat-form-field>                 
+                </mat-grid-tile>
+                <mat-grid-tile colspan="1">
+                    <mat-form-field> 
+                        <input matInput placeholder="calificacion minima" formControlName="minGrade" (change)="onChange(g.controls['id'].value)">
+                    </mat-form-field> 
+                </mat-grid-tile>
+                <mat-grid-tile colspan="5" rowSpan="7">
+                    <mat-form-field class="description"> 
+                        <textarea matInput placeholder="description" formControlName="description" (change)="onChange(g.controls['id'].value)"></textarea>
+                    </mat-form-field> 
+                </mat-grid-tile>                
+            </mat-grid-list>            
+ 
         }
         @else{
                 {{ g.controls['label'].value }}
                 {{ g.controls['minGrade'].value }}
+                {{ g.controls['description'].value }}
+                
         }
         @if( isAdding && g.controls['id'].value == null ){
             <button id="done" name="done" mat-button (click)="onSubmit()"><mat-icon>done</mat-icon></button>

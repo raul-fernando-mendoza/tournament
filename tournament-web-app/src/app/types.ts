@@ -3,6 +3,7 @@ import { Timestamp, WhereFilterOp } from "firebase/firestore/lite"
 export interface Medal{
     id:string
     label:string 
+    description:string
     minGrade:number    
 }
 
