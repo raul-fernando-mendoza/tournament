@@ -4,59 +4,67 @@
         <button mat-icon-button color="warn" (click)="onDelete()"><mat-icon>delete</mat-icon></button>
     }
 </h1>    
+
+
+
+
 <form [formGroup]="form">
    
     <mat-card>
         <mat-card-header>
-            <mat-card-title-group>
+            
             @if( tournamentId && tournament && isAdmin == false){
+                <mat-card-title-group>
                     <mat-card-title>{{ tournament.label }}</mat-card-title>
+                    @if( tournament ){
+                        <mat-card-subtitle>
+                        Fecha:{{tournament.eventDate.toDate() | date: 'dd/MM/yyyy'}}
+                        Hora:{{tournament.eventTime}}
+                        </mat-card-subtitle>                
+                    }                    
                     <img mat-card-lg-image [src]="tournament.imageUrl" >
+                </mat-card-title-group>    
             }
-            </mat-card-title-group>
         </mat-card-header>  
           
         <mat-card-content>
-            
             @if( !tournamentId || (isAdmin && tournament)){
                 <div class="bar">
-                    <mat-form-field>
-                        <mat-label>Nombre del evento</mat-label>
-                        <input matInput placeholder="" formControlName="label" (change)="onNameChange($event)">
-                    </mat-form-field>
-     
-            
-                    @if( tournament ){
+                    <div class="name-container">
+                        <mat-form-field class="name-input">
+                            <mat-label>Nombre del evento</mat-label>
+                            <input matInput placeholder="" formControlName="label" (change)="onNameChange($event)">
+                        </mat-form-field>
+                        <div>
+                            <mat-form-field color="accent" appearance="fill">
+                                <mat-label>Fecha del evento</mat-label>
+                                <input matInput [matDatepicker]="picker1" formControlName="eventDate"  (change)="onChange($event, tournamentId,'eventDate')">
+                                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                                <mat-datepicker #picker1></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div>
+                            <mat-form-field color="accent" appearance="fill">
+                                <mat-label>Hora del evento</mat-label>            
+                                <input matInput formControlName="eventTime" [format]="24" [ngxTimepicker]="picker" (change)="onChange($event,tournamentId,'eventTime')">
+                                <ngx-material-timepicker #picker></ngx-material-timepicker> 
+                            </mat-form-field> 
+                        </div>                        
+                    </div>    
+                @if( tournament ){
+                    @if( isAdmin ){
+                        <app-image-loader [fullpath]="tournament.imagePath" [basepath]="getBasePath()" (onload)="fileLoaded($event)" (ondelete)="fileDeleted($event)"></app-image-loader>                    
+                    }
+                    @else{
                         <img mat-card-lg-image [src]="tournament.imageUrl" >
                     }
-                
+                }                  
                 </div>
-                <mat-form-field>
-                    <mat-label>Image</mat-label>
-                    <input matInput placeholder="image" formControlName="imageUrl" (change)="onChange($event, tournamentId,'imageUrl')">
-                </mat-form-field>   
-              
-                <mat-form-field color="accent" appearance="fill">
-                    <mat-label>Fecha del evento</mat-label>
-                    <input matInput [matDatepicker]="picker1" formControlName="eventDate"  (change)="onChange($event, tournamentId,'eventDate')">
-                    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-                    <mat-datepicker #picker1></mat-datepicker>
-                </mat-form-field>
-                <mat-form-field color="accent" appearance="fill">
-                    <mat-label>Hora del evento</mat-label>            
-                    <input matInput formControlName="eventTime" [format]="24" [ngxTimepicker]="picker" (change)="onChange($event,tournamentId,'eventTime')">
-                    <ngx-material-timepicker #picker></ngx-material-timepicker> 
-                </mat-form-field>              
-            }
-            @else{
-                @if( tournament ){
-                <h2>Fecha:{{tournament.eventDate.toDate() | date: 'dd/MM/yyyy'}}</h2>
-                <h2>Hora:{{tournament.eventTime}}</h2>                
-                }
             }
             @if( tournamentId && tournament ){
+
                 <mat-divider></mat-divider>
-                <h2>Categorias
+                <h2>Categorias   
                 @if( isAdmin ){    
                     <a [routerLink]="['/','tournament',tournamentId,'categories']">
                         <button mat-button-icon><mat-icon>edit</mat-icon></button>
@@ -105,13 +113,26 @@
                     <p>
                     {{medal.description}}
                     </p>
-                }    
+                } 
+                <mat-divider></mat-divider> 
                 <h2>Performances
-                    <button mat-button-icon (click)="onPerformancesEdit()"><mat-icon>edit</mat-icon></button>
+                    @if( isLoggedIn ){
+                        <button mat-button-icon (click)="onPerformancesEdit()"><mat-icon>edit</mat-icon></button>
+                    }
                 </h2> 
-                <h2>Program<a [routerLink]="['/','tournament',tournamentId,'program']">
+                @if( !isLoggedIn ){
+                    <a [routerLink]="['/','tournament',tournamentId,'performances']">
+                        <button mat-raised-button color="accent" >Quiero presentarme</button>
+                    </a>
+                }   
+                <mat-divider></mat-divider>                              
+                <h2>Program
+                @if( isAdmin ){    
+                    <a [routerLink]="['/','tournament',tournamentId,'program']">
                     <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                </a></h2>  
+                </a>
+                }</h2> 
+                <mat-divider></mat-divider>                  
                 <h2>Podium<a [routerLink]="['/','tournament',tournamentId,'podium']">
                     <button mat-button-icon><mat-icon>emoji_events</mat-icon></button>
                 </a></h2>                                                             

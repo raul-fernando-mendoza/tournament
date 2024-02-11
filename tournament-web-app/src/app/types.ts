@@ -41,6 +41,7 @@ export interface Tournament{
     tags?:Array<string>
     creatorUid?:string
     imageUrl?:string|null
+    imagePath?:string|null
     program?:Array<string>
     categories?:Array<Category>
     medals?:Array<Medal>
@@ -54,6 +55,7 @@ export class TournamentObj implements Tournament{
     active: boolean = false
     tags?: string[] 
     creatorUid: string = ""
+    imagePath:string | null = null
     imageUrl: string | null = null
     program:Array<string> = []
     categories:Array<Category> = []

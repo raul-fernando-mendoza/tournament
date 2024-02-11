@@ -21,8 +21,9 @@ import { MatGridListModule} from '@angular/material/grid-list';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatMenuModule} from '@angular/material/menu';
-
-
+import { ImageLoaderComponent } from '../image-loader/image-loader.component';
+import {  ref , getDownloadURL} from "firebase/storage";
+import { storage } from '../../environments/environment';
 
 interface PerformanceReference{
   id:string
@@ -48,6 +49,7 @@ interface PerformanceReference{
   ,EvaluationgradeListComponent
   ,MatDividerModule
   ,MatMenuModule
+  ,ImageLoaderComponent
   ],
   templateUrl: './tournament.component.html',
   styleUrl: './tournament.component.css'
@@ -58,6 +60,7 @@ export class TournamentComponent{
   tournament:TournamentObj| null = null
   submitting = false
   isAdmin = false
+  isLoggedIn = false
 
   performanceColor = 'lightblue'
 
@@ -66,7 +69,8 @@ export class TournamentComponent{
     label:['',Validators.required],
     eventDate:[new Date(),Validators.required],
     eventTime:[""],
-    imageUrl:[""]
+    imageUrl:[""],
+    imagePath:[""]
   })
 
   collection = TournamentCollection.collectionName
@@ -116,6 +120,10 @@ export class TournamentComponent{
         if( this.authService.getUserUid()!= null && this.tournament?.creatorUid != null ){
           this.isAdmin = (this.authService.getUserUid() == this.tournament?.creatorUid) 
         } 
+        if( this.authService.getUserUid()!= null){
+          this.isLoggedIn = true
+        }
+        
         this.getPerformances()
       })
     }
@@ -142,6 +150,7 @@ export class TournamentComponent{
         eventDate: t,
         eventTime: this.form.controls.eventTime.value!,
         imageUrl: this.form.controls.imageUrl.value,
+        imagePath: this.form.controls.imagePath.value,
         active: true,
         creatorUid: this.authService.getUserUid()!,
         tags: tags,
@@ -368,4 +377,56 @@ export class TournamentComponent{
       this.router.navigate(['/loginForm', url])
     }
   } 
+
+  getBasePath():string{
+    return this.tournamentId!
+
+  }
+  fileLoaded(fullpath:string){
+    console.log("files has been loaded")
+    var storageRef = ref(storage, fullpath )
+    getDownloadURL(storageRef).then((downloadURL) => {
+      if( this.tournament ){
+        this.tournament.imageUrl = downloadURL 
+        this.tournament.imagePath = fullpath  
+        let obj:Tournament = {
+          imageUrl:this.tournament.imageUrl,
+          imagePath:this.tournament.imagePath
+        }
+        this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+          console.log( "imagen Updated" )
+        },
+        reason=>{
+          alert("ERROR: guardando la imagen:" + reason)
+        })    
+
+        
+      }
+      else{
+        this.form.controls.imageUrl.setValue(fullpath)
+      }      
+    })
+
+
+  }  
+  fileDeleted(fullpath:string){
+    console.log("files has been deleted")
+    if( this.tournament ){
+      this.tournament.imageUrl = ""
+      this.tournament.imagePath = ""
+      let obj:Tournament = {
+        imageUrl:this.tournament.imageUrl,
+        imagePath:this.tournament.imagePath
+      }
+      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+        console.log( "imagen deleted" )
+      },
+      reason=>{
+        alert("ERROR: guardando la imagen:" + reason)
+      })          
+    }
+    else{
+      this.form.controls.imageUrl.setValue("")
+    }        
+  }  
 }

@@ -3,7 +3,7 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { Auth, getAuth } from "firebase/auth";
 import { getFirestore, Firestore ,connectFirestoreEmulator } from 'firebase/firestore/lite';
-
+import { FirebaseStorage, getStorage } from "firebase/storage";
 export const isDebug = true
 
 const firebaseConfig = {
@@ -19,6 +19,8 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app:FirebaseApp  = initializeApp(firebaseConfig);
 export const db:Firestore  = getFirestore(app);
+export const storage:FirebaseStorage = getStorage(app)
+
 connectFirestoreEmulator(db, 'localhost', 8080);
 
 export const auth:Auth = getAuth(app)

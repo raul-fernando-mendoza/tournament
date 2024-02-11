@@ -1,8 +1,11 @@
 mat-card{
     width:100%;
 }
-mat-form-field{
-    width:80%;  
+.name-container{
+    width:60%;
+}
+.name-input{
+    width:100%;
 }
 .performanceLink{
     display:block;

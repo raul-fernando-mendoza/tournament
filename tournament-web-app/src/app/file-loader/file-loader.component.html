@@ -1,0 +1,22 @@
+
+    <div #status></div>
+    <mat-form-field>
+
+        <mat-label #fileName >selecciona un archivo</mat-label>
+        <input matInput disabled> 
+        <mat-hint>seleccione una imagen</mat-hint>
+        @if (error) {
+            <mat-error>{{error}}</mat-error>
+        }        
+        <span>{{progress}}</span>
+
+      
+        <input hidden (change)="selectFile($event)" name="file" #file type="file" >
+    </mat-form-field>
+    <button mat-icon-button  matSuffix (click)="file.click()">
+        <mat-icon>attach_file</mat-icon> 
+    </button>
+    <button class="remove-property-button" mat-icon-button matSuffix  (click)="removePropertyValue()">
+        <mat-icon>delete</mat-icon>
+    </button>    
+
