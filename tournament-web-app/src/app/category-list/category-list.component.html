@@ -9,6 +9,9 @@
             <mat-form-field>    
                 <input matInput placeholder="label" formControlName="label" (change)="onChange(category.controls['id'].value)">
             </mat-form-field>
+            <mat-form-field> 
+                <textarea matInput placeholder="description" formControlName="description" (change)="onChange(category.controls['id'].value)"></textarea>
+            </mat-form-field>              
             }
             @else{
                 {{ category.controls['label'].value }}
@@ -24,8 +27,9 @@
             <button mat-button (click)="onSave(category.controls['id'].value)"><mat-icon>done</mat-icon></button>
             <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
         }
-
+        
     </form>
+    <mat-divider></mat-divider>
 
     
 }    

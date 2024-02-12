@@ -29,7 +29,9 @@ import { EvaluationListComponent } from '../evaluation-list/evaluation-list.comp
 interface PerformanceReference{
   id:string
   performance:PerformanceObj
+  isInProgram:boolean
 }
+
 
 @Component({
   selector: 'app-tournament',
@@ -77,9 +79,9 @@ export class TournamentComponent{
 
   collection = TournamentCollection.collectionName
 
-  performanceLinks:Array<PerformanceReference> = []
+  performances:Array<PerformanceReference> = []
 
-  programLinks:Array<PerformanceReference> = []
+  program:Array<PerformanceReference> = []  
 
   constructor(
      private activatedRoute: ActivatedRoute
@@ -126,7 +128,8 @@ export class TournamentComponent{
           this.isLoggedIn = true
         }
         
-        this.getPerformances()
+        this.readPerformances()
+        this.readProgram()
       })
     }
   }
@@ -233,56 +236,6 @@ export class TournamentComponent{
       value: this.authService.getUserEmail()
     }
     return [filter]
-  }
-
-  getPerformances():Promise<void>{
-    return this.firebaseService.getDocuments( TournamentCollection.collectionName + "/" + this.tournamentId + "/" + PerformanceCollection.collectionName ).then( set =>{
-        this.programLinks.length = 0
-        this.performanceLinks.length = 0
-        set.map( doc =>{
-          let performanceObj = doc.data() as PerformanceObj
-          
-          let performanceLink:PerformanceReference = {
-            id:doc.id,
-            performance:performanceObj
-          }
-          let isInProgram = false
-
-          let idx = this.tournament!.program.findIndex( e => e==performanceLink.id)
-          if( idx >= 0){
-                //it is in the program
-                isInProgram = true
-                this.programLinks[idx] = performanceLink
-          }          
-          if( isInProgram == false ){
-            //add to program
-            this.performanceLinks.push( performanceLink )
-          }
-        })
-        //now recalculate the percentage for the Performance
-        this.tournament!.program.map( performanceId =>{
-          this.firebaseService.getDocuments([TournamentCollection.collectionName, this.tournamentId
-            ,PerformanceCollection.collectionName, performanceId
-            ,EvaluationGradeCollection.collectionName].join("/") ).then( set =>{
-              let total = 0
-              let gradesCnt = 0
-              set.map( doc =>{
-                let evaluationGrade:EvaluationGradeObj = doc.data() as EvaluationGradeObj
-                if( evaluationGrade.isCompleted ){
-                  total += evaluationGrade.grade
-                  gradesCnt += 1
-                }
-              })
-              if( gradesCnt > 0){
-                let idx = this.programLinks.findIndex( e => e.id==performanceId )
-                this.programLinks[idx].performance.grade = Number((total/gradesCnt).toFixed(1))
-              }
-          })
-        })
-      },
-      reason =>{
-        alert("ERROR updating program:" + reason)
-      })
   }
 
   onAccept( id:string ){
@@ -433,4 +386,66 @@ export class TournamentComponent{
       this.form.controls.imageUrl.setValue("")
     }        
   }  
+
+  readPerformances(){
+    this.performances.length = 0
+    if( this.isLoggedIn ){
+      let filter:Array<Filter> = []
+      if( !this.isAdmin ){
+        let userFilter:Filter = {
+          field: 'email',
+          operator: '==',
+          value: this.authService.getUserEmail()
+        }
+        filter.push( userFilter )
+      }
+      this.firebaseService.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"), filter).then( set =>{
+        set.map( doc =>{
+          let p = doc.data() as PerformanceObj
+
+          let pr:PerformanceReference = {
+            id: doc.id,
+            performance: p,
+            isInProgram: this.isInProgram(doc.id)
+          }
+          this.performances.push( pr )
+
+        })
+        this.performances.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
+      })
+    }
+  }
+
+  readProgram(){
+    this.program.length = 0  
+
+    if( this.tournament ){
+      this.tournament.program.map( programId =>{
+        console.log("reading program:" + programId)
+        this.firebaseService.getDocument( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") , programId).then( (data)=>{
+          let performance = data as PerformanceObj
+          let pr:PerformanceReference = {
+            id: programId,
+            performance: performance,
+            isInProgram: this.isInProgram(programId)
+          }
+          this.program.push( pr )
+        },
+        reason =>{
+          alert("ERROR error reading perfomance in program:" + reason)
+        })  
+      })
+    }
+  }  
+
+  isInProgram( id:string ):boolean{
+    let idx = this.tournament!.program.findIndex( e => e == id)
+    if( idx >= 0){
+      return true
+    }
+    else{
+      return false
+    }
+  }
+
 }

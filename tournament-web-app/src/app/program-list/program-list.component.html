@@ -32,7 +32,16 @@
                 }
             </mat-grid-tile>    
         </mat-grid-list>        
-        <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance"></app-evaluationgrade-list>
+        <mat-accordion>
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  Examenes
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+            <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance"></app-evaluationgrade-list>
+            </mat-expansion-panel>
+        </mat-accordion>        
     } 
     @empty{
         Por favor adicione performances al programa desde la lista de performances 

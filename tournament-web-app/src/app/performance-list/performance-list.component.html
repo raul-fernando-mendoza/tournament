@@ -11,8 +11,10 @@
                 @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
                     <mat-form-field> 
                         <input matInput placeholder="Nombre del performance" formControlName="label" (change)="onChange(g.controls['id'].value)">
-                    </mat-form-field> 
-                    <button mat-button color="warn" (click)="onDelete(g.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
+                    </mat-form-field>
+                    @if( g.controls['id'].value != null ){ 
+                        <button mat-button color="warn" (click)="onDelete(g.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
+                    }
                 }
                 @else{
                     <span class="label">{{ g.controls['label'].value }}</span>
@@ -49,7 +51,7 @@
                     <span class="email">{{ g.controls['email'].value }}</span>
             }
             @if( isAdding && g.controls['id'].value == null ){
-                <button id="done" name="done" mat-button (click)="onSubmit()"><mat-icon>done</mat-icon></button>
+                <button id="done" name="done" mat-button (click)="onSubmit()" [disabled]="!g.valid"><mat-icon>done</mat-icon></button>
                 <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
             }        
         </mat-card-content>
@@ -65,7 +67,7 @@
                 }
             }
             @if( !isAdding && g.controls['id'].value != null && g.dirty ){
-                <button mat-button (click)="onSave(g.controls['id'].value)"><mat-icon>done</mat-icon></button>
+                <button mat-button (click)="onSave(g.controls['id'].value)" [disabled]="!g.valid"><mat-icon>done</mat-icon></button>
                 <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
             }
         </mat-card-actions>

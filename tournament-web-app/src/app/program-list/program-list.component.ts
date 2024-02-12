@@ -14,6 +14,7 @@ import { Unsubscribe } from 'firebase/auth';
 import { doc, DocumentData, QuerySnapshot } from 'firebase/firestore';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
 import { AuthService } from '../auth.service';
+import {MatExpansionModule} from '@angular/material/expansion';
 
 interface PerformanceReference{
   id:string
@@ -36,6 +37,7 @@ interface PerformanceReference{
     ,RouterModule
     ,MatGridListModule
     ,EvaluationgradeListComponent
+    ,MatExpansionModule
   ],
   templateUrl: './program-list.component.html',
   styleUrl: './program-list.component.css',

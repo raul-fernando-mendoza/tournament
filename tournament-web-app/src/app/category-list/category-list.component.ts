@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Category, Tournament, TournamentCollection, TournamentObj } from '../types';
 import { v4 as uuidv4, v4 } from 'uuid';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-category-list',
@@ -21,7 +22,8 @@ import { v4 as uuidv4, v4 } from 'uuid';
     ,ReactiveFormsModule
     ,MatFormFieldModule
     ,MatInputModule
-    ,RouterModule],
+    ,RouterModule
+    ,MatDividerModule],
   templateUrl: './category-list.component.html',
   styleUrl: './category-list.component.css',
 
@@ -68,7 +70,8 @@ export class CategoryListComponent {
           FA.push(
             this.fb.group({
               id:[category.id],
-              label:[category.label,Validators.required]
+              label:[category.label,Validators.required],
+              description:[category.description,Validators.required]
             })
           )
         )
@@ -85,7 +88,8 @@ export class CategoryListComponent {
       category.push(
         this.fb.group({
           id:[null],
-          label:['',Validators.required]
+          label:['',Validators.required],
+          description:['',Validators.required]
         })
       );
       this.isAdding = true
@@ -96,10 +100,11 @@ export class CategoryListComponent {
     let categoryGrp = categoryFGs[ categoryFGs.length -1 ]
     let id = categoryGrp?.controls["id"].value
     let label = categoryGrp?.controls["label"].value
+    let description = categoryGrp?.controls["description"].value
     let category:Category = { 
       id:uuidv4(),
       label: label,
-      description: ''
+      description: description
     }
     this.tournament.categories.push( category )
     let obj:Tournament = {
@@ -125,18 +130,20 @@ export class CategoryListComponent {
       if( idx >= 0 ){
         let categoryGrp = FGs[idx]
         let label =  categoryGrp?.controls["label"].value.trim()
+        let description =  categoryGrp?.controls["description"].value.trim()
 
         this.tournament.categories[ idx ].label = label
+        this.tournament.categories[ idx ].description = description
         let obj:Tournament = {
           categories:this.tournament.categories
         }        
        
         this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-          console.log("medals list updated")
+          console.log("category list updated")
           this.update()
         },
         reason =>{
-          alert("Error updating medals")
+          alert("Error updating category")
         })
       }
     }

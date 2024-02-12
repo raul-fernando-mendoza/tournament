@@ -31,14 +31,14 @@
                 
         }
         @if( isAdding && g.controls['id'].value == null ){
-            <button id="done" name="done" mat-button (click)="onSubmit()"><mat-icon>done</mat-icon></button>
+            <button id="done" name="done" mat-button (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
             <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
         }        
         @if( !isAdding && g.controls['id'].value != null && g.enabled && !g.dirty  ){
             <button mat-button (click)="onDelete(g.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
         }
         @if( !isAdding && g.controls['id'].value != null && g.dirty ){
-            <button mat-button (click)="onSave(g.controls['id'].value)"><mat-icon>done</mat-icon></button>
+            <button mat-button (click)="onSave(g.controls['id'].value)" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
             <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
         }
 
