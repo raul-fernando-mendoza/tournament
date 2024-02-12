@@ -110,6 +110,19 @@ export class EvaluationEditComponent implements OnDestroy{
       }
       this.evaluation = evaluation
       this.tournament.evaluations.push( evaluation )
+      this.tournament.evaluations.sort( (a,b)=>{
+        return a.label >= b.label ? 1 : -1
+      }) 
+      let obj:Tournament = {
+        evaluations:this.tournament.evaluations
+      }
+      this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+        console.log("evaluations list inserted")
+        this.router.navigate(['/',TournamentCollection.collectionName,this.tournamentId,'evaluation', this.evaluation!.id])
+      },
+      reason =>{
+        alert("Error updating evaluations:" + reason)
+      })          
     }
     else{
       var id = this.evaluation.id
@@ -118,21 +131,19 @@ export class EvaluationEditComponent implements OnDestroy{
         this.tournament.evaluations[idx].label = label
         this.tournament.evaluations[idx].description = description
       }
+      let obj:Tournament = {
+        evaluations:this.tournament.evaluations
+      }
+      this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+        console.log("evaluations list updated")
+        this.router.navigate(['/',TournamentCollection.collectionName,this.tournamentId])
+      },
+      reason =>{
+        alert("Error updating evaluations:" + reason)
+      })        
     }  
     
-    this.tournament.evaluations.sort( (a,b)=>{
-      return a.label >= b.label ? 1 : -1
-    }) 
-    let obj:Tournament = {
-      evaluations:this.tournament.evaluations
-    }
-    this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-      console.log("evaluations list updated")
-      this.router.navigate(['/',TournamentCollection.collectionName,this.tournamentId,'evaluation', this.evaluation!.id])
-    },
-    reason =>{
-      alert("Error updating evaluations:" + reason)
-    })      
+  
   }
   onDelete(){
     let idx = this.tournament.evaluations.findIndex( e => e.id == this.evaluationId)

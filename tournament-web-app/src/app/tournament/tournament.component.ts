@@ -135,7 +135,9 @@ export class TournamentComponent{
     if( !this.tournamentId ){
       let id = uuidv4();
       let d:Date = this.form.controls.eventDate.value!
-      let t:Timestamp = new Timestamp(d.getSeconds(), 0)
+
+      
+      let t:Timestamp = new Timestamp(d.getTime()/1000, 0)
 
       var label = this.form.controls.label.value!
       var tags:Array<string> =  []
