@@ -22,7 +22,7 @@ export interface Aspect{
 export interface Evaluation{
     id:string
     label:string
-    description?:string    
+    description:string    
     aspects:Array<Aspect>
 }
 

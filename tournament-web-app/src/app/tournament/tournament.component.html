@@ -75,20 +75,11 @@
                     <span class="item">{{category.label}}</span>
                 }               
 
-            
-                <mat-divider></mat-divider>
-                <h2>Evaluaciones
                 @if(isAdmin){
-                    <a [routerLink]="['/','tournament',tournamentId,'evaluations']">
-                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                    </a>
-                }
-                </h2>  
-                @for( e of tournament.evaluations; track e){
-                    <span class="item">{{e.label}}</span>
-                }               
+                    <mat-divider></mat-divider>
+                    <app-evaluation-list [tournamentId]="tournamentId" [tournament]="tournament"></app-evaluation-list>
     
-                @if(isAdmin){
+                
                     <mat-divider></mat-divider>
                     <h2>Jurado
                     <a [routerLink]="['/','tournament',tournamentId,'jurors']">

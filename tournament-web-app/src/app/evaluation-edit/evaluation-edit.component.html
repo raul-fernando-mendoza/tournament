@@ -1,0 +1,43 @@
+<a [routerLink]="['/','tournament',tournamentId]">
+    <button mat-button-button><mat-icon>arrow_back</mat-icon></button>   
+</a>  
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>
+            @if( evaluationId==null ){
+                <h1>Adicionar una nueva evaluacion</h1>                
+            }
+            @else{
+                Evaluación
+            }
+        </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <form [formGroup]="form">
+        @if( evaluationId==null || (evaluation) ){
+            <div class="bar">
+            <mat-form-field> 
+                <input matInput placeholder="label" formControlName="label">
+            </mat-form-field> 
+            @if( evaluationId ){
+                <button mat-icon-button color="warn" (click)="onDelete()"><mat-icon>delete</mat-icon></button>
+            }
+            </div>
+
+            <mat-form-field> 
+                <textarea matInput placeholder="description" formControlName="description"></textarea>
+            </mat-form-field>  
+        }
+        </form>
+
+        @if( tournament && evaluationId && evaluation  ) {
+            <app-aspect-list [tournamentId]="tournamentId" [tournament]="tournament" [evaluationId]="evaluationId" [evaluation]="evaluation"></app-aspect-list>          
+        }        
+    </mat-card-content>
+    <mat-card-actions>
+        <button mat-button (click)="onSave()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+        <a [routerLink]="['/','tournament',tournamentId]">
+            <button mat-button><mat-icon>cancel</mat-icon></button>   
+        </a>                    
+    </mat-card-actions>  
+</mat-card>

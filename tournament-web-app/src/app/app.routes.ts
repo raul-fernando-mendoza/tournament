@@ -11,6 +11,8 @@ import { PerformanceListComponent } from './performance-list/performance-list.co
 import { AspectListComponent } from './aspect-list/aspect-list.component';
 import { ProgramListComponent } from './program-list/program-list.component';
 import { PodiumListComponent } from './podium-list/podium-list.component';
+import { EvaluationEditComponent } from './evaluation-edit/evaluation-edit.component';
+import { AspectEditComponent } from './aspect-edit/aspect-edit.component';
 
 export const routes: Routes = [
     { path:"loginForm/:intendedPath",component:LoginFormComponent}, 
@@ -29,9 +31,11 @@ export const routes: Routes = [
     
     { path:"tournament/:tournamentId/categories",component:CategoryListComponent},
     { path:"tournament/:tournamentId/evaluations",component:EvaluationListComponent},
+    { path:"tournament/:tournamentId/evaluation/:evaluationId",component:EvaluationEditComponent},
+    { path:"tournament/:tournamentId/evaluation/:evaluationId/aspect/:aspectId",component:AspectEditComponent},
+
     { path:"tournament/:tournamentId/jurors",component:JurorListComponent},
     { path:"tournament/:tournamentId/performances",component:PerformanceListComponent},
-    { path:"tournament/:tournamentId/evaluations/:evaluationId/aspects",component:AspectListComponent},
     { path:"tournament/:tournamentId/program",component:ProgramListComponent},
     { path:"tournament/:tournamentId/podium",component:PodiumListComponent},
     

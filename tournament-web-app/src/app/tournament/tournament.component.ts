@@ -24,6 +24,7 @@ import {MatMenuModule} from '@angular/material/menu';
 import { ImageLoaderComponent } from '../image-loader/image-loader.component';
 import {  ref , getDownloadURL} from "firebase/storage";
 import { storage } from '../../environments/environment';
+import { EvaluationListComponent } from '../evaluation-list/evaluation-list.component';
 
 interface PerformanceReference{
   id:string
@@ -50,6 +51,7 @@ interface PerformanceReference{
   ,MatDividerModule
   ,MatMenuModule
   ,ImageLoaderComponent
+  ,EvaluationListComponent
   ],
   templateUrl: './tournament.component.html',
   styleUrl: './tournament.component.css'

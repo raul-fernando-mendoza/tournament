@@ -3,7 +3,8 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { Auth, getAuth } from "firebase/auth";
 import { getFirestore, Firestore ,connectFirestoreEmulator } from 'firebase/firestore/lite';
-import { FirebaseStorage, getStorage } from "firebase/storage";
+import { connectStorageEmulator, FirebaseStorage, getStorage } from "firebase/storage";
+import { start } from "node:repl";
 export const isDebug = true
 
 const firebaseConfig = {
@@ -22,6 +23,7 @@ export const db:Firestore  = getFirestore(app);
 export const storage:FirebaseStorage = getStorage(app)
 
 connectFirestoreEmulator(db, 'localhost', 8080);
+connectStorageEmulator(storage,'localhost', 8080)
 
 export const auth:Auth = getAuth(app)
 

@@ -1,37 +1,17 @@
-<a [routerLink]="'/tournament/'+tournamentId">
-    <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
-</a>
-@if( tournament && evaluation ){
-    <h1>Aspectos<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
-    @for(g of getGroups(); track g){
-        <form [formGroup]="g">
-            
-            @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
-            <mat-form-field> 
-                <input matInput placeholder="Nombre del aspecto" formControlName="label" (change)="onChange(g.controls['id'].value)">
-            </mat-form-field>                 
-            <mat-form-field> 
-                <textarea matInput placeholder="description" formControlName="description" (change)="onChange(g.controls['id'].value)"></textarea>
-            </mat-form-field>  
-            }
-            @else{
-                    {{ g.controls['label'].value }}
-                    {{ g.controls['description'].value }}
-            }
-            @if( isAdding && g.controls['id'].value == null ){
-                <button id="done" name="done" mat-button (click)="onSubmit()"><mat-icon>done</mat-icon></button>
-                <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
-            }        
-            @if( !isAdding && g.controls['id'].value != null && g.enabled && !g.dirty  ){
-                <button mat-button (click)="onDelete(g.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
-            }
-            @if( !isAdding && g.controls['id'].value != null && g.dirty ){
-                <button mat-button (click)="onSave(g.controls['id'].value)"><mat-icon>done</mat-icon></button>
-                <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
-            }
-
-        </form>
+<h1>Aspectos
+    @if( isAdmin ){
+        <a [routerLink]="['/','tournament',tournamentId,'evaluation',evaluationId,'aspect',null]">
+            <button mat-icon-button><mat-icon>add</mat-icon></button>
+        </a>
     }    
+</h1>
+@if( evaluation ){
+    @for(aspect of evaluation.aspects; track aspect){
+        <div class="aspect" (click)="onAspect(aspect.id)">
+            <button mat-button><span class="label">{{ aspect.label }}</span></button>
+            <p>
+                {{ aspect.description }}
+            </p>    
+        </div>           
+    }
 }
-
-
