@@ -1,9 +1,7 @@
 <h1>Aspectos
-    @if( isAdmin ){
-        <a [routerLink]="['/','tournament',tournamentId,'evaluation',evaluationId,'aspect',null]">
-            <button mat-icon-button><mat-icon>add</mat-icon></button>
-        </a>
-    }    
+    <a [routerLink]="['/','tournament',tournamentId,'evaluation',evaluationId,'aspect',null]">
+        <button mat-icon-button><mat-icon>add</mat-icon></button>
+    </a>
 </h1>
 @if( evaluation ){
     @for(aspect of evaluation.aspects; track aspect){

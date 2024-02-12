@@ -31,7 +31,7 @@ import { AuthService } from '../auth.service';
   styleUrl: './evaluation-list.component.css',
 
 })
-export class EvaluationListComponent implements AfterViewInit, OnDestroy{
+export class EvaluationListComponent{
   @Input() tournamentId:string | null = null
   @Input() tournament!:TournamentObj
 
@@ -48,24 +48,12 @@ export class EvaluationListComponent implements AfterViewInit, OnDestroy{
   ){
 
   }
-  ngAfterViewInit(): void {
-    this.update()
-  }
   ngOnDestroy(): void {
     if( this.unsubscribe ){
       this.unsubscribe()
     }
   }
 
-  form = new FormGroup({
-    evaluations: new FormArray([]),
-  });  
-
-  update(){
-    if( this.auth.getUserUid()!= null && this.tournament?.creatorUid != null ){
-      this.isAdmin = (this.auth.getUserUid() == this.tournament?.creatorUid) 
-    }         
-  }
   onEvaluation(id:string){
     this.router.navigate(['/',TournamentCollection.collectionName,this.tournamentId,'evaluation',id])
   }

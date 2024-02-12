@@ -1,20 +1,19 @@
 <h1>Evaluaciones
-    @if( isAdmin ){
-        <a [routerLink]="['/','tournament',tournamentId,'evaluation','null']">
-            <button mat-icon-button><mat-icon>add</mat-icon></button>
-        </a>
-    }
+    <a [routerLink]="['/','tournament',tournamentId,'evaluation','null']">
+        <button mat-icon-button><mat-icon>add</mat-icon></button>
+    </a>
 </h1>
-@for( e of tournament.evaluations; track e){
-    
-    <div (click)="onEvaluation(e.id)">
-        <button mat-button><span class="label">{{ e.label }}</span></button>
-        <p>
-            {{ e.description }}
-        </p>    
-    </div>
+@if( tournament ){
+    @for( e of tournament.evaluations; track e){
+        
+        <div (click)="onEvaluation(e.id)">
+            <button mat-button><span class="label">{{ e.label }}</span></button>
+            <p>
+                {{ e.description }}
+            </p>    
+        </div>
 
+    }
 }
-
 
 
