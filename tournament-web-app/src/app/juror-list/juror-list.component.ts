@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { CommonModule, ViewportScroller } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Juror, Tournament, TournamentCollection, TournamentObj } from '../types';
 import { v4 as uuidv4, v4 } from 'uuid';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-juror-list',
@@ -21,20 +22,27 @@ import { v4 as uuidv4, v4 } from 'uuid';
     ,ReactiveFormsModule
     ,MatFormFieldModule
     ,MatInputModule
-    ,RouterModule],
+    ,RouterModule
+    ,MatCardModule    
+  ],
   templateUrl: './juror-list.component.html',
   styleUrl: './juror-list.component.css',
 
 })
 export class JurorListComponent {
+  @ViewChild("edited", {static: false}) childComponentRef: ElementRef | null = null;
+
   tournamentId:string | null = null
   tournament!:TournamentObj
 
+
   isAdding = false
+  editingId:string | null = null  
 
   constructor( public firebaseService:FirebaseService 
     ,private fb:FormBuilder
-    ,private activatedRoute: ActivatedRoute    
+    ,private activatedRoute: ActivatedRoute 
+    ,private viewportScroller: ViewportScroller          
   ){
     var thiz = this
     this.activatedRoute.paramMap.subscribe({
@@ -59,6 +67,8 @@ export class JurorListComponent {
   }
 
   update(){
+    this.isAdding = false
+    this.editingId = null      
     this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( (data)=>{
       this.tournament = data 
       let jurors = this.form.get('jurors') as FormArray
@@ -81,6 +91,8 @@ export class JurorListComponent {
   }
 
   onAdd() {
+    this.isAdding =true
+    this.editingId = null       
     let jurors = this.form.get('jurors') as FormArray
     if( jurors ){
       jurors.push(
@@ -94,6 +106,9 @@ export class JurorListComponent {
     this.isAdding = true
   }
   onSubmit(){
+    this.isAdding =false
+    this.editingId = null   
+
     let FGs = this.getGroups()
     let lastGrp = FGs[ FGs.length -1 ]
     let id = lastGrp.controls["id"].value
@@ -122,6 +137,9 @@ export class JurorListComponent {
   }
 
   onSave(id:string) {
+    this.isAdding =false
+    this.editingId = null   
+
     console.log("on save")
     if( id ){
 
@@ -155,6 +173,8 @@ export class JurorListComponent {
   }
 
   onDelete(id:string) {
+    this.isAdding =false
+    this.editingId = null 
 
     let idx:number = this.tournament.jurors.findIndex( c => c.id == id)
 
@@ -174,23 +194,45 @@ export class JurorListComponent {
     }
   }
   onCancelAdd(){
+    this.isAdding =false
+    this.editingId = null 
+
     let FGs = this.getGroups()
     FGs.splice( FGs.length-1,1)
     this.isAdding =false
   }  
 
-  onChange( id:string ){
-    let FGs = this.getGroups()
-    FGs.map( fg =>{
-      if( fg.controls["id"].value != id){
-        fg.disable()
-      } 
-    })
-    return true
+  onCancelEdit(){
+    this.isAdding = false
+    this.editingId = null       
+    this.update()
+  }
+  onEdit(id:string){
+    this.isAdding = false
+    this.editingId = id
+    this.waitForElement("edited")
   }
 
-  onCancelEdit(){
-    this.update()
-  }  
+  waitForElement(selector:string) {
+    let thiz = this
+    let observer = new MutationObserver(mutations => {
+      mutations.forEach(function(mutation) {
+        if( thiz.childComponentRef ){
+          observer.disconnect();
+          thiz.scroll(selector)
+        }
+      });
+    });
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+
+  scroll(selector:string) {
+    this.viewportScroller.scrollToAnchor(selector)
+  }
+
 
 }

@@ -109,7 +109,8 @@ export class CategoryListComponent {
   }
   onSubmit(){
     this.isAdding =false
-    this.editingId = null     
+    this.editingId = null   
+
     let categoryFGs = this.getCategoryGroups()
     let categoryGrp = categoryFGs[ categoryFGs.length -1 ]
     let id = categoryGrp?.controls["id"].value
@@ -188,6 +189,7 @@ export class CategoryListComponent {
   onCancelAdd(){
     this.isAdding =false
     this.editingId = null      
+    
     let FGs = this.getCategoryGroups()
     FGs.splice( FGs.length-1,1)
     this.isAdding =false

@@ -2,37 +2,46 @@
     <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
 </a>
 <h1>Jurados<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
-@for(g of getGroups(); track g){
-    <form [formGroup]="g">
-         
-         @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
+@for(e of getGroups(); track e){
+<mat-card [formGroup]="e">
+    <mat-card-content> 
+        @if( (isAdding && !e.controls['id'].value) || (e.controls['id'].value == editingId) ){
         <mat-form-field> 
-            <input matInput placeholder="Nombre del jurado" formControlName="label" (change)="onChange(g.controls['id'].value)">
+            <input matInput placeholder="Nombre del jurado" formControlName="label">
         </mat-form-field>                 
         <mat-form-field> 
-            <input matInput placeholder="email" formControlName="email" (change)="onChange(g.controls['id'].value)">
+            <input matInput placeholder="email" formControlName="email" >
         </mat-form-field>  
         }
         @else{
-                {{ g.controls['label'].value }}
-                {{ g.controls['email'].value }}
+                {{ e.controls['label'].value }}
+                {{ e.controls['email'].value }}
         }
-        @if( isAdding && g.controls['id'].value == null ){
-            <button id="done" name="done" mat-button (click)="onSubmit()"><mat-icon>done</mat-icon></button>
+    </mat-card-content>
+
+    <mat-card-actions>
+    @if( isAdding ){
+        @if( e.controls['id'].value == null ){
+            <button #edited id="edited" mat-button (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
             <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
-        }        
-        @if( !isAdding && g.controls['id'].value != null && g.enabled && !g.dirty  ){
-            <button mat-button (click)="onDelete(g.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
         }
-        @if( !isAdding && g.controls['id'].value != null && g.dirty ){
-            <button mat-button (click)="onSave(g.controls['id'].value)"><mat-icon>done</mat-icon></button>
+    }               
+    @else{
+        @if( e.controls['id'].value == editingId  ){
+            <button mat-button (click)="onSave(e.controls['id'].value)" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
             <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
+        }                
+        @else{
+            <button mat-button (click)="onEdit(e.controls['id'].value)"><mat-icon>edit</mat-icon></button>               
+            <button mat-button color="warn" (click)="onDelete(e.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
         }
+    }
+    </mat-card-actions>
 
-    </form>
+</mat-card>
+}
 
-    
-}    
+
 
 
 
