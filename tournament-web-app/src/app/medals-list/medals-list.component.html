@@ -1,51 +1,63 @@
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
 <a [routerLink]="'/tournament/'+tournamentId">
     <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
 </a>
 <h1>Medallas<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
+
 @for(g of getGroups(); track g){
-    <form [formGroup]="g"> 
-         @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
+    <mat-card [formGroup]="g"> 
+        <mat-card-content>
+         @if( (isAdding && !g.controls['id'].value) || (g.controls['id'].value == editingId) ){
             <mat-grid-list cols="5" rowHeight="7em">
                 <mat-grid-tile colspan="4">
                     <mat-form-field> 
-                        <input matInput placeholder="label" formControlName="label" (change)="onChange(g.controls['id'].value)">
+                        <input matInput placeholder="label" formControlName="label">
                     </mat-form-field>                 
                 </mat-grid-tile>
                 <mat-grid-tile colspan="1">
                     <mat-form-field> 
-                        <input matInput placeholder="calificacion minima" formControlName="minGrade" (change)="onChange(g.controls['id'].value)">
+                        <input matInput placeholder="calificacion minima" formControlName="minGrade">
                     </mat-form-field> 
                 </mat-grid-tile>
-                <mat-grid-tile colspan="5" rowSpan="7">
-                    <mat-form-field class="description"> 
-                        <textarea matInput placeholder="description" formControlName="description" (change)="onChange(g.controls['id'].value)"></textarea>
-                    </mat-form-field> 
-                </mat-grid-tile>                
-            </mat-grid-list>            
- 
+            </mat-grid-list>  
+            <quill-editor formControlName="description" placeholder="Descripción de la imagen"></quill-editor>
         }
         @else{
-                {{ g.controls['label'].value }}
-                {{ g.controls['minGrade'].value }}
-                {{ g.controls['description'].value }}
-                
+            <mat-grid-list cols="5" rowHeight="7em">
+                <mat-grid-tile colspan="4">
+                    {{ g.controls['label'].value }}                
+                </mat-grid-tile>
+                <mat-grid-tile colspan="1">
+                    {{ g.controls['minGrade'].value }} 
+                </mat-grid-tile>
+            </mat-grid-list>                  
+            <quill-view-html [content]="g.controls['description'].value"></quill-view-html>  
         }
-        @if( isAdding && g.controls['id'].value == null ){
-            <button id="done" name="done" mat-button (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
-            <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
-        }        
-        @if( !isAdding && g.controls['id'].value != null && g.enabled && !g.dirty  ){
-            <button mat-button (click)="onDelete(g.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
-        }
-        @if( !isAdding && g.controls['id'].value != null && g.dirty ){
-            <button mat-button (click)="onSave(g.controls['id'].value)" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
-            <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
-        }
+        </mat-card-content>
 
-    </form>
+        <mat-card-actions>
+        @if( isAdding ){
+            @if( g.controls['id'].value == null ){
+                <button #edited id="edited" mat-button (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+                <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
+            }
+        }               
+        @else{
+            @if( g.controls['id'].value == editingId  ){
+                <button mat-button (click)="onSave(g.controls['id'].value)" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+                <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
+            }                
+            @else{
+                <button mat-button (click)="onEdit(g.controls['id'].value)"><mat-icon>edit</mat-icon></button>               
+                <button mat-button color="warn" (click)="onDelete(g.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
+            }
+        }
+        </mat-card-actions>
+
+    </mat-card>
 
     
 }    
-
 
 

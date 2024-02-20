@@ -25,6 +25,7 @@ import { ImageLoaderComponent } from '../image-loader/image-loader.component';
 import {  ref , getDownloadURL} from "firebase/storage";
 import { storage } from '../../environments/environment';
 import { EvaluationListComponent } from '../evaluation-list/evaluation-list.component';
+import { QuillModule } from 'ngx-quill'
 
 interface PerformanceReference{
   id:string
@@ -54,6 +55,7 @@ interface PerformanceReference{
   ,MatMenuModule
   ,ImageLoaderComponent
   ,EvaluationListComponent
+  ,QuillModule
   ],
   templateUrl: './tournament.component.html',
   styleUrl: './tournament.component.css'

@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { CommonModule, ViewportScroller } from '@angular/common';
 import {FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -10,7 +10,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { Medal, Tournament, TournamentCollection, TournamentObj } from '../types';
 import { v4 as uuidv4, v4 } from 'uuid';
 import {MatGridListModule} from '@angular/material/grid-list';
-
+import { QuillModule } from 'ngx-quill'
+import {MatCardModule} from '@angular/material/card';
+import { throwToolbarMixedModesError } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-medals-list',
@@ -25,21 +27,28 @@ import {MatGridListModule} from '@angular/material/grid-list';
     ,MatInputModule
     ,RouterModule
     ,MatGridListModule
+    ,QuillModule
+    ,MatCardModule
   ],
   templateUrl: './medals-list.component.html',
   styleUrl: './medals-list.component.css',
 
 })
-export class MedalsListComponent {
+export class MedalsListComponent implements AfterViewInit{
+  @ViewChild("edited", {static: false}) childComponentRef: ElementRef | null = null;
+  
   tournamentId:string | null = null
   tournament!:TournamentObj
 
   isAdding = false
 
+  editingId:string | null = null
+
   constructor( public firebaseService:FirebaseService 
     ,private fb:FormBuilder
     ,private activatedRoute: ActivatedRoute    
     ,private router: Router
+    ,private viewportScroller: ViewportScroller
   ){
     var thiz = this
     this.activatedRoute.paramMap.subscribe({
@@ -51,6 +60,9 @@ export class MedalsListComponent {
           }
         }
       })
+  }
+  ngAfterViewInit(): void {
+    console.log( this.childComponentRef )
   }
 
   form = new FormGroup({
@@ -64,6 +76,8 @@ export class MedalsListComponent {
   }
 
   update(){
+    this.isAdding = false
+    this.editingId = null    
     this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( (data)=>{
       this.tournament = data 
       let medals = this.form.get('medals') as FormArray
@@ -87,6 +101,8 @@ export class MedalsListComponent {
   }
 
   onAdd() {
+    this.isAdding =true
+    this.editingId = null       
     let medals = this.form.get('medals') as FormArray
     if( medals ){
       medals.push(
@@ -97,10 +113,14 @@ export class MedalsListComponent {
           minGrade:['',Validators.required]
         })
       );
+      this.waitForElement("edited")      
     }
-    this.isAdding = true
+    
   }
   onSubmit(){
+    this.isAdding =false
+    this.editingId = null   
+
     let FGs = this.getGroups()
     let categoryGrp = FGs[ FGs.length -1 ]
     let id = categoryGrp?.controls["id"].value
@@ -122,7 +142,6 @@ export class MedalsListComponent {
     }
     this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
       console.log("medals list updated")
-      this.isAdding = false
       this.update()
     },
     reason =>{
@@ -131,6 +150,8 @@ export class MedalsListComponent {
   }
 
   onSave(id:string) {
+    this.isAdding =false
+    this.editingId = null       
     console.log("on save")
     if( id ){
 
@@ -157,6 +178,7 @@ export class MedalsListComponent {
         this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
           console.log("medals list updated")
           this.update()
+
         },
         reason =>{
           alert("Error updating medals")
@@ -166,6 +188,8 @@ export class MedalsListComponent {
   }
 
   onDelete(id:string) {
+    this.isAdding =false
+    this.editingId = null   
 
     let idx:number = this.tournament.medals.findIndex( c => c.id == id)
 
@@ -185,23 +209,45 @@ export class MedalsListComponent {
     }
   }
   onCancelAdd(){
+    this.isAdding =false
+    this.editingId = null    
     let FGs = this.getGroups()
     FGs.splice( FGs.length-1,1)
-    this.isAdding =false
-  }  
 
-  onChange( id:string ){
-    let FGs = this.getGroups()
-    FGs.map( fg =>{
-      if( fg.controls["id"].value != id){
-        fg.disable()
-      } 
-    })
-    return true
-  }
+  }  
 
   onCancelEdit(){
+    this.isAdding = false
+    this.editingId = null    
     this.update()
   }  
+
+  onEdit(id:string){
+    this.isAdding = false
+    this.editingId = id
+    this.waitForElement("edited")
+  }
+
+  waitForElement(selector:string) {
+    let thiz = this
+    let observer = new MutationObserver(mutations => {
+      mutations.forEach(function(mutation) {
+        if( thiz.childComponentRef ){
+          observer.disconnect();
+          thiz.scroll(selector)
+        }
+      });
+    });
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+
+  scroll(selector:string) {
+    this.viewportScroller.scrollToAnchor(selector)
+  }
+
 
 }
