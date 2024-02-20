@@ -13,6 +13,14 @@ npm install @types/quill
 npm install ngx-quill
 npm install quill
 
-in the html add
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+in the angular.json add
+
+            "styles": [
+              "@angular/material/prebuilt-themes/indigo-pink.css",
+              "./node_modules/quill/dist/quill.core.css",
+              "./node_modules/quill/dist/quill.bubble.css",
+              "./node_modules/quill/dist/quill.snow.css",             
+              "src/styles.css"
+            ],
+
 <quill-editor></quill-editor>
