@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { CommonModule, ViewportScroller } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -10,6 +10,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { Category, Tournament, TournamentCollection, TournamentObj } from '../types';
 import { v4 as uuidv4, v4 } from 'uuid';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatCardModule } from '@angular/material/card';
+import { QuillModule } from 'ngx-quill'
 
 @Component({
   selector: 'app-category-list',
@@ -23,20 +25,26 @@ import { MatDividerModule } from '@angular/material/divider';
     ,MatFormFieldModule
     ,MatInputModule
     ,RouterModule
-    ,MatDividerModule],
+    ,MatCardModule
+    ,QuillModule
+  ],
   templateUrl: './category-list.component.html',
   styleUrl: './category-list.component.css',
 
 })
 export class CategoryListComponent {
+  @ViewChild("edited", {static: false}) childComponentRef: ElementRef | null = null;
+    
   tournamentId:string | null = null
   tournament!:TournamentObj
 
   isAdding = false
+  editingId:string | null = null  
 
   constructor( public firebaseService:FirebaseService 
     ,private fb:FormBuilder
-    ,private activatedRoute: ActivatedRoute    
+    ,private activatedRoute: ActivatedRoute  
+    ,private viewportScroller: ViewportScroller      
   ){
     var thiz = this
     this.activatedRoute.paramMap.subscribe({
@@ -61,6 +69,8 @@ export class CategoryListComponent {
   }
 
   update(){
+    this.isAdding = false
+    this.editingId = null    
     this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( (data)=>{
       this.tournament = data 
       let FA = this.form.get('categories') as FormArray
@@ -82,7 +92,9 @@ export class CategoryListComponent {
     })    
   }
 
-  add() {
+  onAdd() {
+    this.isAdding =true
+    this.editingId = null      
     let category = this.form.get('categories') as FormArray
     if( category ){
       category.push(
@@ -96,6 +108,8 @@ export class CategoryListComponent {
     }
   }
   onSubmit(){
+    this.isAdding =false
+    this.editingId = null     
     let categoryFGs = this.getCategoryGroups()
     let categoryGrp = categoryFGs[ categoryFGs.length -1 ]
     let id = categoryGrp?.controls["id"].value
@@ -122,7 +136,8 @@ export class CategoryListComponent {
   }
 
   onSave(id:string) {
-    console.log("on save")
+    this.isAdding =false
+    this.editingId = null       
     if( id ){
 
       let FGs = this.getCategoryGroups()
@@ -150,6 +165,8 @@ export class CategoryListComponent {
   }
 
   onDelete(id:string) {
+    this.isAdding =false
+    this.editingId = null 
 
     let idx:number = this.tournament.categories.findIndex( c => c.id == id)
 
@@ -169,38 +186,44 @@ export class CategoryListComponent {
     }
   }
   onCancelAdd(){
+    this.isAdding =false
+    this.editingId = null      
     let FGs = this.getCategoryGroups()
     FGs.splice( FGs.length-1,1)
     this.isAdding =false
   }  
 
-  onLeave($event:any, id:string){
-    console.log( "onleave" )
-    /* 
-    var resultado = window.confirm('Desea Guardar los cambios?');
-    if (resultado === true) {
-        this.onSave(id)
-    } 
-    else{
-      this.isAdding = false
-      this.update()     
-    }
-    */
-    return true
-  }  
-
-  onChange( id:string ){
-    let FGs = this.getCategoryGroups()
-    FGs.map( fg =>{
-      if( fg.controls["id"].value != id){
-        fg.disable()
-      } 
-    })
-    return true
-  }
-
   onCancelEdit(){
+    this.isAdding = false
+    this.editingId = null       
     this.update()
   }
+  onEdit(id:string){
+    this.isAdding = false
+    this.editingId = id
+    this.waitForElement("edited")
+  }
+
+  waitForElement(selector:string) {
+    let thiz = this
+    let observer = new MutationObserver(mutations => {
+      mutations.forEach(function(mutation) {
+        if( thiz.childComponentRef ){
+          observer.disconnect();
+          thiz.scroll(selector)
+        }
+      });
+    });
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+
+  scroll(selector:string) {
+    this.viewportScroller.scrollToAnchor(selector)
+  }
+
 
 }

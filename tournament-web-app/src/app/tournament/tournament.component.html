@@ -72,13 +72,8 @@
                 }
                 </h2>
                 @for( category of tournament.categories; track category){
-                    <div>
-                    <h3 class="item">{{category.label}}</h3>
-                    <p>
-                        {{category.description}}
-                    </p> 
-                    </div> 
-
+                    <h3>{{category.label}}</h3>
+                    <quill-view-html [content]="category.description"></quill-view-html>                     
                 }               
 
                 @if(isAdmin){

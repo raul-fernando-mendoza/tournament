@@ -1,38 +1,45 @@
 <a [routerLink]="'/tournament/'+tournamentId">
     <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
 </a>
-<h1>Category<button mat-button-icon (click)="add()"><mat-icon>add</mat-icon></button></h1>
-@for(category of getCategoryGroups(); track category){
-    <form [formGroup]="category">
-         
-            @if( (!isAdding && category.controls['id'].value) || category.controls['id'].value == null ){
+<h1>Category<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
+@for(e of getCategoryGroups(); track e){
+    <mat-card [formGroup]="e">
+        <mat-card-content>
+            @if( (isAdding && !e.controls['id'].value) || (e.controls['id'].value == editingId) ){
             <mat-form-field>    
-                <input matInput placeholder="label" formControlName="label" (change)="onChange(category.controls['id'].value)">
+                <input matInput placeholder="label" formControlName="label" >
             </mat-form-field>
-            <mat-form-field> 
-                <textarea matInput placeholder="description" formControlName="description" (change)="onChange(category.controls['id'].value)"></textarea>
-            </mat-form-field>              
+            <quill-editor formControlName="description" placeholder="Descripción de la imagen"></quill-editor>            
             }
             @else{
-                {{ category.controls['label'].value }}
+                {{ e.controls['label'].value }}
+                <quill-view-html [content]="e.controls['description'].value"></quill-view-html>  
             }
-        @if( isAdding && category.controls['id'].value == null ){
-            <button id="done" name="done" mat-button (click)="onSubmit()"><mat-icon>done</mat-icon></button>
-            <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
-        }        
-        @if( !isAdding && category.controls['id'].value != null && category.enabled && !category.dirty  ){
-            <button mat-button (click)="onDelete(category.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
-        }
-        @if( !isAdding && category.controls['id'].value != null && category.dirty ){
-            <button mat-button (click)="onSave(category.controls['id'].value)"><mat-icon>done</mat-icon></button>
-            <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
-        }
-        
-    </form>
-    <mat-divider></mat-divider>
+        </mat-card-content>
 
+        <mat-card-actions>
+        @if( isAdding ){
+            @if( e.controls['id'].value == null ){
+                <button #edited id="edited" mat-button (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+                <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
+            }
+        }               
+        @else{
+            @if( e.controls['id'].value == editingId  ){
+                <button mat-button (click)="onSave(e.controls['id'].value)" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+                <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
+            }                
+            @else{
+                <button mat-button (click)="onEdit(e.controls['id'].value)"><mat-icon>edit</mat-icon></button>               
+                <button mat-button color="warn" (click)="onDelete(e.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
+            }
+        }
+        </mat-card-actions>
+
+    </mat-card>
+}
     
-}    
+    
 
 
 

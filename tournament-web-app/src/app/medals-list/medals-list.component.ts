@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { CommonModule, ViewportScroller } from '@angular/common';
-import {FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FirebaseService } from '../firebase.service';
@@ -12,7 +12,6 @@ import { v4 as uuidv4, v4 } from 'uuid';
 import {MatGridListModule} from '@angular/material/grid-list';
 import { QuillModule } from 'ngx-quill'
 import {MatCardModule} from '@angular/material/card';
-import { throwToolbarMixedModesError } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-medals-list',
