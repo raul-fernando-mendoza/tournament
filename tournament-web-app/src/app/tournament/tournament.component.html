@@ -78,8 +78,17 @@
 
                 @if(isAdmin){
                     <mat-divider></mat-divider>
-                    <app-evaluation-list [tournamentId]="tournamentId" [tournament]="tournament"></app-evaluation-list>
-    
+                    <h2>Evaluaciones   
+                        @if( isAdmin ){    
+                            <a [routerLink]="['/','tournament',tournamentId,'evaluation']">
+                                <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                            </a>
+                        }
+                        </h2>
+                        @for( evaluation of tournament.evaluations; track evaluation){
+                            <h3>{{evaluation.label}}</h3>
+                            <quill-view-html [content]="evaluation.description"></quill-view-html>                     
+                        }  
                 
                     <mat-divider></mat-divider>
                     <h2>Jurado

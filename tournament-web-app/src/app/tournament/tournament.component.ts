@@ -24,7 +24,6 @@ import {MatMenuModule} from '@angular/material/menu';
 import { ImageLoaderComponent } from '../image-loader/image-loader.component';
 import {  ref , getDownloadURL} from "firebase/storage";
 import { storage } from '../../environments/environment';
-import { EvaluationListComponent } from '../evaluation-list/evaluation-list.component';
 import { QuillModule } from 'ngx-quill'
 
 interface PerformanceReference{
@@ -54,7 +53,6 @@ interface PerformanceReference{
   ,MatDividerModule
   ,MatMenuModule
   ,ImageLoaderComponent
-  ,EvaluationListComponent
   ,QuillModule
   ],
   templateUrl: './tournament.component.html',

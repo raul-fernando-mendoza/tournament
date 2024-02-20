@@ -27,9 +27,14 @@
         }
     }               
     @else{
-        @if( e.controls['id'].value == editingId  ){
-            <button mat-button (click)="onSave(e.controls['id'].value)" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
-            <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
+        @if( editingId ){
+            @if(e.controls['id'].value == editingId  ){
+                <button mat-button (click)="onSave(e.controls['id'].value)" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+                <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
+            }
+            @else{
+
+            }
         }                
         @else{
             <button mat-button (click)="onEdit(e.controls['id'].value)"><mat-icon>edit</mat-icon></button>               

@@ -1,19 +1,58 @@
-<h1>Evaluaciones
-    <a [routerLink]="['/','tournament',tournamentId,'evaluation','null']">
-        <button mat-icon-button><mat-icon>add</mat-icon></button>
-    </a>
-</h1>
-@if( tournament ){
-    @for( e of tournament.evaluations; track e){
-        
-        <div (click)="onEvaluation(e.id)">
-            <button mat-button><span class="label">{{ e.label }}</span></button>
-            <p>
-                {{ e.description }}
-            </p>    
-        </div>
+<a [routerLink]="'/tournament/'+tournamentId">
+    <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
+</a>
+<h1>Evaluation<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
+@for(e of getEvaluationGroups(); track e){
+    <mat-card [formGroup]="e">
+        <mat-card-content>
+            @if( (isAdding && !e.controls['id'].value) || (e.controls['id'].value == editingId) ){
+            <mat-form-field>    
+                <input matInput placeholder="label" formControlName="label" >
+            </mat-form-field>
+            <quill-editor formControlName="description" placeholder="Descripción"></quill-editor>            
+            }
+            @else{
+                {{ e.controls['label'].value }}
+                <quill-view-html [content]="e.controls['description'].value"></quill-view-html>  
+                <h2>Aspectos   
+                        <a [routerLink]="['/','tournament',tournamentId,'evaluation',e.controls['id'].value]">
+                            <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                        </a>
+                </h2>
+                <ul>              
+                @for(aspect of e.controls['aspects'].value; track aspect){
+                    <li>{{ aspect.label }}</li>
+                }
+                @empty{
+                    <li>Por favor adicione aspectos</li>
+                }   
+                </ul>           
+            }
+        </mat-card-content>
 
-    }
+        <mat-card-actions>
+        @if( isAdding ){
+            @if( e.controls['id'].value == null ){
+                <button #edited id="edited" mat-button (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+                <button mat-button (click)="onCancelAdd()"><mat-icon>cancel</mat-icon></button>
+            }
+        }               
+        @else{
+            @if( e.controls['id'].value == editingId  ){
+                <button mat-button (click)="onSave(e.controls['id'].value)" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+                <button mat-button (click)="onCancelEdit()"><mat-icon>cancel</mat-icon></button>               
+            }                
+            @else{
+                <button mat-button (click)="onEdit(e.controls['id'].value)"><mat-icon>edit</mat-icon></button>               
+                <button mat-button color="warn" (click)="onDelete(e.controls['id'].value)"><mat-icon>delete</mat-icon></button>               
+            }
+        }
+        </mat-card-actions>
+
+    </mat-card>
 }
+    
+    
+
 
 
