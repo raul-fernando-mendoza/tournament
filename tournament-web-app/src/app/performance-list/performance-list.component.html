@@ -10,6 +10,7 @@
             <mat-card-header>
                 @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
                     <mat-form-field> 
+                        <mat-label>Nombre del performance</mat-label>  
                         <input matInput placeholder="Nombre del performance" formControlName="label" (change)="onChange(g.controls['id'].value)">
                     </mat-form-field>
                     @if( g.controls['id'].value != null ){ 
@@ -23,13 +24,15 @@
             <mat-card-content>
             @if( (!isAdding && g.controls['id'].value) || g.controls['id'].value == null ){
             <mat-form-field> 
-                <input matInput placeholder="Nombre completo" formControlName="fullname" (change)="onChange(g.controls['id'].value)">
+                <mat-label>Nombre completo del bailarin</mat-label>  
+                <input matInput placeholder="" formControlName="fullname" (change)="onChange(g.controls['id'].value)">
             </mat-form-field>             
             <mat-form-field> 
-                <input matInput placeholder="email" formControlName="email" (change)="onChange(g.controls['id'].value)">
+                <mat-label>email</mat-label>                
+                <input matInput placeholder="" formControlName="email" (change)="onChange(g.controls['id'].value)">
             </mat-form-field>             
             <mat-form-field appearance="fill" >
-                <mat-label>category</mat-label>
+                <mat-label>categoria</mat-label>
                 <mat-select formControlName="categoryId" (selectionChange)="onChange(g.controls['id'].value)">
                     <mat-option *ngFor="let c of tournament.categories" [value]="c.id">
                     {{ c.label }}

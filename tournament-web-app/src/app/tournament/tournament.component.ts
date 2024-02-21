@@ -83,6 +83,7 @@ export class TournamentComponent{
 
   program:Array<PerformanceReference> = []  
 
+  isJuror = false
   constructor(
      private activatedRoute: ActivatedRoute
     ,public firebaseService:FirebaseService 
@@ -108,6 +109,13 @@ export class TournamentComponent{
     if( this.tournamentId != null){
       this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( data =>{
         this.tournament = data as TournamentObj
+
+        let email = this.authService.getUserEmail()
+        let jurorIdx = this.tournament?.jurors.findIndex( j => j.email == email)
+        if( jurorIdx >= 0){
+          this.isJuror = true
+        }
+    
         this.form.controls.label.setValue( this.tournament.label )
         var t:any = this.tournament.eventDate
 
@@ -447,5 +455,6 @@ export class TournamentComponent{
       return false
     }
   }
+
 
 }

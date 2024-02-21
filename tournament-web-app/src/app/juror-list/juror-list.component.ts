@@ -121,7 +121,7 @@ export class JurorListComponent {
       }
     this.tournament.jurors.push( juror )
     this.tournament.jurors.sort( (a,b)=>{
-      return a.label >= b.label ? -1 : 1
+      return a.label >= b.label ? 1 : -1
     }) 
     let obj:Tournament = {
       jurors:this.tournament.jurors
@@ -153,9 +153,7 @@ export class JurorListComponent {
         this.tournament.jurors[ idx ].label = label
         this.tournament.jurors[ idx ].email = email
 
-        this.tournament.jurors.sort( (a,b)=>{
-          return a.label >= b.label ? -1 : 1
-        }) 
+        this.tournament.jurors.sort( (a,b) => (a.label > b.label) ? 1 : -1) 
 
         let obj:Tournament = {
           jurors:this.tournament.jurors

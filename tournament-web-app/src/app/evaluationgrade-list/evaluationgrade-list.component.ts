@@ -177,7 +177,7 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
   }
   getJurors():Juror[]{
     if( this.isAdmin ){
-      return this.tournament.jurors
+      return this.tournament.jurors.sort( (a,b)=>( a.label > b.label ? 1:-1))
     }
     else{
       let idx = this.tournament.jurors.findIndex( e => e.email == this.auth.getUserEmail())
