@@ -7,7 +7,7 @@
 @if( evaluation ){
     <h1>Evaluación: {{evaluation.label}}</h1>
 
-    <h1>Aspects<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
+    <h1>Aspectos<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
     @for(e of getAspectGroups(); track e){
         <mat-card [formGroup]="e">
             <mat-card-content>

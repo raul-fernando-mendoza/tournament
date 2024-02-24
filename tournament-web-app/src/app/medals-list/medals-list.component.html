@@ -24,10 +24,10 @@
         @else{
             <mat-grid-list cols="5" rowHeight="7em">
                 <mat-grid-tile colspan="4">
-                    {{ e.controls['label'].value }}                
+                    <span class="label">{{ e.controls['label'].value }}</span>                
                 </mat-grid-tile>
                 <mat-grid-tile colspan="1">
-                    {{ e.controls['minGrade'].value }} 
+                    <span class="mingrade">{{ e.controls['minGrade'].value }}</span> 
                 </mat-grid-tile>
             </mat-grid-list>                  
             <quill-view-html [content]="e.controls['description'].value"></quill-view-html>  

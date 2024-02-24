@@ -14,3 +14,7 @@ mat-card{
 p{
     margin-left:2em;
 }
+.error-message{
+    color:red;
+    font-size:large;
+}

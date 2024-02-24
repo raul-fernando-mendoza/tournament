@@ -11,7 +11,7 @@
                 @if(isAdmin){
                 <button mat-icon-button (click)="onPerformanceUp(p.id)"><mat-icon>arrow_upward</mat-icon></button>
                 }
-                {{ idx }}
+                {{ idx + 1}}
                 @if(isAdmin){
                 <button mat-icon-button (click)="onPerformanceDown(p.id)"><mat-icon>arrow_downward</mat-icon></button>
                 }
