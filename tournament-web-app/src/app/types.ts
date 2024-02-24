@@ -33,6 +33,10 @@ export class Juror{
 }
 
 
+interface Dictionary<T>{
+    [key:string]:T;
+}
+
 export interface Tournament{
     label?:string
     eventDate?:Timestamp
@@ -46,7 +50,7 @@ export interface Tournament{
     categories?:Array<Category>
     medals?:Array<Medal>
     evaluations?:Array<Evaluation>
-    jurors?:Array<Juror>
+    jurors?:Dictionary<Juror>
 }
 export class TournamentObj implements Tournament{
     label: string = ""
@@ -61,7 +65,7 @@ export class TournamentObj implements Tournament{
     categories:Array<Category> = []
     medals:Array<Medal> = []
     evaluations:Array<Evaluation> = []
-    jurors:Array<Juror> = []
+    jurors:Dictionary<Juror> = {}
 }
 export class TournamentCollection{
     static readonly collectionName:string = 'tournament';

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FirebaseService } from '../firebase.service';
-import { Performance, EvaluationGradeCollection, EvaluationGradeObj, Filter, PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj} from '../types'
+import { Performance, EvaluationGradeCollection, EvaluationGradeObj, Filter, PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror} from '../types'
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -66,6 +66,8 @@ export class TournamentComponent{
   isAdmin = false
   isLoggedIn = false
 
+  jurorList:Array<Juror> = []
+
   performanceColor = 'lightblue'
 
 
@@ -111,10 +113,16 @@ export class TournamentComponent{
         this.tournament = data as TournamentObj
 
         let email = this.authService.getUserEmail()
-        let jurorIdx = this.tournament?.jurors.findIndex( j => j.email == email)
-        if( jurorIdx >= 0){
-          this.isJuror = true
-        }
+
+        
+
+        Object.values( this.tournament?.jurors ).forEach( j =>{
+          if( j.email == email  ){
+            this.isJuror = true
+          }
+        })
+
+        this.jurorList = Object.values( this.tournament.jurors )
     
         this.form.controls.label.setValue( this.tournament.label )
         var t:any = this.tournament.eventDate
@@ -170,10 +178,10 @@ export class TournamentComponent{
         creatorUid: this.authService.getUserUid()!,
         tags: tags,
         program: [],
-        medals: [],
         categories: [],
+        medals: [],
         evaluations: [],
-        jurors: []
+        jurors: {}
       }
 
       this.firebaseService.setDocument( this.collection, id, tournament).then( ()=>{
@@ -455,6 +463,6 @@ export class TournamentComponent{
       return false
     }
   }
-
+  
 
 }

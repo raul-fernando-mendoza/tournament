@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+       
+    match /tournament/{tournamentId} {  
+
+        allow read: if true
+        allow read, write: if request.resource.data.creatorUid == request.auth.uid
+
+        function isAdmin(request) {
+            return ( get(/databases/$(database)/documents/tournament/$(tournamentId)).data.creatorUid) == request.auth.uid
+        }   
+        function isJuror(request, id, email) {
+            return ( get(/databases/$(database)/documents/tournament/$(tournamentId)).data.jurors[id].email == email )
+        }               
+        match /{document=**} {    
+          
+          allow read: if true
+          allow read, write: if isAdmin(request) 
+          allow read, write: if request.resource.data.email == request.auth.token.email
+        }   
+        match /{path=**}/performance/{performanceId}/evaluationgrade/{evaluationGradeId} {    
+          
+          allow read: if true
+          allow read, write: if isAdmin(request) 
+          allow read, write: if isJuror(request, request.resource.data.jurorId, request.auth.token.email)
+        }                  
+    }     
+  } 
+}

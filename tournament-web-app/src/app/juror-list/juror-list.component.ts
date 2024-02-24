@@ -74,7 +74,8 @@ export class JurorListComponent {
       let jurors = this.form.get('jurors') as FormArray
       jurors.clear()
       if( jurors ){
-        this.tournament.jurors.map( juror =>
+        let jurorsArray = Object.values(this.tournament.jurors)
+        jurorsArray.map( juror =>
           jurors.push(
             this.fb.group({
               id:[juror.id,Validators.required],
@@ -119,10 +120,7 @@ export class JurorListComponent {
         label: label,
         email: email
       }
-    this.tournament.jurors.push( juror )
-    this.tournament.jurors.sort( (a,b)=>{
-      return a.label >= b.label ? 1 : -1
-    }) 
+    this.tournament.jurors[juror.id] =  juror 
     let obj:Tournament = {
       jurors:this.tournament.jurors
     }
@@ -153,8 +151,6 @@ export class JurorListComponent {
         this.tournament.jurors[ idx ].label = label
         this.tournament.jurors[ idx ].email = email
 
-        this.tournament.jurors.sort( (a,b) => (a.label > b.label) ? 1 : -1) 
-
         let obj:Tournament = {
           jurors:this.tournament.jurors
         }        
@@ -174,12 +170,14 @@ export class JurorListComponent {
     this.isAdding =false
     this.editingId = null 
 
-    let idx:number = this.tournament.jurors.findIndex( c => c.id == id)
+    let jurorArray = Object.values( this.tournament.jurors )
+
+    let idx:number = jurorArray.findIndex( c => c.id == id)
 
     if( idx >= 0){
-      this.tournament.jurors.splice(idx,1)
+      jurorArray.splice(idx,1)
       let obj:Tournament = {
-        jurors:[] = this.tournament.jurors
+        jurors:this.tournament.jurors
       }
   
       this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
