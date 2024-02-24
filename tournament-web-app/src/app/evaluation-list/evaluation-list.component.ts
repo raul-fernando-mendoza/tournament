@@ -83,7 +83,7 @@ export class EvaluationListComponent {
             this.fb.group({
               id:[evaluation.id],
               label:[evaluation.label,Validators.required],
-              description:[evaluation.description,Validators.required],
+              description:[evaluation.description],
               aspects:[evaluation.aspects]
             })
           )
@@ -104,7 +104,7 @@ export class EvaluationListComponent {
         this.fb.group({
           id:[null],
           label:['',Validators.required],
-          description:['',Validators.required]
+          description:['']
         })
       );
       this.isAdding = true
@@ -122,7 +122,7 @@ export class EvaluationListComponent {
     let evaluation:Evaluation = {
       id: uuidv4(),
       label: label,
-      description: description,
+      description: description ? description : "",
       aspects: []
     }
     this.tournament.evaluations.push( evaluation )
@@ -150,10 +150,10 @@ export class EvaluationListComponent {
       if( idx >= 0 ){
         let evaluationGrp = FGs[idx]
         let label =  evaluationGrp?.controls["label"].value.trim()
-        let description =  evaluationGrp?.controls["description"].value.trim()
+        let description =  evaluationGrp?.controls["description"].value?.trim()
 
         this.tournament.evaluations[ idx ].label = label
-        this.tournament.evaluations[ idx ].description = description
+        this.tournament.evaluations[ idx ].description = description ? description : ""
         let obj:Tournament = {
           evaluations:this.tournament.evaluations
         }        

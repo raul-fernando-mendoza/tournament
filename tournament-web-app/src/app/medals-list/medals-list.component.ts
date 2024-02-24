@@ -87,8 +87,8 @@ export class MedalsListComponent implements AfterViewInit{
             this.fb.group({
               id:[medal.id,Validators.required],
               label:[medal.label,Validators.required],
-              description:[medal.description,Validators.required],
-              minGrade:[medal.minGrade,Validators.required]
+              description:[medal.description],
+              minGrade:[medal.minGrade,[Validators.required, Validators.min(0), Validators.max(10)]]
             })
           )
         )
@@ -108,8 +108,8 @@ export class MedalsListComponent implements AfterViewInit{
         this.fb.group({
           id:[null],
           label:['',Validators.required],
-          description:['',Validators.required],
-          minGrade:['',Validators.required]
+          description:[''],
+          minGrade:['',[Validators.required, Validators.min(0), Validators.max(10)]]
         })
       );
       this.waitForElement("edited")      
@@ -124,13 +124,13 @@ export class MedalsListComponent implements AfterViewInit{
     let categoryGrp = FGs[ FGs.length -1 ]
     let id = categoryGrp?.controls["id"].value
     let label = categoryGrp?.controls["label"].value.trim()
-    let minGrade = categoryGrp?.controls["minGrade"].value
+    let minGrade =  categoryGrp?.controls["minGrade"].value 
     let description = categoryGrp?.controls["description"].value.trim()
     let medal:Medal = { 
       id:uuidv4(),
         label: label,
         minGrade: Number(minGrade),
-        description:description
+        description:description ? description : ""
       }
     this.tournament.medals.push( medal )
     this.tournament.medals.sort( (a,b)=>{
@@ -160,11 +160,11 @@ export class MedalsListComponent implements AfterViewInit{
         let categoryGrp = FGs[idx]
         let label =  categoryGrp?.controls["label"].value.trim()
         let minGrade =  Number(categoryGrp?.controls["minGrade"].value)
-        let description =  categoryGrp?.controls["description"].value.trim()
+        let description =  categoryGrp?.controls["description"].value?.trim()
       
         this.tournament.medals[ idx ].label = label
         this.tournament.medals[ idx ].minGrade = minGrade
-        this.tournament.medals[ idx ].description = description
+        this.tournament.medals[ idx ].description = description ? description : ""
 
         this.tournament.medals.sort( (a,b)=>{
           return a.minGrade >= b.minGrade ? -1 : 1

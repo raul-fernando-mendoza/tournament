@@ -91,7 +91,7 @@ export class AspectListComponent{
             this.fb.group({
               id:[aspect.id],
               label:[aspect.label,Validators.required],
-              description:[aspect.description,Validators.required]
+              description:[aspect.description]
             })
           )
         )
@@ -111,7 +111,7 @@ export class AspectListComponent{
         this.fb.group({
           id:[null],
           label:['',Validators.required],
-          description:['',Validators.required]
+          description:['']
         })
       );
       this.isAdding = true
@@ -129,7 +129,7 @@ export class AspectListComponent{
     let aspect:Aspect = { 
       id:uuidv4(),
       label: label,
-      description: description
+      description: description ? description : ""
     }
     this.evaluation.aspects.push( aspect )
     let obj:Tournament = {
@@ -156,10 +156,10 @@ export class AspectListComponent{
       if( idx >= 0 ){
         let aspectGrp = FGs[idx]
         let label =  aspectGrp?.controls["label"].value.trim()
-        let description =  aspectGrp?.controls["description"].value.trim()
+        let description =  aspectGrp?.controls["description"].value?.trim()
 
         this.evaluation.aspects[ idx ].label = label
-        this.evaluation.aspects[ idx ].description = description
+        this.evaluation.aspects[ idx ].description = description ? description : ""
         let obj:Tournament = {
           evaluations:this.tournament.evaluations
         }        

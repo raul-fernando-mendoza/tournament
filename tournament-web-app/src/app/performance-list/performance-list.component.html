@@ -4,7 +4,10 @@
 @if( tournament ){
     <h1>{{  tournament.label }}</h1>
 
-    <h1>Performances<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
+    <h1>Performances
+        @if( !isAdding){
+            <button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button>
+        }</h1>
     @for(g of getGroups(); track g){
         <mat-card [formGroup]="g">
             <mat-card-header>

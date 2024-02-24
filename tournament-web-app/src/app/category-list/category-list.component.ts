@@ -80,7 +80,7 @@ export class CategoryListComponent {
             this.fb.group({
               id:[category.id],
               label:[category.label,Validators.required],
-              description:[category.description,Validators.required]
+              description:[category.description]
             })
           )
         )
@@ -100,7 +100,7 @@ export class CategoryListComponent {
         this.fb.group({
           id:[null],
           label:['',Validators.required],
-          description:['',Validators.required]
+          description:['']
         })
       );
       this.isAdding = true
@@ -118,7 +118,7 @@ export class CategoryListComponent {
     let category:Category = { 
       id:uuidv4(),
       label: label,
-      description: description
+      description: description ? description : ""
     }
     this.tournament.categories.push( category )
     let obj:Tournament = {
@@ -145,10 +145,10 @@ export class CategoryListComponent {
       if( idx >= 0 ){
         let categoryGrp = FGs[idx]
         let label =  categoryGrp?.controls["label"].value.trim()
-        let description =  categoryGrp?.controls["description"].value.trim()
+        let description =  categoryGrp?.controls["description"].value?.trim()
 
         this.tournament.categories[ idx ].label = label
-        this.tournament.categories[ idx ].description = description
+        this.tournament.categories[ idx ].description = description ? description : ""
         let obj:Tournament = {
           categories:this.tournament.categories
         }        

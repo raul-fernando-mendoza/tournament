@@ -1,8 +1,11 @@
 <a [routerLink]="'/tournament/'+tournamentId">
     <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
 </a>
-<h1>Jurados<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
-@for(e of getGroups(); track e){
+<h1>Jurados
+    @if( !isAdding && !editingId){
+        <button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button>
+    }</h1>
+    @for(e of getGroups(); track e){
 <mat-card [formGroup]="e">
     <mat-card-content> 
         @if( (isAdding && !e.controls['id'].value) || (e.controls['id'].value == editingId) ){

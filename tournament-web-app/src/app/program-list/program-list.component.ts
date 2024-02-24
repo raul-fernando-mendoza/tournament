@@ -194,6 +194,9 @@ export class ProgramListComponent implements OnDestroy{
     return ""
   } 
   onRelease(performanceRef:PerformanceReference){
+    if( !confirm("Esta seguro de querer liberar la calificacion :" +  performanceRef.performance.grade + " la calificacion ya no podra ser modificada.") ){
+      return
+    }         
     let obj:Performance = {
       grade:performanceRef.performance.grade,
       isReleased:true

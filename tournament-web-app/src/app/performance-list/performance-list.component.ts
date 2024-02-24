@@ -230,28 +230,25 @@ export class PerformanceListComponent {
   }  
 
   onAddToProgram(id:string) {
-    let FGs = this.getGroups()
-    let idx = FGs.findIndex( FG => FG.controls["id"].value == id )
 
-    if( idx >= 0 ){  
-      this.tournament.program.push( id )
-      let obj:Tournament = {
-        program:this.tournament.program
-      }
-      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-        this.update()
-      },
-      reason =>{
-        alert("Error guardando programa:" + reason )
-      })  
-    }  
+    this.tournament.program.push( id )
+    let obj:Tournament = {
+      program:this.tournament.program
+    }
+    this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+      this.update()
+    },
+    reason =>{
+      alert("Error guardando programa:" + reason )
+    })  
   }
 
   onRemoveFromProgram(id:string) {
     let FGs = this.getGroups()
-    let idx = FGs.findIndex( FG => FG.controls["id"].value == id )
+    let idx = this.tournament.program.findIndex( p => p == id )
 
     if( idx >= 0 ){  
+    
       this.tournament.program.splice( idx, 1 )
       let obj:Tournament = {
         program:this.tournament.program

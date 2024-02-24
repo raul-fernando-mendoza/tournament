@@ -1,7 +1,11 @@
 <a [routerLink]="'/tournament/'+tournamentId">
     <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
 </a>
-<h1>Category<button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button></h1>
+<h1>Category
+    @if( !isAdding && !editingId){
+        <button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button>
+    }</h1>
+
 @for(e of getCategoryGroups(); track e){
     <mat-card [formGroup]="e">
         <mat-card-content>
