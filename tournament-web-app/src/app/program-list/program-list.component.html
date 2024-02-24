@@ -19,10 +19,11 @@
             <mat-grid-tile><span class="label">{{ p.performance.label }}</span></mat-grid-tile>
             <mat-grid-tile><span class="fullname">{{ p.performance.fullname }}</span></mat-grid-tile>
             <mat-grid-tile>
-                @if( isAdmin || p.performance.isReleased  ){
+                @if( isAdmin && p.performance.isReleased  ){
                     <span class="score">score:{{ p.performance.grade }}</span>
                 }
                 @if( isAdmin && !p.performance.isReleased && p.performance.grade ){ 
+                    <span class="score">score:{{ p.performance.grade }}</span>
                     <button mat-mini-fab color="accent" (click)="onRelease(p)"><mat-icon>done</mat-icon></button>
                 }                
             </mat-grid-tile>
