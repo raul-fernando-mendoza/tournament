@@ -88,7 +88,6 @@ export class ImageLoaderComponent implements AfterViewInit{
             console.log('Upload is running');
             break;
         }
-     
       }, 
       (error) => {
         // A full list of error codes is available at
@@ -109,6 +108,9 @@ export class ImageLoaderComponent implements AfterViewInit{
             // Unknown error occurred, inspect error.serverResponse
             thiz.error = "Error desconocido"
             break;
+        }
+        if( error.code == 'storage/unknown'){
+          thiz.error = "Error desconocido"
         }
       }, 
       () => {

@@ -6,7 +6,17 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     match /{allPaths=**} {
-      allow read, write: if false;
+      allow read: if true;
     }
+    match /tournament/{tournamentId} {
+      function isAdmin(request) {
+          return ( get(/databases/$(database)/documents/tournament/$(tournamentId)).data.creatorUid == request.auth.uid)
+      }        
+      allow read, write: if ( get(/databases/$(database)/documents/tournament/$(tournamentId)).data.creatorUid == request.auth.token.uid)
+      
+      match /{document=**} { 
+      	allow read, write: if isAdmin()
+      }
+    }    
   }
 }

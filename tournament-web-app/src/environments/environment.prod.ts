@@ -3,6 +3,7 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { Auth, getAuth } from "firebase/auth";
 import { getFirestore, Firestore } from 'firebase/firestore/lite';
+import { FirebaseStorage, getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDUc-FKXKaMmtu9f4m-mu27VxV01IwOC9Y",
@@ -18,8 +19,15 @@ export const app:FirebaseApp  = initializeApp(firebaseConfig);
 export const db:Firestore  = getFirestore(app);
 export const auth:Auth = getAuth(app)
 
+export const storage:FirebaseStorage = getStorage(app)
+
 export var environment = { 
   production: true,
+  recaptcha: {
+    siteKey: '6LcqKiEpAAAAAPSO6OqkR2sNGfsLjJayy__Xr97H',
+    secretKey:'6LcqKiEpAAAAABZ3Cchdp6XUoY5YstMTUqETlXLu',
+    url:'https://www.google.com/recaptcha/api/siteverify'
+  },   
 }
 
 

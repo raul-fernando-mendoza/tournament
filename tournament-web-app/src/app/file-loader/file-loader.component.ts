@@ -118,6 +118,7 @@ export class FileLoaderComponent implements AfterViewInit{
             thiz.error = "Error desconocido"
             break;
         }
+        alert("Error guardando archivo:" + thiz.error)
       }, 
       () => {
         // Upload completed successfully, now we can get the download URL

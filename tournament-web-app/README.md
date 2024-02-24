@@ -4,6 +4,20 @@ firebase init emulators
 
 firebase login --reauth
 
+firebase deploy
+
+# use the followng to select the hosting option.
+firebase projects:list
+firebase use <project_id>
+firebase init
+firebase init storage
+firebase init hosting
+
+
+#use to deploy the app first compile for deployment
+ng build --configuration="production"
+firebase deploy
+
 git push https://raul-fernando-mendoza@github.com/raul-fernando-mendoza/tournament.git
 
 

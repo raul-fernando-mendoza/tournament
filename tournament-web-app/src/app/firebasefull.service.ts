@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { collection, connectFirestoreEmulator, doc, DocumentData, DocumentSnapshot, Firestore, FirestoreError, where, getFirestore, onSnapshot, query, QuerySnapshot, Unsubscribe, WhereFilterOp, QueryFieldFilterConstraint, deleteDoc, and, getDocs, setDoc, getDoc, updateDoc, QueryDocumentSnapshot, arrayUnion, arrayRemove, orderBy, limit } from "firebase/firestore";
-import { app } from '../environments/environment'
+import { app, environment } from '../environments/environment'
 import { Filter } from './types';
 
 export const fulldb:Firestore  = getFirestore(app);
-connectFirestoreEmulator(fulldb, 'localhost', 8080);
+if( environment.production == false ){
+  connectFirestoreEmulator(fulldb, 'localhost', 8080);
+}
 
 @Injectable({
   providedIn: 'root'

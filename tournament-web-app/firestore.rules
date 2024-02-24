@@ -11,7 +11,7 @@ service cloud.firestore {
         allow read, write: if request.resource.data.creatorUid == request.auth.uid
 
         function isAdmin(request) {
-            return ( get(/databases/$(database)/documents/tournament/$(tournamentId)).data.creatorUid) == request.auth.uid
+            return ( get(/databases/$(database)/documents/tournament/$(tournamentId)).data.creatorUid == request.auth.uid)
         }   
         function isJuror(request, id, email) {
             return ( get(/databases/$(database)/documents/tournament/$(tournamentId)).data.jurors[id].email == email )
