@@ -37,6 +37,7 @@ export const routes: Routes = [
     { path:"tournament/:tournamentId/program",component:ProgramListComponent},
     { path:"tournament/:tournamentId/podium",component:PodiumListComponent},
     
+    { path:"home",pathMatch:'full',component:TournamentSearchComponent},
     
     { path:"",pathMatch:'full',component:TournamentSearchComponent}
 

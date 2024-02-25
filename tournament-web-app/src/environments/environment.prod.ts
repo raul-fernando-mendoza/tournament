@@ -24,8 +24,8 @@ export const storage:FirebaseStorage = getStorage(app)
 export var environment = { 
   production: true,
   recaptcha: {
-    siteKey: '6LcqKiEpAAAAAPSO6OqkR2sNGfsLjJayy__Xr97H',
-    secretKey:'6LcqKiEpAAAAABZ3Cchdp6XUoY5YstMTUqETlXLu',
+    siteKey: '6Lex834pAAAAADczET5_Obatn3ntaSKx0Qm2YdLh',
+    secretKey:'6Lex834pAAAAAMXJffhKNI01JAPxFXn_Tc5JR1G9',
     url:'https://www.google.com/recaptcha/api/siteverify'
   },   
 }

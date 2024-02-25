@@ -15,13 +15,29 @@
         </mat-toolbar>        
         <mat-list role="list">
             <mat-list-item>
-                <button *ngIf="(isHandset$ | async) === false" mat-stroked-button  aria-label="logout" >
-                    Nosotros
-                </button>       
-                <button *ngIf="(isHandset$ | async) === true" mat-stroked-button  (click)="drawer.toggle()"  aria-label="nosotros" >
-                    Nosotros
-                </button>                         
+            {{ profileName }}
             </mat-list-item>
+            @if( currentProfile != 'participant'){
+            <mat-list-item>
+                <button mat-button (click)="onParticipant()">
+                    Soy participante
+                </button>       
+            </mat-list-item>
+            }
+            @if( currentProfile != 'juror'){
+            <mat-list-item>
+                <button mat-button (click)="onJuror()">
+                    Soy Jurado
+                </button>  
+            </mat-list-item>
+            }
+            @if( currentProfile != 'organizer'){ 
+            <mat-list-item>
+                <button mat-button (click)="onOrganizer()">
+                    Soy Organizador
+                </button>       
+            </mat-list-item> 
+            }
         </mat-list>
     </mat-sidenav>    
 
@@ -43,8 +59,8 @@
                 <mat-icon>home</mat-icon>
             </a>             
         
-            <span class="spacer"></span>    
-            <button mat-raised-button (click)="onCreateTournament()" color="primary">Crear tu propio evento</button>
+            <span class="spacer"></span> 
+
 
             <button mat-icon-button [matMenuTriggerFor]="menu"><mat-icon>person</mat-icon></button>
             <mat-menu #menu="matMenu">

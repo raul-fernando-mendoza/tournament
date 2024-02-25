@@ -10,6 +10,18 @@
     <span class="spacer"></span>
 </div>
 
+@if( currentProfile == 'participant' ){
+    <h2>Mostrando todos los eventos</h2>
+}
+@if( currentProfile == 'juror' ){
+    <h2>Mostrando solo los eventos donde usted es jurado</h2>
+}
+@if( currentProfile == 'organizer' ){
+    <h2>Mis Eventos
+        <button mat-button-icon (click)="onCreateTournament()"><mat-icon>add</mat-icon></button>
+    </h2>
+}
+
 @for( tournament of tournamentList; track tournament.id){
     <mat-card>
         <mat-card-header>
@@ -26,7 +38,7 @@
         </mat-card-content>         
     </mat-card>     
 } @empty{
-    <h3 class="not-found">No hay eventos encontrados, haga una nueva busqueda o crea tu propio evento</h3>
+    <h3 class="not-found">No hay eventos encontrados</h3>
 }
 
 

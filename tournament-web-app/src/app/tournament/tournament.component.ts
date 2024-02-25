@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FirebaseService } from '../firebase.service';
@@ -16,7 +16,7 @@ import { AuthService } from '../auth.service';
 import { v4 as uuidv4 } from 'uuid';
 import { NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
 import { PathService } from '../path.service';
-import { BusinesslogicService } from '../businesslogic.service';
+import { BusinesslogicService, Profile } from '../businesslogic.service';
 import { MatGridListModule} from '@angular/material/grid-list';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
 import {MatDividerModule} from '@angular/material/divider';
@@ -58,7 +58,7 @@ interface PerformanceReference{
   templateUrl: './tournament.component.html',
   styleUrl: './tournament.component.css'
 })
-export class TournamentComponent{
+export class TournamentComponent implements OnInit{
 
   tournamentId :string | null= null
   tournament:TournamentObj| null = null
@@ -86,6 +86,9 @@ export class TournamentComponent{
   program:Array<PerformanceReference> = []  
 
   isJuror = false
+
+  currentProfile:Profile = null
+
   constructor(
      private activatedRoute: ActivatedRoute
     ,public firebaseService:FirebaseService 
@@ -107,6 +110,14 @@ export class TournamentComponent{
       })      
 
   }
+
+  ngOnInit(): void {
+    this.businesslogic.onProfileChangeEvent().subscribe( profile =>{
+      this.currentProfile = profile
+    })
+    this.currentProfile = this.businesslogic.getProfile()
+  }
+
   update(){
     if( this.tournamentId != null){
       this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( data =>{

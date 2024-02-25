@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { AuthService } from './auth.service';
@@ -13,6 +13,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../environments/environment';
 import {MatMenuModule} from '@angular/material/menu';
+import { BusinesslogicService, Profile } from './businesslogic.service';
+import { Init } from 'v8';
 
 
 
@@ -33,9 +35,11 @@ import {MatMenuModule} from '@angular/material/menu';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   title = 'tournament-web-app';
   displayName = ""
+  currentProfile :Profile = null
+  profileName:string = ""
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
@@ -47,6 +51,7 @@ export class AppComponent {
     , private router: Router
     , private route: ActivatedRoute
     , private authService: AuthService
+    , private bussiness:BusinesslogicService
   ) {
 
     onAuthStateChanged( auth, (user) => {
@@ -65,6 +70,14 @@ export class AppComponent {
       }
     })
 
+  }
+  ngOnInit(): void {
+    this.bussiness.onProfileChangeEvent().subscribe( profile =>{
+      this.currentProfile = profile
+      this.profileName = this.bussiness.getProfileName()
+    })
+    this.currentProfile = this.bussiness.getProfile()
+    this.profileName = this.bussiness.getProfileName()
   }
   login(){
     this.router.navigate(['/loginForm'])
@@ -86,12 +99,32 @@ export class AppComponent {
   isLoggedIn(){
     return this.authService.isloggedIn()
   }  
-  onCreateTournament(){
-    if( this.authService.isloggedIn() ){
-      this.router.navigate(['/tournamentNew'])
+
+
+  onParticipant(){
+    this.bussiness.setCurrentProfile("participant")
+    if( !this.authService.isloggedIn() ){
+      this.router.navigate(['/'])
+    }    
+  }
+  onJuror(){
+    this.bussiness.setCurrentProfile("juror")
+    if( !this.authService.isloggedIn() ){
+      this.router.navigate(['/loginForm/home'])
     }
     else{
-      this.router.navigate(['/loginForm/tournamentNew'])
+      this.router.navigate(['/'])
+    }    
+  }
+  onOrganizer(){
+    this.bussiness.setCurrentProfile("organizer")
+    if( !this.authService.isloggedIn() ){
+      this.router.navigate(['/loginForm/home'])
     }
-  }  
+    else{
+      this.router.navigate(['/'])
+    }
+  }
+
+  
 }

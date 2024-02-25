@@ -1,4 +1,4 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -13,6 +13,7 @@ import { AuthService } from '../auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { TournamentCollection, TournamentObj } from '../types';
 import { PathService } from '../path.service';
+import { BusinesslogicService, Profile } from '../businesslogic.service';
 
 @Component({
   selector: 'app-tournament-list',
@@ -34,7 +35,7 @@ import { PathService } from '../path.service';
   templateUrl: './tournament-search.component.html',
   styleUrl: './tournament-search.component.css'
 })
-export class TournamentSearchComponent implements AfterViewInit{
+export class TournamentSearchComponent implements OnInit, AfterViewInit{
 
   
 
@@ -43,13 +44,23 @@ export class TournamentSearchComponent implements AfterViewInit{
   });
 
   tournamentList:Array<any> = []
+  currentProfile :Profile = null
   
   constructor( private fb:FormBuilder,
     private firebaseService:FirebaseService,
     private authService:AuthService,
     public pathService:PathService,
-    private router: Router){
+    private router: Router,
+    private bussiness:BusinesslogicService
+    ){
 
+  }
+  ngOnInit(): void {
+    this.bussiness.onProfileChangeEvent().subscribe( profile =>{
+      this.currentProfile = profile
+      this.onSearch()
+    })
+    this.currentProfile = this.bussiness.getProfile()
   }
   ngAfterViewInit(): void {
     this.onSearch()
@@ -58,10 +69,28 @@ export class TournamentSearchComponent implements AfterViewInit{
     console.log( this.searchForm.controls.search.value )
     var tag:string = this.searchForm.controls.search.value ? this.searchForm.controls.search.value : ""
     this.tournamentList.length = 0
-    this.firebaseService.getCollectionByTag(TournamentCollection.collectionName, tag).then( data =>{
-      console.log(data)
-      data.map( e =>{
-        this.tournamentList.push(e)
+    this.firebaseService.getCollectionByTag(TournamentCollection.collectionName, tag).then( set =>{
+      console.log(set)
+      
+      set.map( e =>{
+        let t:TournamentObj = e.data() as TournamentObj
+        if( this.currentProfile == 'organizer' ) {
+          if( t.creatorUid == this.authService.getUserUid() ){
+            this.tournamentList.push(e)
+          }
+        }
+        else if( this.currentProfile == 'juror' ){
+          let jurorList = Object.values( t.jurors )
+          let currentEmail = this.authService.getUserEmail()
+          if( currentEmail ){
+            if(  jurorList.findIndex( juror => juror.email == currentEmail ) >= 0){
+              this.tournamentList.push(e)
+            }    
+          }
+        }
+        else{
+          this.tournamentList.push(e)
+        }
       })
       
     },
@@ -80,6 +109,14 @@ export class TournamentSearchComponent implements AfterViewInit{
     console.log("isReadonly called")
     this.authService.isloggedIn()
   }) 
-  
+
+  onCreateTournament(){
+    if( this.authService.isloggedIn() ){
+      this.router.navigate(['/tournamentNew'])
+    }
+    else{
+      this.router.navigate(['/loginForm/tournamentNew'])
+    }
+  }    
 
 }

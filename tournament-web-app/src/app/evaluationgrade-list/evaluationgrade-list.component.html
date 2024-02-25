@@ -22,6 +22,9 @@
                         }                    
                     </mat-grid-tile>
                 }
+                @empty{
+                    <span>no hay examenes encontrados para {{e.label}}</span>
+                }
             }
             @else{
                 <mat-grid-tile>{{e.label}}</mat-grid-tile>

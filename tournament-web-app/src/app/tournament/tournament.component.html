@@ -114,34 +114,35 @@
                     <quill-view-html [content]="medal.description"></quill-view-html>                      
                 } 
                 <mat-divider></mat-divider> 
-                <h2>Performances
-                    @if( isLoggedIn ){
-                        <button mat-button-icon (click)="onPerformancesEdit()"><mat-icon>edit</mat-icon></button>
-                    }
-                </h2> 
-                @for( p of performances; track p){
-                    <div class="item">
-                    {{ p.performance.label }}
-                    @if( p.isInProgram ){
-                        <mat-icon>done</mat-icon>
-                    }
-                    </div>
-                }
-                @if( performances.length == 0){
-                    @if( !isAdmin ){
+                @if( currentProfile == "participant" || currentProfile == "organizer" ){
+                    <h2>Performances
                         @if( isLoggedIn ){
-                            <a [routerLink]="['/','tournament',tournamentId,'performances']">
-                                <button mat-raised-button color="accent" >Quiero presentarme</button>
-                            </a>                    
-                        }  
-                        @else{                      
-                            <a [routerLink]="['/','loginForm']">
-                                <button mat-raised-button color="accent" >Quiero presentarme</button>
-                            </a>
+                            <button mat-button-icon (click)="onPerformancesEdit()"><mat-icon>edit</mat-icon></button>
                         }
+                    </h2> 
+                    @for( p of performances; track p){
+                        <div class="item">
+                        {{ p.performance.label }}
+                        @if( p.isInProgram ){
+                            <mat-icon>done</mat-icon>
+                        }
+                        </div>
                     }
-                }   
-
+                    @if( performances.length == 0){
+                        @if( !isAdmin && currentProfile == 'participant' ){
+                            @if( isLoggedIn ){
+                                <a [routerLink]="['/','tournament',tournamentId,'performances']">
+                                    <button mat-raised-button color="accent" >Quiero presentarme</button>
+                                </a>                    
+                            }  
+                            @else{                      
+                                <a [routerLink]="['/','loginForm']">
+                                    <button mat-raised-button color="accent" >Quiero presentarme</button>
+                                </a>
+                            }
+                        }
+                    }   
+                }        
                 <mat-divider></mat-divider>                              
                 <h2>Programa
                 @if( isAdmin || isJuror ){    

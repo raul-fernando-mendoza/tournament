@@ -38,3 +38,8 @@ in the angular.json add
             ],
 
 <quill-editor></quill-editor>
+
+
+recaptcha:
+add the path in 
+https://www.google.com/recaptcha/admin/site/690039338
