@@ -68,8 +68,14 @@ export class TournamentSearchComponent implements OnInit, AfterViewInit{
   onSearch(){
     console.log( this.searchForm.controls.search.value )
     var tag:string = this.searchForm.controls.search.value ? this.searchForm.controls.search.value : ""
+
+    let uid = null
+    if( this.currentProfile == 'organizer' ) {
+      uid = this.authService.getUserUid()
+    }
+
     this.tournamentList.length = 0
-    this.firebaseService.getCollectionByTag(TournamentCollection.collectionName, tag).then( set =>{
+    this.firebaseService.getCollectionByTag(TournamentCollection.collectionName, tag, uid).then( set =>{
       console.log(set)
       
       set.map( e =>{

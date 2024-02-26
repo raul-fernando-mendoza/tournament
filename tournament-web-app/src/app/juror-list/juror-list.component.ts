@@ -7,7 +7,7 @@ import { FirebaseService } from '../firebase.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Juror, Tournament, TournamentCollection, TournamentObj } from '../types';
+import { Dictionary, Juror, Tournament, TournamentCollection, TournamentObj } from '../types';
 import { v4 as uuidv4, v4 } from 'uuid';
 import { MatCardModule } from '@angular/material/card';
 
@@ -120,7 +120,7 @@ export class JurorListComponent {
         label: label,
         email: email
       }
-    this.tournament.jurors[juror.id] =  juror 
+    this.tournament.jurors[email] =  juror 
     let obj:Tournament = {
       jurors:this.tournament.jurors
     }
@@ -142,27 +142,53 @@ export class JurorListComponent {
     if( id ){
 
       let FGs = this.getGroups()
-      let idx = FGs.findIndex( FG => FG.controls["id"].value == id )
-      if( idx >= 0 ){
-        let grp = FGs[idx]
-        let label =  grp.controls["label"].value.trim()
-        let email =  grp.controls["email"].value.trim()
+      let fgIdx = FGs.findIndex( FG => FG.controls["id"].value == id )
+      
+      //new values
+      let grp = FGs[fgIdx]
+      let label =  grp.controls["label"].value.trim()
+      let email =  grp.controls["email"].value.trim()
 
-        this.tournament.jurors[ idx ].label = label
-        this.tournament.jurors[ idx ].email = email
+      let newJurors:Dictionary<Juror> = {}
+      if( fgIdx >= 0 ){
 
-        let obj:Tournament = {
-          jurors:this.tournament.jurors
-        }        
- 
-        this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-          console.log("jurors list updated")
-          this.update()
-        },
-        reason =>{
-          alert("Error updating jurors" + reason)
-        })
+        let oldValues:Array<Juror> = Object.values(this.tournament.jurors)
+        let oldIdx = oldValues.findIndex( e=>e.id = id)
+        if( oldIdx >= 0){
+          let oldJuror:Juror = oldValues[oldIdx]
+          if( oldJuror.email! != email){
+            //erase the old value
+            Object.values(this.tournament.jurors).map( c => {
+              if( c.id != id ){
+                newJurors[c.email!] = c
+              }
+            })          
+            //now add the new value
+            let juror:Juror = { 
+              id:id,
+              label: label,
+              email: email
+            }            
+            newJurors[email] = juror           
+          }
+          else{ //use the old email
+            newJurors = this.tournament.jurors
+            newJurors[email].label = label
+          }
+        }
+
       }
+      let obj:Tournament = {
+        jurors:newJurors
+      }        
+
+      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+        console.log("jurors list updated")
+        this.update()
+      },
+      reason =>{
+        alert("Error updating jurors" + reason)
+      })
     }
   }
 
@@ -174,10 +200,17 @@ export class JurorListComponent {
     
     let idx:number = jurorArray.findIndex( c => c.id == id)
 
+
+
     if( idx >= 0){
-      jurorArray.splice(idx,1)
+      let newJurors:Dictionary<Juror> = {}
+      Object.values(this.tournament.jurors).map( c => {
+        if( c.id != id ){
+          newJurors[c.email!] = c
+        }
+      })
       let obj:Tournament = {
-        jurors:this.tournament.jurors
+        jurors:newJurors
       }
   
       this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
