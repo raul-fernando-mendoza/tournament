@@ -125,15 +125,12 @@ export class EvaluationGradeComponent implements OnInit{
         this.evaluationGradeId).then( data =>{
           this.evaluationGrade = data as EvaluationGradeObj
 
-          let jurorArray = Object.values( this.tournament.jurors )
-          let idx = jurorArray.findIndex( e => e.email == this.auth.getUserEmail())
-          if( idx >=0 ){
-            let jurorId = jurorArray[idx].id
-            if( this.evaluationGrade.jurorId == jurorId || this.tournament.creatorUid == this.auth.getUserUid()){
-              this.canEdit = true
-            }
 
-          }    
+          if( this.evaluationGrade.jurorId == this.auth.getUserEmail() || this.tournament.creatorUid == this.auth.getUserUid()){
+            this.canEdit = true
+          }
+
+  
 
           this.aspects.controls.length = 0
           this.evaluationGrade.aspectGrades.map( aspect =>{

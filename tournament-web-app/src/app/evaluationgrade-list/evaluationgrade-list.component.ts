@@ -83,13 +83,7 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
     }
     else{ //force a filter
       let currentEmail:string = this.auth.getUserEmail()!
-      let jurorArray = Object.values( this.tournament.jurors )
-      let idx = jurorArray.findIndex( e => e.email == currentEmail)
-      let jurorId = "invalid"
-      if( idx >=0 ){
-        jurorId = jurorArray[idx].id
-      }
-      filter = where("jurorId", "==", jurorId)
+      filter = where("jurorId", "==", currentEmail)
     }  
       let unsubscribe = this.firebaseFullService.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId
                                         , PerformanceCollection.collectionName, this.performanceId
@@ -118,17 +112,17 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
 
   }  
 
-  getEvaluationRefence( evaluationId:string, jurorId:string ):EvaluationGradeReference[]{
-    let idx = this.evaluationGradesReferences.findIndex( e => (e.evaluationGrade.evaluationId == evaluationId && e.evaluationGrade.jurorId==jurorId) )
+  getEvaluationRefence( evaluationId:string, email:string ):EvaluationGradeReference[]{
+    let idx = this.evaluationGradesReferences.findIndex( e => (e.evaluationGrade.evaluationId == evaluationId && e.evaluationGrade.jurorId==email) )
     if( idx >=0 ){
       return [this.evaluationGradesReferences[idx]]
     }
     return []
   }
-  onAddEvaluationGrade(evaluationId:string, jurorId:string){
+  onAddEvaluationGrade(evaluationId:string, email:string){
     let evaluationGrade:EvaluationGradeObj = {
       evaluationId: evaluationId,
-      jurorId: jurorId,
+      jurorId: email,
       isCompleted: false,
       aspectGrades: [],
       grade: 10,
@@ -137,7 +131,6 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
     let evaluationIdx = this.tournament.evaluations.findIndex( e => e.id == evaluationId )
 
     let jurorArray = Object.values( this.tournament.jurors )
-    let jurorIdx = jurorArray.findIndex( e => e.id == jurorId)
 
     this.tournament.evaluations[evaluationIdx].aspects.map( aspect =>{
       let aspectGrade:AspectGrade = {
@@ -161,7 +154,6 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
   }
 
   onRemoveEvaluationGrade(evaluationId:string, jurorId:string){
-
 
     let idx = this.evaluationGradesReferences.findIndex( er=>{
       return er.evaluationGrade.evaluationId == evaluationId && er.evaluationGrade.jurorId == jurorId 

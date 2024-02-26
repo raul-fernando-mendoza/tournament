@@ -139,6 +139,13 @@ export class TournamentComponent implements OnInit{
           }
         })
 
+        if(this.authService.isloggedIn() ){
+          let uid = this.authService.getUserEmail()
+          if( this.tournament.participants.findIndex( e=>e==uid ) >= 0 ){
+            this.isParticipant = true
+          }
+        } 
+
         this.jurorList = Object.values( this.tournament.jurors )
     
         this.form.controls.label.setValue( this.tournament.label )
