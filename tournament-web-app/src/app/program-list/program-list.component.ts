@@ -133,10 +133,9 @@ export class ProgramListComponent implements OnDestroy{
                 idx:idx
               }
               this.performances[idx] = performanceRef
-              if( performance.isReleased == false ){
-                let grade = this.recalculateGrade( performanceRef )
-              }
-              else{
+              
+              this.recalculateGrade( performanceRef )
+              if( performanceRef.performance.grade ){
                 performanceRef.medal = this.getMedalForPerformance( performanceRef.performance.grade )
               }
             }
@@ -194,9 +193,6 @@ export class ProgramListComponent implements OnDestroy{
     return ""
   } 
   onRelease(performanceRef:PerformanceReference){
-    if( !confirm("Esta seguro de querer liberar la calificacion :" +  performanceRef.performance.grade + " la calificacion ya no podra ser modificada.") ){
-      return
-    }         
     let obj:Performance = {
       grade:performanceRef.performance.grade,
       isReleased:true
@@ -222,8 +218,11 @@ export class ProgramListComponent implements OnDestroy{
               let evaluationGrade = doc.data() as EvaluationGradeObj
               evaluationGrades.push( evaluationGrade ) 
             })
-            let average = this.calculateAverage( evaluationGrades )
-            performanceRef.performance.grade = Number(average.toFixed(1))
+            let average = Number( this.calculateAverage( evaluationGrades ).toFixed(1) )
+            if( performanceRef.performance.grade != average ){
+              performanceRef.performance.isReleased = false
+            }
+            performanceRef.performance.grade = average
             performanceRef.medal = this.getMedalForPerformance(performanceRef.performance.grade)
           },
           'error':(reason) =>{

@@ -14,6 +14,13 @@ import { Router, RouterModule } from '@angular/router';
 import { TournamentCollection, TournamentObj } from '../types';
 import { PathService } from '../path.service';
 import { BusinesslogicService, Profile } from '../businesslogic.service';
+import {MatListModule} from '@angular/material/list';
+
+
+interface TournamentLink{
+  id:string
+  tournament:TournamentObj
+}
 
 @Component({
   selector: 'app-tournament-list',
@@ -31,11 +38,12 @@ import { BusinesslogicService, Profile } from '../businesslogic.service';
     ,MatTooltipModule
     ,RouterModule
     ,MatCardModule
+    ,MatListModule
   ],
-  templateUrl: './tournament-search.component.html',
-  styleUrl: './tournament-search.component.css'
+  templateUrl: './tournament-list.component.html',
+  styleUrl: './tournament-list.component.css'
 })
-export class TournamentSearchComponent implements OnInit, AfterViewInit{
+export class TournamentListComponent implements OnInit, AfterViewInit{
 
   
 
@@ -43,7 +51,7 @@ export class TournamentSearchComponent implements OnInit, AfterViewInit{
     search: [null],
   });
 
-  tournamentList:Array<any> = []
+  tournaments:Array<TournamentLink> = []
   currentProfile :Profile = null
   
   constructor( private fb:FormBuilder,
@@ -67,34 +75,20 @@ export class TournamentSearchComponent implements OnInit, AfterViewInit{
   }
   onSearch(){
     console.log( this.searchForm.controls.search.value )
+    let uid = this.authService.getUserUid()
     var tag:string = this.searchForm.controls.search.value ? this.searchForm.controls.search.value : ""
-    this.tournamentList.length = 0
-    this.firebaseService.getCollectionByTag(TournamentCollection.collectionName, tag).then( set =>{
+    this.tournaments.length = 0
+    this.firebaseService.getCollectionByTag(TournamentCollection.collectionName, tag, uid).then( set =>{
       console.log(set)
       
       set.map( e =>{
         let t:TournamentObj = e.data() as TournamentObj
-        if( this.currentProfile == 'organizer' ) {
-          if( t.creatorUid == this.authService.getUserUid() ){
-            this.tournamentList.push(e)
-          }
+        let tl:TournamentLink = {
+          id:e.id,
+          tournament:t
         }
-        
-        else if( this.currentProfile == 'juror' ){
-          let jurorList =  Object.values(t.jurors)
-          let currentEmail = this.authService.getUserEmail()
-          if( currentEmail ){
-            if(  jurorList.findIndex( juror => juror.email == currentEmail ) >= 0){
-              this.tournamentList.push(e)
-            }    
-          }
-        }
-        
-        else{
-          this.tournamentList.push(e)
-        }
+        this.tournaments.push(tl)
       })
-      
     },
     reason=>{
       alert("Error onSearch:" + reason)
@@ -104,21 +98,16 @@ export class TournamentSearchComponent implements OnInit, AfterViewInit{
     return this.authService.isloggedIn()
   }
 
-  parentCollection = ""
-  isReadOnly = new Promise<boolean>((resolve, reject)=>{
-    let collection=this.parentCollection[0]
-    let id=this.parentCollection[1]
-    console.log("isReadonly called")
-    this.authService.isloggedIn()
-  }) 
-
   onCreateTournament(){
     if( this.authService.isloggedIn() ){
       this.router.navigate(['/tournamentNew'])
     }
-    else{
-      this.router.navigate(['/loginForm/tournamentNew'])
-    }
   }    
+
+  onShowAll(){
+    this.searchForm.controls.search.setValue(null)
+    this.onSearch()
+  }
+
 
 }

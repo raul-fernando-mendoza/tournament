@@ -1,12 +1,9 @@
-<a routerLink="/"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
-<h1>Torneo:
+<a routerLink="/organizer"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
+<h1>Torneo
     @if( tournamentId && tournament && isAdmin){
         <button mat-icon-button color="warn" (click)="onDelete()"><mat-icon>delete</mat-icon></button>
     }
 </h1>    
-
-
-
 
 <form [formGroup]="form">
    
@@ -63,7 +60,15 @@
             }
             @if( tournamentId && tournament ){
 
-                <mat-divider></mat-divider>
+                @if( currentProfile == "participant" && !isParticipant){
+                    <span class="bar">
+                        <span class="spacer"></span>
+                        <button class="inscribe" mat-raised-button color="primary" (click)="onInscribe()">Inscribete</button>
+                        <span class="spacer"></span>
+                    </span>
+                    
+                }
+
                 <h2>Categorias   
                 @if( isAdmin ){    
                     <a [routerLink]="['/','tournament',tournamentId,'categories']">
@@ -71,10 +76,18 @@
                     </a>
                 }
                 </h2>
+                <mat-accordion>
                 @for( category of tournament.categories; track category){
-                    <h3>{{category.label}}</h3>
-                    <quill-view-html [content]="category.description"></quill-view-html>                     
-                }               
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>{{category.label}}</mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <p>
+                            <quill-view-html [content]="category.description"></quill-view-html> 
+                        </p>
+                    </mat-expansion-panel>
+                } 
+                </mat-accordion>              
 
                 @if(isAdmin){
                     <mat-divider></mat-divider>
@@ -85,10 +98,13 @@
                             </a>
                         }
                         </h2>
+                        <mat-list>
                         @for( evaluation of tournament.evaluations; track evaluation){
-                            <h3>{{evaluation.label}}</h3>
-                            <quill-view-html [content]="evaluation.description"></quill-view-html>                     
-                        }  
+                            <mat-list-item>
+                            {{evaluation.label}}
+                            </mat-list-item>    
+                        } 
+                        </mat-list>
                 
                     <mat-divider></mat-divider>
                     <h2>Jurado
@@ -96,9 +112,11 @@
                         <button mat-button-icon><mat-icon>edit</mat-icon></button>
                     </a>
                     </h2>  
+                    <mat-list>
                     @for( j of jurorList; track j){
-                        <span class="item">{{j.label}}</span>
-                    }               
+                        <mat-list-item>{{j.label}}</mat-list-item>
+                    }
+                    </mat-list>               
                 }
     
                 <mat-divider></mat-divider>        
@@ -109,57 +127,65 @@
                     </a>
                 }
                 </h2>  
-                @for( medal of tournament.medals; track medal){
-                    <h3>{{medal.label}}</h3>
-                    <quill-view-html [content]="medal.description"></quill-view-html>                      
-                } 
+                <mat-accordion>
+                    @for( medal of tournament.medals; track medal){
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>{{medal.label}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <p>
+                                <quill-view-html [content]="medal.description"></quill-view-html> 
+                            </p>
+                        </mat-expansion-panel>
+                    } 
+                </mat-accordion> 
+
                 <mat-divider></mat-divider> 
-                @if( currentProfile == "participant" || currentProfile == "organizer" ){
+                @if( isParticipant || isAdmin ){
                     <h2>Performances
-                        @if( isLoggedIn ){
+                        @if( (isParticipant && performances.length > 0) || isAdmin ){
                             <button mat-button-icon (click)="onPerformancesEdit()"><mat-icon>edit</mat-icon></button>
                         }
-                    </h2> 
+                    </h2>
+                    <mat-list>
                     @for( p of performances; track p){
-                        <div class="item">
+                        <mat-list-item>
                         {{ p.performance.label }}
                         @if( p.isInProgram ){
                             <mat-icon>done</mat-icon>
                         }
-                        </div>
+                        </mat-list-item>
                     }
-                    @if( performances.length == 0){
-                        @if( !isAdmin && currentProfile == 'participant' ){
-                            @if( isLoggedIn ){
-                                <a [routerLink]="['/','tournament',tournamentId,'performances']">
-                                    <button mat-raised-button color="accent" >Quiero presentarme</button>
-                                </a>                    
-                            }  
-                            @else{                      
-                                <a [routerLink]="['/','loginForm']">
-                                    <button mat-raised-button color="accent" >Quiero presentarme</button>
-                                </a>
-                            }
+                    @empty{
+                        @if( isParticipant ){
+                            <a [routerLink]="['/','tournament',tournamentId,'performances']">
+                                <button mat-raised-button color="accent" >Quiero presentarme</button>
+                            </a>                    
                         }
-                    }   
-                }        
-                <mat-divider></mat-divider>                              
-                <h2>Programa
-                @if( isAdmin || isJuror ){    
-                    <a [routerLink]="['/','tournament',tournamentId,'program']">
-                    <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                </a>
-                }</h2> 
-                @for( p of program; track p){
-                    <div class="item">{{ p.performance.label }}</div>
-                }
-                @empty{
-                    <h3>No se han adicionado performances al programa</h3>
-                }                  
-                <mat-divider></mat-divider>                  
-                <h2>Podium<a [routerLink]="['/','tournament',tournamentId,'podium']">
-                    <button mat-button-icon><mat-icon>emoji_events</mat-icon></button>
-                </a></h2>                                                             
+                    }
+                    </mat-list> 
+                }    
+                @if( isAdmin || isJuror ){   
+                    <mat-divider></mat-divider>                              
+                    <h2>Programa
+                        
+                        <a [routerLink]="['/','tournament',tournamentId,'program']">
+                        <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                    </a>
+                    </h2> 
+                    @for( p of program; track p){
+                        <div class="item">{{ p.performance.label }}</div>
+                    }
+                    @empty{
+                        <h3>No se han adicionado performances al programa</h3>
+                    }  
+                }    
+                @if( isAdmin || isJuror ){            
+                    <mat-divider></mat-divider>                  
+                    <h2>Podium<a [routerLink]="['/','tournament',tournamentId,'podium']">
+                        <button mat-button-icon><mat-icon>emoji_events</mat-icon></button>
+                    </a></h2>      
+                }                                                       
             }  
 
 

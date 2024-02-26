@@ -67,18 +67,24 @@ export class AppComponent implements OnInit{
         // User is signed out
         // ...
         this.displayName = ""
+        this.router.navigate(["/"])
+
       }
     })
 
   }
+ 
   ngOnInit(): void {
+    
     this.bussiness.onProfileChangeEvent().subscribe( profile =>{
       this.currentProfile = profile
       this.profileName = this.bussiness.getProfileName()
     })
     this.currentProfile = this.bussiness.getProfile()
     this.profileName = this.bussiness.getProfileName()
+    
   }
+  
   login(){
     this.router.navigate(['/loginForm'])
   }
@@ -90,7 +96,7 @@ export class AppComponent implements OnInit{
   }  
   logout(){
     this.authService.logout()
-    this.router.navigate(['/loginForm']);
+    this.bussiness.setCurrentProfile("participant")
   }
   isEmailVerified(){
     return this.authService.isEmailVerified()
@@ -101,30 +107,6 @@ export class AppComponent implements OnInit{
   }  
 
 
-  onParticipant(){
-    this.bussiness.setCurrentProfile("participant")
-    if( !this.authService.isloggedIn() ){
-      this.router.navigate(['/'])
-    }    
-  }
-  onJuror(){
-    this.bussiness.setCurrentProfile("juror")
-    if( !this.authService.isloggedIn() ){
-      this.router.navigate(['/loginForm/home'])
-    }
-    else{
-      this.router.navigate(['/'])
-    }    
-  }
-  onOrganizer(){
-    this.bussiness.setCurrentProfile("organizer")
-    if( !this.authService.isloggedIn() ){
-      this.router.navigate(['/loginForm/home'])
-    }
-    else{
-      this.router.navigate(['/'])
-    }
-  }
 
   
 }

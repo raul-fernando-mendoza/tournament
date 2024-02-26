@@ -44,10 +44,10 @@
             </mat-form-field>                          
             <p class="info">   
                 @if( isInProgram(g.controls["id"].value)  ){
-                    El Performance ha sido aceptado y ha sido adicionado al programa
+                    <span class="status-added">El Performance ha sido aceptado y ha sido adicionado al programa</span>
                 }
                 @else{
-                    El performance esta en proceso de aceptación
+                    <span class="status-accepting">El performance esta en proceso de aceptación</span>
                 }
             </p>
             }

@@ -25,6 +25,8 @@ import { ImageLoaderComponent } from '../image-loader/image-loader.component';
 import {  ref , getDownloadURL} from "firebase/storage";
 import { storage } from '../../environments/environment';
 import { QuillModule } from 'ngx-quill'
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatListModule} from '@angular/material/list';
 
 interface PerformanceReference{
   id:string
@@ -54,6 +56,8 @@ interface PerformanceReference{
   ,MatMenuModule
   ,ImageLoaderComponent
   ,QuillModule
+  ,MatExpansionModule
+  ,MatListModule
   ],
   templateUrl: './tournament.component.html',
   styleUrl: './tournament.component.css'
@@ -88,6 +92,8 @@ export class TournamentComponent implements OnInit{
   isJuror = false
 
   currentProfile:Profile = null
+
+  isParticipant = false
 
   constructor(
      private activatedRoute: ActivatedRoute
@@ -192,7 +198,8 @@ export class TournamentComponent implements OnInit{
         categories: [],
         medals: [],
         evaluations: [],
-        jurors: {}
+        jurors: {},
+        participants: []
       }
 
       this.firebaseService.setDocument( this.collection, id, tournament).then( ()=>{
@@ -475,5 +482,28 @@ export class TournamentComponent implements OnInit{
     }
   }
   
+  onInscribe(){
+    if( !this.authService.isloggedIn() ){
+      this.router.navigate(['/loginForm', encodeURI("tournament/" + this.tournamentId)])
+    }
+    else{
+      this.addParticipant( this.authService.getUserEmail()! )
+    }
+  }
+  addParticipant(email:string){
+    if( this.tournament && this.tournament.participants.findIndex( e => e == email) < 0){
+      this.tournament.participants.push( email )
+      let t:Tournament ={
+        participants: this.tournament.participants
+      }
+      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, t).then( ()=>{
+        this.update()
+      },
+      reason=>{
+        alert("Error saving participant:" + reason)
+      })
+    }
+  } 
+   
 
 }

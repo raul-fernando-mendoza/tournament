@@ -15,29 +15,15 @@
         </mat-toolbar>        
         <mat-list role="list">
             <mat-list-item>
-            {{ profileName }}
-            </mat-list-item>
-            @if( currentProfile != 'participant'){
-            <mat-list-item>
-                <button mat-button (click)="onParticipant()">
-                    Soy participante
+                <button mat-button >
+                    Nosotros
                 </button>       
             </mat-list-item>
-            }
-            @if( currentProfile != 'juror'){
             <mat-list-item>
-                <button mat-button (click)="onJuror()">
-                    Soy Jurado
+                <button mat-button >
+                    privacidad
                 </button>  
             </mat-list-item>
-            }
-            @if( currentProfile != 'organizer'){ 
-            <mat-list-item>
-                <button mat-button (click)="onOrganizer()">
-                    Soy Organizador
-                </button>       
-            </mat-list-item> 
-            }
         </mat-list>
     </mat-sidenav>    
 

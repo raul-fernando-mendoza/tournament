@@ -261,19 +261,31 @@ export class FirebaseService {
       alert("ERROR removing:" + reason)
     })
   }
-  getCollectionByTag( collectionName:string, tag:string):Promise<QueryDocumentSnapshot<DocumentData, DocumentData>[]>{
+  getCollectionByTag( collectionName:string, tag:string, uid:string|null = null):Promise<QueryDocumentSnapshot<DocumentData, DocumentData>[]>{
     return new Promise((resolve, reject) =>{
       const collectionRef = collection(db, collectionName);
       var q
       if( tag != ""){
-        q = query(collectionRef, and(where("tags", "array-contains", tag), where("active","==",true)), orderBy("eventDate", "asc"), limit(100)); 
+        if( uid ){
+          q = query(collectionRef, and(where("tags", "array-contains", tag), where("active","==",true),where("creatorUid","==",uid)), orderBy("eventDate", "asc"), limit(100)); 
+        }
+        else{
+          q = query(collectionRef, and(where("tags", "array-contains", tag), where("active","==",true)), orderBy("eventDate", "asc"), limit(100)); 
+        }
+        
+
       }
       else{
         let t =  (new Date())
         //q = query(collectionRef, and( where("eventDate","==",t) , where("active","==",true)), orderBy("eventDate", "asc"),limit(100) ); 
         //q = query(collectionRef, orderBy("eventDate", "asc"), limit(100) ); 
         //q = query(collectionRef, and( where("eventDate","==",t) ), orderBy("eventDate", "asc"),limit(100) ); 
-        q = query(collectionRef, where("active","==",true), orderBy("eventDate", "asc"), limit(100)); 
+        if( uid ){
+          q = query(collectionRef, and(where("active","==",true), where("creatorUid","==",uid)), orderBy("eventDate", "asc"), limit(100)); 
+        }
+        else{
+          q = query(collectionRef, where("active","==",true), orderBy("eventDate", "asc"), limit(100)); 
+        }
       }
       getDocs ( q ).then( data =>{
         resolve( data.docs )

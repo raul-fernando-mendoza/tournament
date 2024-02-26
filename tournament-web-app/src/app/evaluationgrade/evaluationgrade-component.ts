@@ -138,7 +138,7 @@ export class EvaluationGradeComponent implements OnInit{
           this.aspects.controls.length = 0
           this.evaluationGrade.aspectGrades.map( aspect =>{
             let newControl = this.fb.control([aspect.grade])
-            if( !(this.isAdmin || this.canEdit) || this.performance.isReleased  ){
+            if( !(this.isAdmin || this.canEdit)  ){
               newControl.disable()
             }
             this.aspects.push(newControl);

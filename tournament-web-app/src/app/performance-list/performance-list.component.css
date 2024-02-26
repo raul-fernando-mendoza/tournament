@@ -16,3 +16,9 @@ mat-card{
 .info{
     margin-left: 3em;
 }
+.status-accepting{
+    color:green;
+}
+.status-added{
+    color:blue;
+}

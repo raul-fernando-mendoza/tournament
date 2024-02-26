@@ -51,6 +51,7 @@ export interface Tournament{
     medals?:Array<Medal>
     evaluations?:Array<Evaluation>
     jurors?:Dictionary<Juror>
+    participants?:Array<string>
 }
 export class TournamentObj implements Tournament{
     label: string = ""
@@ -66,6 +67,7 @@ export class TournamentObj implements Tournament{
     medals:Array<Medal> = []
     evaluations:Array<Evaluation> = []
     jurors:Dictionary<Juror> = {}
+    participants:Array<string> = []
 }
 export class TournamentCollection{
     static readonly collectionName:string = 'tournament';

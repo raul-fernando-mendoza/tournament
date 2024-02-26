@@ -147,7 +147,7 @@ export class JurorListComponent {
         let grp = FGs[idx]
         let label =  grp.controls["label"].value.trim()
         let email =  grp.controls["email"].value.trim()
-      
+
         this.tournament.jurors[ idx ].label = label
         this.tournament.jurors[ idx ].email = email
 
@@ -171,7 +171,7 @@ export class JurorListComponent {
     this.editingId = null 
 
     let jurorArray = Object.values( this.tournament.jurors )
-
+    
     let idx:number = jurorArray.findIndex( c => c.id == id)
 
     if( idx >= 0){

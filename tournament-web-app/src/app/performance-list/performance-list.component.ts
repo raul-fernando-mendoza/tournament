@@ -262,8 +262,8 @@ export class PerformanceListComponent {
     }  
   }  
 
-  isInProgram( id:string ){
-    let idx = this.tournament.program.findIndex( e=> e == id)
+  isInProgram( email:string ){
+    let idx = this.tournament.program.findIndex( e=> e == email)
     if( idx >= 0 ){
       return true
     }
