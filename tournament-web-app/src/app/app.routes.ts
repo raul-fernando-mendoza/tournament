@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { CanActivateFn, Router, Routes } from '@angular/router';
 import { LoginFormComponent } from './login-form/login-form.component';
 import { TournamentComponent } from './tournament/tournament.component';
 import { TournamentSearchComponent } from './tournament-search/tournament-search.component';
@@ -13,7 +13,21 @@ import { ProgramListComponent } from './program-list/program-list.component';
 import { PodiumListComponent } from './podium-list/podium-list.component';
 import { ProfileComponent } from './profile/profile.component';
 import { TournamentListComponent } from './tournament-list/tournament-list.component';
+import { WelcomeJurorComponent } from './welcome-juror/welcome-juror.component';
+import { AuthService } from './auth.service';
+import { inject } from '@angular/core';
 
+export function loginGuard(
+    redirectRoute: string
+  ): CanActivateFn {
+    return () => {
+      const oauthService: AuthService = inject(AuthService);
+      const router: Router = inject(Router);
+      
+      const isFlagEnabled = oauthService.isloggedIn()
+      return isFlagEnabled || router.createUrlTree([redirectRoute]);
+    };
+  }
 
 export const routes: Routes = [
     { path:"loginForm/:intendedPath",component:LoginFormComponent}, 
@@ -41,7 +55,7 @@ export const routes: Routes = [
     
     
     { path:"participant",pathMatch:'full',component:TournamentSearchComponent},
-    { path:"juror",pathMatch:'full',component:TournamentSearchComponent},
+    { path:"juror",pathMatch:'full',component:WelcomeJurorComponent, canActivate: [loginGuard('loginForm/juror')]},
     { path:"organizer",pathMatch:'full',component:TournamentListComponent},
     
     { path:"home",pathMatch:'full',component:ProfileComponent},    
