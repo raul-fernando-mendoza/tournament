@@ -87,10 +87,10 @@ export class TournamentSearchComponent implements OnInit, AfterViewInit{
         }
         
         else if( this.currentProfile == 'juror' ){
-          let jurorList =  Object.values(t.jurors)
+          
           let currentEmail = this.authService.getUserEmail()
           if( currentEmail ){
-            if(  jurorList.findIndex( juror => juror.email == currentEmail ) >= 0){
+            if(  t.jurors.findIndex( juror => juror.email == currentEmail ) >= 0){
               this.tournamentList.push(e)
             }    
           }

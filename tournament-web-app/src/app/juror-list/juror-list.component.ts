@@ -74,8 +74,7 @@ export class JurorListComponent {
       let jurors = this.form.get('jurors') as FormArray
       jurors.clear()
       if( jurors ){
-        let jurorsArray = Object.values(this.tournament.jurors)
-        jurorsArray.map( juror =>
+        this.tournament.jurors.map( juror =>
           jurors.push(
             this.fb.group({
               id:[juror.id,Validators.required],
@@ -120,9 +119,17 @@ export class JurorListComponent {
         label: label,
         email: email
       }
-    this.tournament.jurors[email] =  juror 
+    this.tournament.jurors.push(juror)
+    this.tournament.jurorEmails = []
+    this.tournament.jurors.map( j =>{
+      if( !this.tournament.jurorEmails.find( e => e == j.email)){
+        this.tournament.jurorEmails.push( j.email )
+      }
+    })
+    
     let obj:Tournament = {
-      jurors:this.tournament.jurors
+      jurors:this.tournament.jurors,
+      jurorEmails:this.tournament.jurorEmails
     }
     this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
       console.log("jurors list updated")
@@ -139,47 +146,31 @@ export class JurorListComponent {
     this.editingId = null   
 
     console.log("on save")
-    if( id ){
 
-      let FGs = this.getGroups()
-      let fgIdx = FGs.findIndex( FG => FG.controls["id"].value == id )
-      
-      //new values
-      let grp = FGs[fgIdx]
-      let label =  grp.controls["label"].value.trim()
-      let email =  grp.controls["email"].value.trim()
+    let FGs = this.getGroups()
+    let fgIdx = FGs.findIndex( FG => FG.controls["id"].value == id )
+    
+    //new values
+    let grp = FGs[fgIdx]
+    let label =  grp.controls["label"].value.trim()
+    let email =  grp.controls["email"].value.trim()
 
-      let newJurors:Dictionary<Juror> = {}
-      if( fgIdx >= 0 ){
+    if( fgIdx >= 0 ){
 
-        let oldValues:Array<Juror> = Object.values(this.tournament.jurors)
-        let oldIdx = oldValues.findIndex( e=>e.id = id)
-        if( oldIdx >= 0){
-          let oldJuror:Juror = oldValues[oldIdx]
-          if( oldJuror.email! != email){
-            //erase the old value
-            Object.values(this.tournament.jurors).map( c => {
-              if( c.id != id ){
-                newJurors[c.email!] = c
-              }
-            })          
-            //now add the new value
-            let juror:Juror = { 
-              id:id,
-              label: label,
-              email: email
-            }            
-            newJurors[email] = juror           
-          }
-          else{ //use the old email
-            newJurors = this.tournament.jurors
-            newJurors[email].label = label
-          }
-        }
-
+      let oldIdx = this.tournament.jurors.findIndex( e=>e.id == id)
+      if( oldIdx >= 0){
+        this.tournament.jurors[oldIdx].email = email
+        this.tournament.jurors[oldIdx].label = label
       }
+      let jurorEmails:Array<string> = []
+      this.tournament.jurors.map( juror => {
+        if( !(jurorEmails.find( e => e == juror.email)) ){
+          jurorEmails.push( juror.email )
+        }
+      })
       let obj:Tournament = {
-        jurors:newJurors
+        jurors:this.tournament.jurors,
+        jurorEmails:jurorEmails
       }        
 
       this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
@@ -196,21 +187,21 @@ export class JurorListComponent {
     this.isAdding =false
     this.editingId = null 
 
-    let jurorArray = Object.values( this.tournament.jurors )
-    
-    let idx:number = jurorArray.findIndex( c => c.id == id)
-
-
+    let idx:number = this.tournament.jurors.findIndex( c => c.id == id)
 
     if( idx >= 0){
-      let newJurors:Dictionary<Juror> = {}
-      Object.values(this.tournament.jurors).map( c => {
-        if( c.id != id ){
-          newJurors[c.email!] = c
+
+      this.tournament.jurors.splice( idx, 1)
+      let jurorEmails:Array<string> = []
+      this.tournament.jurors.map( juror => {
+        if( !(jurorEmails.find( e => e == juror.email)) ){
+          jurorEmails.push( juror.email )
         }
-      })
+      })      
+
       let obj:Tournament = {
-        jurors:newJurors
+        jurors:this.tournament.jurors,
+        jurorEmails:jurorEmails
       }
   
       this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{

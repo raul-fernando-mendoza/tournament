@@ -29,7 +29,7 @@ export interface Evaluation{
 export class Juror{
     id!:string
     label!:string
-    email?:string
+    email!:string
 }
 
 
@@ -50,7 +50,8 @@ export interface Tournament{
     categories?:Array<Category>
     medals?:Array<Medal>
     evaluations?:Array<Evaluation>
-    jurors?:Dictionary<Juror>
+    jurors?:Array<Juror>
+    jurorEmails?:Array<string>
     participants?:Array<string>
 }
 export class TournamentObj implements Tournament{
@@ -66,7 +67,8 @@ export class TournamentObj implements Tournament{
     categories:Array<Category> = []
     medals:Array<Medal> = []
     evaluations:Array<Evaluation> = []
-    jurors:Dictionary<Juror> = {}
+    jurors:Array<Juror> = []
+    jurorEmails:Array<string> = []
     participants:Array<string> = []
 }
 export class TournamentCollection{
@@ -100,10 +102,9 @@ export class PerformanceCollection{
 
 export interface Filter{
     field:string
-    operator:'==' 
-    value:string | null
-  }
-
+    operator:'==' | "array-contains"
+    value:unknown
+}
 export class AspectGrade {
     label!:string
     description:string|null = null

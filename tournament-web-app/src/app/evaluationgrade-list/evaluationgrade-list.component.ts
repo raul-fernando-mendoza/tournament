@@ -112,8 +112,8 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
 
   }  
 
-  getEvaluationRefence( evaluationId:string, email:string ):EvaluationGradeReference[]{
-    let idx = this.evaluationGradesReferences.findIndex( e => (e.evaluationGrade.evaluationId == evaluationId && e.evaluationGrade.jurorId==email) )
+  getEvaluationRefence( evaluationId:string, jurorId:string ):EvaluationGradeReference[]{
+    let idx = this.evaluationGradesReferences.findIndex( e => (e.evaluationGrade.evaluationId == evaluationId && e.evaluationGrade.jurorId==jurorId) )
     if( idx >=0 ){
       return [this.evaluationGradesReferences[idx]]
     }
@@ -130,7 +130,7 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
     }
     let evaluationIdx = this.tournament.evaluations.findIndex( e => e.id == evaluationId )
 
-    let jurorArray = Object.values( this.tournament.jurors )
+    
 
     this.tournament.evaluations[evaluationIdx].aspects.map( aspect =>{
       let aspectGrade:AspectGrade = {
@@ -171,16 +171,16 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
     }
   }
   getJurors():Juror[]{
-    let jurorArray = Object.values( this.tournament.jurors )
+   
     if( this.isAdmin ){
       
-      return jurorArray.sort( (a,b)=>( a.label > b.label ? 1:-1))
+      return this.tournament.jurors.sort( (a,b)=>( a.label > b.label ? 1:-1))
     }
     else{
-      let idx = jurorArray.findIndex( e => e.email == this.auth.getUserEmail())
+      let idx = this.tournament.jurors.findIndex( e => e.email == this.auth.getUserEmail())
       if( idx >=0 ){
-        let jurorId = jurorArray[idx].id
-        return jurorArray.filter( j => j.id == jurorId )
+        let jurorId = this.tournament.jurors[idx].id
+        return this.tournament.jurors.filter( j => j.id == jurorId )
       }      
     }
     return []

@@ -20,13 +20,17 @@ export class BusinesslogicService {
 
   setCurrentProfile(profile:Profile){
     this.profile = profile
-    localStorage.setItem('profile', JSON.stringify(profile) ) 
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('profile', JSON.stringify(profile) ) 
+    }
     this.profileSubject.next( this.profile )
   }
   getStoredItem( id:string):string | null{
     let valueStr:string | null = null
     try {
-      valueStr = localStorage.getItem(id)
+      if (typeof window !== 'undefined') {
+        valueStr = localStorage.getItem(id)
+      }
     }
     catch( e ){
       console.log("error reading value from disk:" + id + " " + e)

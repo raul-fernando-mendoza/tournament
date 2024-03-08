@@ -133,7 +133,7 @@ export class TournamentComponent implements OnInit{
 
         
 
-        Object.values( this.tournament?.jurors ).forEach( j =>{
+        this.tournament.jurors.forEach( j =>{
           if( j.email == email  ){
             this.isJuror = true
           }
@@ -146,7 +146,7 @@ export class TournamentComponent implements OnInit{
           }
         } 
 
-        this.jurorList = Object.values( this.tournament.jurors )
+        
     
         this.form.controls.label.setValue( this.tournament.label )
         var t:any = this.tournament.eventDate
@@ -205,7 +205,8 @@ export class TournamentComponent implements OnInit{
         categories: [],
         medals: [],
         evaluations: [],
-        jurors: {},
+        jurors: [],
+        jurorEmails:[],
         participants: []
       }
 

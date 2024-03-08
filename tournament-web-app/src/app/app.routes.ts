@@ -25,6 +25,8 @@ export function loginGuard(
       const router: Router = inject(Router);
       
       const isFlagEnabled = oauthService.isloggedIn()
+      let val = isFlagEnabled || router.createUrlTree([redirectRoute]);
+      console.log("val:" + val)
       return isFlagEnabled || router.createUrlTree([redirectRoute]);
     };
   }
