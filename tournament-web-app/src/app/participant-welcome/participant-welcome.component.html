@@ -1,4 +1,13 @@
-<a routerLink="/organizer"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
+<p>participant-welcome works!</p>
+
+@if( currentProfile == "participant" && !isParticipant && !isAdmin && !isJuror){
+    <span class="bar">
+        <span class="spacer"></span>
+        <button class="inscribe" mat-raised-button color="primary" (click)="onInscribe()">Inscribete</button>
+        <span class="spacer"></span>
+    </span>
+    
+}<a routerLink="/organizer"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
 <h1>Torneo
     @if( tournamentId && tournament && isAdmin){
         <button mat-icon-button color="warn" (click)="onDelete()"><mat-icon>delete</mat-icon></button>
@@ -6,19 +15,15 @@
 </h1>    
 
 <form [formGroup]="form">
-   
     <mat-card>
         <mat-card-header>
-            
-            @if( tournamentId && tournament && isAdmin == false){
+            @if( tournamentId && tournament ){
                 <mat-card-title-group>
                     <mat-card-title>{{ tournament.label }}</mat-card-title>
-                    @if( tournament ){
-                        <mat-card-subtitle>
-                        Fecha:{{tournament.eventDate.toDate() | date: 'dd/MM/yyyy'}}
-                        Hora:{{tournament.eventTime}}
-                        </mat-card-subtitle>                
-                    }                    
+                    <mat-card-subtitle>
+                    Fecha:{{tournament.eventDate.toDate() | date: 'dd/MM/yyyy'}}
+                    Hora:{{tournament.eventTime}}
+                    </mat-card-subtitle>                
                     <img mat-card-lg-image [src]="tournament.imageUrl" >
                 </mat-card-title-group>    
             }
@@ -58,16 +63,19 @@
                 }                  
                 </div>
             }
+
+        </mat-card-content>   
+        <mat-card-actions>
+            @if( !tournamentId ){
+                <button mat-button-icon (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+            }
+        </mat-card-actions>
+           
+    </mat-card>    
+                
             @if( tournamentId && tournament ){
 
-                @if( currentProfile == "participant" && !isParticipant && !isAdmin && !isJuror){
-                    <span class="bar">
-                        <span class="spacer"></span>
-                        <button class="inscribe" mat-raised-button color="primary" (click)="onInscribe()">Inscribete</button>
-                        <span class="spacer"></span>
-                    </span>
-                    
-                }
+
 
                 <h2>Categorias   
                 @if( isAdmin ){    
@@ -190,12 +198,5 @@
             }  
 
 
-        </mat-card-content>   
-        <mat-card-actions>
-            @if( !tournamentId ){
-                <button mat-button-icon (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
-            }
-        </mat-card-actions>
-           
-    </mat-card>    
+
 </form>

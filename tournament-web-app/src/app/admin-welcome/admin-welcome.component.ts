@@ -25,8 +25,8 @@ interface TournamentLink{
     ,RouterModule  
     ,MatCardModule  
   ],
-  templateUrl: './admin-tournament-welcome.component.html',
-  styleUrl: './admin-tournament-welcome.component.css'
+  templateUrl: './admin-welcome.component.html',
+  styleUrl: './admin-welcome.component.css'
 })
 export class AdminTournamentWelcomeComponent implements OnInit{
 

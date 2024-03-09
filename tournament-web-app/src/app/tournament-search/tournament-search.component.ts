@@ -5,7 +5,6 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input'; 
 import {MatCardModule} from '@angular/material/card'; 
-import { TournamentComponent } from '../tournament/tournament.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FirebaseService } from '../firebase.service';
@@ -26,7 +25,6 @@ import { BusinesslogicService, Profile } from '../businesslogic.service';
     ,MatInputModule
     ,ReactiveFormsModule
     ,MatFormFieldModule
-    ,TournamentComponent
     ,MatButtonModule
     ,MatTooltipModule
     ,RouterModule

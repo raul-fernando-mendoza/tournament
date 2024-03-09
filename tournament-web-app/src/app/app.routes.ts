@@ -1,6 +1,6 @@
 import { CanActivateFn, Router, Routes } from '@angular/router';
 import { LoginFormComponent } from './login-form/login-form.component';
-import { TournamentComponent } from './tournament/tournament.component';
+import { TournamentComponent } from './admin-tournament/admin-tournament.component';
 import { TournamentSearchComponent } from './tournament-search/tournament-search.component';
 import { EvaluationGradeComponent } from './evaluationgrade/evaluationgrade-component';
 import { MedalsListComponent } from './medals-list/medals-list.component';
@@ -16,7 +16,7 @@ import { TournamentListComponent } from './tournament-list/tournament-list.compo
 import { WelcomeJurorComponent } from './welcome-juror/welcome-juror.component';
 import { AuthService } from './auth.service';
 import { inject } from '@angular/core';
-import { AdminTournamentWelcomeComponent } from './admin-tournament-welcome/admin-tournament-welcome.component';
+import { AdminTournamentWelcomeComponent } from './admin-welcome/admin-welcome.component';
 
 export function loginGuard(
     redirectRoute: string

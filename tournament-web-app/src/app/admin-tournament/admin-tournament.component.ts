@@ -59,8 +59,8 @@ interface PerformanceReference{
   ,MatExpansionModule
   ,MatListModule
   ],
-  templateUrl: './tournament.component.html',
-  styleUrl: './tournament.component.css'
+  templateUrl: './admin-tournament.component.html',
+  styleUrl: './admin-tournament.component.css'
 })
 export class TournamentComponent implements OnInit{
 
@@ -97,9 +97,9 @@ export class TournamentComponent implements OnInit{
 
   constructor(
      private activatedRoute: ActivatedRoute
-    ,public firebaseService:FirebaseService 
+    ,public firebase:FirebaseService 
     ,private fb:FormBuilder
-    ,public authService:AuthService
+    ,public auth:AuthService
     ,private router: Router
     ,public pathService:PathService
     ,public businesslogic:BusinesslogicService){
@@ -126,10 +126,10 @@ export class TournamentComponent implements OnInit{
 
   update(){
     if( this.tournamentId != null){
-      this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( data =>{
+      this.firebase.getDocument( TournamentCollection.collectionName, this.tournamentId).then( data =>{
         this.tournament = data as TournamentObj
 
-        let email = this.authService.getUserEmail()
+        let email = this.auth.getUserEmail()
 
         
 
@@ -139,8 +139,8 @@ export class TournamentComponent implements OnInit{
           }
         })
 
-        if(this.authService.isloggedIn() ){
-          let email = this.authService.getUserEmail()
+        if(this.auth.isloggedIn() ){
+          let email = this.auth.getUserEmail()
           if( this.tournament.participantEmails.findIndex( e=>e==email ) >= 0 ){
             this.isParticipant = true
           }
@@ -161,10 +161,10 @@ export class TournamentComponent implements OnInit{
           this.form.controls.imageUrl.setValue( this.tournament.imageUrl )
         }
 
-        if( this.authService.getUserUid()!= null && this.tournament?.creatorUid != null ){
-          this.isAdmin = (this.authService.getUserUid() == this.tournament?.creatorUid) 
+        if( this.auth.getUserUid()!= null && this.tournament?.creatorUid != null ){
+          this.isAdmin = (this.auth.getUserUid() == this.tournament?.creatorUid) 
         } 
-        if( this.authService.getUserUid()!= null){
+        if( this.auth.getUserUid()!= null){
           this.isLoggedIn = true
         }
         
@@ -199,7 +199,7 @@ export class TournamentComponent implements OnInit{
         imageUrl: this.form.controls.imageUrl.value,
         imagePath: this.form.controls.imagePath.value,
         active: true,
-        creatorUid: this.authService.getUserUid()!,
+        creatorUid: this.auth.getUserUid()!,
         tags: tags,
         program: [],
         isProgramReleased: false,
@@ -212,7 +212,7 @@ export class TournamentComponent implements OnInit{
         
       }
 
-      this.firebaseService.setDocument( this.collection, id, tournament).then( ()=>{
+      this.firebase.setDocument( this.collection, id, tournament).then( ()=>{
         this.router.navigate(['/' + TournamentCollection.collectionName + "/" + id]);
       },
       reason =>{
@@ -240,7 +240,7 @@ export class TournamentComponent implements OnInit{
           label: this.form.controls.label.value!,
           tags: tags
         }
-        this.firebaseService.updateDocument(TournamentCollection.collectionName, this.tournamentId, obj).then(data=>{
+        this.firebase.updateDocument(TournamentCollection.collectionName, this.tournamentId, obj).then(data=>{
           console.log("update name")
         },
         reason =>{
@@ -253,7 +253,7 @@ export class TournamentComponent implements OnInit{
   }
   onChange($event:any, id:string | null,attr:string){
     if( id ){
-      this.firebaseService.onChange($event,this.collection,id,attr).then( ()=>{
+      this.firebase.onChange($event,this.collection,id,attr).then( ()=>{
         this.update()
       },
       reason=>{
@@ -265,7 +265,7 @@ export class TournamentComponent implements OnInit{
     if( !confirm("Esta seguro de querer borrar:" +  this.tournament!.label) ){
       return
     }        
-    this.firebaseService.deleteDocument( this.collection , this.tournamentId! ).then( ()=>{
+    this.firebase.deleteDocument( this.collection , this.tournamentId! ).then( ()=>{
       console.log( "category removed")
       this.router.navigate([""])
     },
@@ -277,13 +277,13 @@ export class TournamentComponent implements OnInit{
     let filter:Filter = {
       field: 'email',
       operator: '==',
-      value: this.authService.getUserEmail()
+      value: this.auth.getUserEmail()
     }
     return [filter]
   }
 
   onAccept( id:string ){
-    this.firebaseService.unionArrayElementDoc( this.collection + "/" + this.tournamentId, "program", id).then( ()=>{
+    this.firebase.unionArrayElementDoc( this.collection + "/" + this.tournamentId, "program", id).then( ()=>{
       console.log("update programa")
       this.update()
     },
@@ -292,7 +292,7 @@ export class TournamentComponent implements OnInit{
     })
   }
   onReject( id:string ){
-    this.firebaseService.removeArrayElementDoc( this.collection + "/" + this.tournamentId, "program", id).then( ()=>{
+    this.firebase.removeArrayElementDoc( this.collection + "/" + this.tournamentId, "program", id).then( ()=>{
       console.log("update programa")
       this.update()
     },
@@ -309,7 +309,7 @@ export class TournamentComponent implements OnInit{
         let obj:Tournament ={
           program:this.tournament.program
         }
-        this.firebaseService.updateDocument( this.collection, this.tournamentId, obj).then( ()=>{
+        this.firebase.updateDocument( this.collection, this.tournamentId, obj).then( ()=>{
           this.update()
         },
         reason =>{
@@ -327,7 +327,7 @@ export class TournamentComponent implements OnInit{
         let obj:Tournament ={
           program:this.tournament.program
         }
-        this.firebaseService.updateDocument( this.collection, this.tournamentId, obj).then( ()=>{
+        this.firebase.updateDocument( this.collection, this.tournamentId, obj).then( ()=>{
           this.update()
         },
         reason =>{
@@ -341,7 +341,7 @@ export class TournamentComponent implements OnInit{
     let obj:Performance = {
       isReleased:true
     }
-    this.firebaseService.updateDocument( [TournamentCollection.collectionName, this.tournamentId
+    this.firebase.updateDocument( [TournamentCollection.collectionName, this.tournamentId
       ,PerformanceCollection.collectionName].join("/"), performanceId, obj).then( ()=>{
         this.update()
     },
@@ -371,7 +371,7 @@ export class TournamentComponent implements OnInit{
   onPerformancesEdit(){
     let parts = ['tournament',this.tournamentId,'performances']
     let url = encodeURIComponent( parts.join("/") )
-    if( this.authService.isloggedIn() ){
+    if( this.auth.isloggedIn() ){
       this.router.navigate(parts)
     }
     else{
@@ -394,7 +394,7 @@ export class TournamentComponent implements OnInit{
           imageUrl:this.tournament.imageUrl,
           imagePath:this.tournament.imagePath
         }
-        this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+        this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
           console.log( "imagen Updated" )
         },
         reason=>{
@@ -419,7 +419,7 @@ export class TournamentComponent implements OnInit{
         imageUrl:this.tournament.imageUrl,
         imagePath:this.tournament.imagePath
       }
-      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+      this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
         console.log( "imagen deleted" )
       },
       reason=>{
@@ -439,11 +439,11 @@ export class TournamentComponent implements OnInit{
         let userFilter:Filter = {
           field: 'email',
           operator: '==',
-          value: this.authService.getUserEmail()
+          value: this.auth.getUserEmail()
         }
         filter.push( userFilter )
       }
-      this.firebaseService.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"), filter).then( set =>{
+      this.firebase.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"), filter).then( set =>{
         set.map( doc =>{
           let p = doc.data() as PerformanceObj
 
@@ -466,7 +466,7 @@ export class TournamentComponent implements OnInit{
     if( this.tournament ){
       this.tournament.program.map( programId =>{
         console.log("reading program:" + programId)
-        this.firebaseService.getDocument( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") , programId).then( (data)=>{
+        this.firebase.getDocument( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") , programId).then( (data)=>{
           let performance = data as PerformanceObj
           let pr:PerformanceReference = {
             id: programId,
@@ -492,28 +492,8 @@ export class TournamentComponent implements OnInit{
     }
   }
   
-  onInscribe(){
-    if( !this.authService.isloggedIn() ){
-      this.router.navigate(['/loginForm', encodeURI("tournament/" + this.tournamentId)])
-    }
-    else{
-      this.addParticipant( this.authService.getUserEmail()! )
-    }
-  }
-  addParticipant(email:string){
-    if( this.tournament && this.tournament.participantEmails.findIndex( e => e == email) < 0){
-      this.tournament.participantEmails.push( email )
-      let t:Tournament ={
-        participantEmails: this.tournament.participantEmails
-      }
-      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, t).then( ()=>{
-        this.update()
-      },
-      reason=>{
-        alert("Error saving participant:" + reason)
-      })
-    }
-  } 
+
+
    
 
 }

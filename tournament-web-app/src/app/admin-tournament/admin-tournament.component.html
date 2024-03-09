@@ -1,0 +1,144 @@
+<a routerLink="/organizer"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
+<h1>Torneo
+    @if( tournamentId && tournament){
+        <button mat-icon-button color="warn" (click)="onDelete()"><mat-icon>delete</mat-icon></button>
+    }
+</h1>    
+
+<form [formGroup]="form">
+    <mat-card>
+        <mat-card-content>
+            <div class="name-container">
+                <mat-form-field class="name-input">
+                    <mat-label>Nombre del evento</mat-label>
+                    <input matInput placeholder="" formControlName="label" (change)="onNameChange($event)">
+                </mat-form-field>
+                <div>
+                    <mat-form-field color="accent" appearance="fill">
+                        <mat-label>Fecha del evento</mat-label>
+                        <input matInput [matDatepicker]="picker1" formControlName="eventDate"  (change)="onChange($event, tournamentId,'eventDate')">
+                        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                        <mat-datepicker #picker1></mat-datepicker>
+                    </mat-form-field>
+                </div>
+                <div>
+                    <mat-form-field color="accent" appearance="fill">
+                        <mat-label>Hora del evento</mat-label>            
+                        <input matInput formControlName="eventTime" [format]="24" [ngxTimepicker]="picker" (change)="onChange($event,tournamentId,'eventTime')">
+                        <ngx-material-timepicker #picker></ngx-material-timepicker> 
+                    </mat-form-field> 
+                </div>                        
+
+                @if( tournament ){
+                <app-image-loader [fullpath]="tournament.imagePath" [basepath]="getBasePath()" (onload)="fileLoaded($event)" (ondelete)="fileDeleted($event)"></app-image-loader>                    
+                }                  
+            </div>
+        </mat-card-content>   
+        @if( !tournamentId ){        
+        <mat-card-actions>
+                <button mat-button-icon (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+        </mat-card-actions>
+        }   
+    </mat-card>    
+</form>
+
+@if( tournamentId && tournament ){
+    <mat-accordion>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Categorias</mat-panel-title>
+            </mat-expansion-panel-header>    
+                <a [routerLink]="['/','tournament',tournamentId,'categories']">
+                    <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                </a>       
+                <mat-list>
+                    @for( category of tournament.categories; track category){
+                        <mat-list-item>{{category.label}}</mat-list-item>
+                    }
+                </mat-list>                  
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Evaluaciones</mat-panel-title>
+            </mat-expansion-panel-header>    
+                <a [routerLink]="['/','tournament',tournamentId,'evaluation']">
+                    <button mat-button-icon><mat-icon>edit</mat-icon></button>
+                </a>    
+                <mat-list>
+                    @for( evaluation of tournament.evaluations; track evaluation){
+                        <mat-list-item>
+                        {{evaluation.label}}
+                        </mat-list-item>    
+                    } 
+                </mat-list>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Jurado</mat-panel-title>
+            </mat-expansion-panel-header>    
+            <a [routerLink]="['/','tournament',tournamentId,'jurors']">
+                <button mat-button-icon><mat-icon>edit</mat-icon></button>
+            </a>
+            <mat-list>
+                @for( j of jurorList; track j){
+                    <mat-list-item>{{j.label}}</mat-list-item>
+                }
+            </mat-list>  
+        </mat-expansion-panel>  
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Premiacion</mat-panel-title>
+            </mat-expansion-panel-header>    
+            <a [routerLink]="['/','tournament',tournamentId,'medals']">
+                <button mat-button-icon><mat-icon>edit</mat-icon></button>
+            </a>
+            <mat-list>
+                @for( medal of tournament.medals; track medal ){
+                    <mat-list-item>{{medal.label}}</mat-list-item>
+                }
+            </mat-list>  
+        </mat-expansion-panel>     
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Performances</mat-panel-title>
+            </mat-expansion-panel-header>  
+            <a [routerLink]="['/','tournament',tournamentId,'performances']">
+                <button mat-button-icon><mat-icon>edit</mat-icon></button>
+            </a>   
+                                
+            <mat-list>
+                @for( p of performances; track p){
+                    <mat-list-item>
+                    {{ p.performance.label }}
+                    @if( p.isInProgram ){
+                        <mat-icon>done</mat-icon>
+                    }
+                    </mat-list-item>
+                }                
+            </mat-list>  
+        </mat-expansion-panel>  
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Programa</mat-panel-title>
+            </mat-expansion-panel-header>  
+            <a [routerLink]="['/','tournament',tournamentId,'program']">
+                <button mat-button-icon><mat-icon>edit</mat-icon></button>
+            </a>   
+                                
+            <mat-list>
+                @for( p of program; track p){
+                    <mat-list-item>
+                    {{ p.performance.label }}
+                    </mat-list-item>
+                }    
+                @empty{
+                    <h3>No se han adicionado performances al programa</h3>
+                }                             
+            </mat-list>  
+        </mat-expansion-panel>                               
+    </mat-accordion>    
+    <p>
+        <mat-divider></mat-divider>
+    </p>
+}     
+
