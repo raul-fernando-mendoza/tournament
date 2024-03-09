@@ -250,5 +250,18 @@ export class ProgramListComponent implements OnDestroy{
     }
     return 0
   }
+
+  onReleaseProgram(isProgramReleased:boolean){
+    let obj:Tournament = {
+      isProgramReleased : isProgramReleased
+    }
+    this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+      console.log("Tournament released")
+      this.update()
+    },
+    reason =>{
+      alert("Error actualizando la liberacion")
+    })    
+  }
   
 }

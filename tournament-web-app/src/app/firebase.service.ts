@@ -1,10 +1,18 @@
 import { Injectable } from '@angular/core';
-import { db } from '../environments/environment'
-import { QueryDocumentSnapshot, collection, doc, limit, deleteDoc , getDoc, and, getDocs, query, setDoc, updateDoc, DocumentData, arrayRemove, where, FieldPath, WhereFilterOp, orderBy, QueryConstraint, Query, QueryNonFilterConstraint, startAt, OrderByDirection, arrayUnion, DocumentSnapshot, FirestoreError} from "firebase/firestore/lite"; 
+import { QueryDocumentSnapshot, collection, doc, limit, deleteDoc , getDoc, and, getDocs, query, setDoc, updateDoc, DocumentData, arrayRemove, where, FieldPath, WhereFilterOp, orderBy, OrderByDirection, arrayUnion, getFirestore, Firestore, connectFirestoreEmulator} from "firebase/firestore/lite"; 
 import { MatSelectChange } from '@angular/material/select';
-import { Filter } from './types';
-import { Unsubscribe } from 'firebase/auth';
+import { app, environment } from '../environments/environment'
 
+export const db:Firestore  = getFirestore(app);
+if( environment.production == false ){
+  connectFirestoreEmulator(db, 'localhost', 8080);
+}
+
+export interface Filter{
+  field:string
+  operator:'==' | "array-contains"
+  value:unknown
+}
 
 export interface QryPar {
   collectionPath:string,

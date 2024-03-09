@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { FirebaseService } from '../firebase.service';
-import { Performance, EvaluationGradeCollection, EvaluationGradeObj, Filter, PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror} from '../types'
+import { FirebaseService,Filter } from '../firebase.service';
+import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror} from '../types'
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -140,8 +140,8 @@ export class TournamentComponent implements OnInit{
         })
 
         if(this.authService.isloggedIn() ){
-          let uid = this.authService.getUserEmail()
-          if( this.tournament.participants.findIndex( e=>e==uid ) >= 0 ){
+          let email = this.authService.getUserEmail()
+          if( this.tournament.participantEmails.findIndex( e=>e==email ) >= 0 ){
             this.isParticipant = true
           }
         } 
@@ -202,12 +202,14 @@ export class TournamentComponent implements OnInit{
         creatorUid: this.authService.getUserUid()!,
         tags: tags,
         program: [],
+        isProgramReleased: false,
         categories: [],
         medals: [],
         evaluations: [],
         jurors: [],
-        jurorEmails:[],
-        participants: []
+        jurorEmails: [],
+        participantEmails: [],
+        
       }
 
       this.firebaseService.setDocument( this.collection, id, tournament).then( ()=>{
@@ -499,10 +501,10 @@ export class TournamentComponent implements OnInit{
     }
   }
   addParticipant(email:string){
-    if( this.tournament && this.tournament.participants.findIndex( e => e == email) < 0){
-      this.tournament.participants.push( email )
+    if( this.tournament && this.tournament.participantEmails.findIndex( e => e == email) < 0){
+      this.tournament.participantEmails.push( email )
       let t:Tournament ={
-        participants: this.tournament.participants
+        participantEmails: this.tournament.participantEmails
       }
       this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, t).then( ()=>{
         this.update()

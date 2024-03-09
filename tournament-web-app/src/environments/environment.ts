@@ -19,10 +19,9 @@ const firebaseConfig = {
 
 // Initialize Firebase
 export const app:FirebaseApp  = initializeApp(firebaseConfig);
-export const db:Firestore  = getFirestore(app);
+
 export const storage:FirebaseStorage = getStorage(app)
 
-connectFirestoreEmulator(db, 'localhost', 8080);
 connectStorageEmulator(storage,'localhost', 8080)
 
 export const auth:Auth = getAuth(app)

@@ -5,6 +5,14 @@
     <h1>{{  tournament.label }}</h1>
 
     <h2>Programa</h2>
+
+    @if( !tournament.isProgramReleased ){
+        <button mat-button color="warn" (click)="onReleaseProgram(true)">Publicar Programa</button>
+    }
+    @else{
+        <button mat-button color="warn" (click)="onReleaseProgram(false)">Ocultar Programa</button>
+    }    
+
     @for(p of performances; track p;let idx = $index, e = $even){
         <mat-grid-list cols="5" rowHeight="2em" [style.background]="performanceColor">
             <mat-grid-tile>

@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { FirebaseService } from '../firebase.service';
-import { FirebaseFullService } from '../firebasefull.service';
-import { Filter, Tournament, TournamentCollection } from '../types';
+import { FirebaseFullService, Filter } from '../firebasefull.service';
+import { Tournament, TournamentCollection } from '../types';
 
 interface TournamentLink{
   id:string

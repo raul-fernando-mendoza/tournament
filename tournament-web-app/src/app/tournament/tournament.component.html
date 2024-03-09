@@ -165,7 +165,8 @@
                     }
                     </mat-list> 
                 }    
-                @if( isAdmin || isJuror ){   
+                @if( isAdmin || 
+                     ( (isJuror || isParticipant) && tournament.isProgramReleased ) ){   
                     <mat-divider></mat-divider>                              
                     <h2>Programa
                         

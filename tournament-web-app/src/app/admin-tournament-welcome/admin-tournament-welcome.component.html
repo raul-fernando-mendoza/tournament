@@ -1,0 +1,35 @@
+<h1>Bienvenido Administrador</h1>
+
+@if( tournamentLinks ){
+
+    <h1>Mis Torneos</h1>
+    @for( tl of tournamentLinks; track tl.id){
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>
+                    <a routerLink="/tournament/{{tl.id}}">{{tl.tournament.label}}</a>
+                </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="bar">
+                    <div>fecha:{{tl.tournament.eventDate.toDate() | date: 'dd/MM/yyyy'}}</div>
+                    <span class="spacer"></span>
+                    <img mat-card-sm-image [src]="tl.tournament.imageUrl" >  
+                </div>       
+            </mat-card-content>         
+        </mat-card>    
+    }
+    @empty{
+        <p>No se encontro ningun Torneo</p>
+    }
+
+    <div>
+        <a [routerLink]="['/','tournamentNew']">
+            <button mat-icon-button><mat-icon>add</mat-icon></button>
+        </a>
+    </div>
+    
+}
+@else{
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>    
+}

@@ -47,12 +47,13 @@ export interface Tournament{
     imageUrl?:string|null
     imagePath?:string|null
     program?:Array<string>
+    isProgramReleased?:boolean
     categories?:Array<Category>
     medals?:Array<Medal>
     evaluations?:Array<Evaluation>
     jurors?:Array<Juror>
     jurorEmails?:Array<string>
-    participants?:Array<string>
+    participantEmails?:Array<string>
 }
 export class TournamentObj implements Tournament{
     label: string = ""
@@ -64,12 +65,13 @@ export class TournamentObj implements Tournament{
     imagePath:string | null = null
     imageUrl: string | null = null
     program:Array<string> = []
+    isProgramReleased:boolean = false
     categories:Array<Category> = []
     medals:Array<Medal> = []
     evaluations:Array<Evaluation> = []
     jurors:Array<Juror> = []
     jurorEmails:Array<string> = []
-    participants:Array<string> = []
+    participantEmails:Array<string> = []
 }
 export class TournamentCollection{
     static readonly collectionName:string = 'tournament';
@@ -100,11 +102,7 @@ export class PerformanceCollection{
     static readonly collectionName:string = "performance"
 }
 
-export interface Filter{
-    field:string
-    operator:'==' | "array-contains"
-    value:unknown
-}
+
 export class AspectGrade {
     label!:string
     description:string|null = null
@@ -132,3 +130,10 @@ export class EvaluationGradeCollection{
     static readonly collectionName:string = "evaluationgrade"
 }
 
+export class ParticipantRequest{
+    email!:string
+}
+
+export class ParticipantRequestCollection{
+    static readonly collectionName:string = "performance"
+}

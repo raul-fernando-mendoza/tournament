@@ -16,6 +16,7 @@ import { TournamentListComponent } from './tournament-list/tournament-list.compo
 import { WelcomeJurorComponent } from './welcome-juror/welcome-juror.component';
 import { AuthService } from './auth.service';
 import { inject } from '@angular/core';
+import { AdminTournamentWelcomeComponent } from './admin-tournament-welcome/admin-tournament-welcome.component';
 
 export function loginGuard(
     redirectRoute: string
@@ -58,7 +59,7 @@ export const routes: Routes = [
     
     { path:"participant",pathMatch:'full',component:TournamentSearchComponent},
     { path:"juror",pathMatch:'full',component:WelcomeJurorComponent, canActivate: [loginGuard('loginForm/juror')]},
-    { path:"organizer",pathMatch:'full',component:TournamentListComponent},
+    { path:"organizer",pathMatch:'full',component:AdminTournamentWelcomeComponent, canActivate: [loginGuard('loginForm/organizer')]},
     
     { path:"home",pathMatch:'full',component:ProfileComponent},    
     { path:"",pathMatch:'full',component:ProfileComponent}
