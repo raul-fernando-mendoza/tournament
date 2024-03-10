@@ -70,8 +70,6 @@ export class AdminTournamentComponent implements OnInit{
   isAdmin = false
   isLoggedIn = false
 
-  jurorList:Array<Juror> = []
-
   performanceColor = 'lightblue'
 
 
@@ -88,8 +86,6 @@ export class AdminTournamentComponent implements OnInit{
   performances:Array<PerformanceReference> = []
 
   program:Array<PerformanceReference> = []  
-
-  isJuror = false
 
   currentProfile:Profile = null
 
@@ -131,13 +127,6 @@ export class AdminTournamentComponent implements OnInit{
 
         let email = this.auth.getUserEmail()
 
-        
-
-        this.tournament.jurors.forEach( j =>{
-          if( j.email == email  ){
-            this.isJuror = true
-          }
-        })
 
         if(this.auth.isloggedIn() ){
           let email = this.auth.getUserEmail()

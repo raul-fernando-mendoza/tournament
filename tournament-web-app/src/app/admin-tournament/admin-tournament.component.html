@@ -82,7 +82,7 @@
                 <button mat-button-icon><mat-icon>edit</mat-icon></button>
             </a>
             <mat-list>
-                @for( j of jurorList; track j){
+                @for( j of tournament.jurors; track j){
                     <mat-list-item>{{j.label}}</mat-list-item>
                 }
             </mat-list>  
