@@ -9,6 +9,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule} from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 
+export interface FileLoaded{
+  fullpath:string | null,
+  url:string | null
+}
+
 @Component({
   selector: 'app-image-loader',
   standalone: true,
@@ -29,14 +34,14 @@ import { MatCardModule } from '@angular/material/card';
 export class ImageLoaderComponent implements AfterViewInit{
   @Input() basepath!:string //the folder where the file should be written
   @Input() fullpath:string | null = null//current full path to the storage
+  @Input() url:string | null = null//current full path to the storage
   
   @Input() maxSize = 200 * 1024*1024 
-  @Output() onload = new EventEmitter<string>();
+  @Output() onload = new EventEmitter<FileLoaded>();
   @Output() ondelete = new EventEmitter<string>(); 
 
   progress:string = ""
   error:string  = ""
-  url:string = ""
 
   constructor() { 
     console.log("creaing file-loader")
@@ -44,12 +49,6 @@ export class ImageLoaderComponent implements AfterViewInit{
   }
   ngAfterViewInit(): void {
     console.log("after view iniit file loader")
-    if( this.fullpath ){
-      var storageRef = ref(storage, this.fullpath )
-      getDownloadURL(storageRef).then((downloadURL) => {
-        this.url = downloadURL
-      })
-    } 
   }
 
   selectFile(event:any) {
@@ -119,7 +118,13 @@ export class ImageLoaderComponent implements AfterViewInit{
           console.log('File available at', downloadURL);
           this.url = downloadURL
           thiz.progress = "Complete"
-          this.onload.emit(this.fullpath!)          
+
+          let fileLoaded:FileLoaded ={
+            fullpath: this.fullpath,
+            url: this.url
+          }
+
+          this.onload.emit(fileLoaded)       
         });
       }
     );

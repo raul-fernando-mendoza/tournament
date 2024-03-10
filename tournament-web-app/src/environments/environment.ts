@@ -22,7 +22,7 @@ export const app:FirebaseApp  = initializeApp(firebaseConfig);
 
 export const storage:FirebaseStorage = getStorage(app)
 
-connectStorageEmulator(storage,'localhost', 8080)
+connectStorageEmulator(storage,'localhost', 9199)
 
 export const auth:Auth = getAuth(app)
 

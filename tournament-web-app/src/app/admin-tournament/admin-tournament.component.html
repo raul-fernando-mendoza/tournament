@@ -16,7 +16,7 @@
                     </mat-form-field>                </mat-grid-tile>
                 <mat-grid-tile colspan="2" rowspan="5">
                     @if( tournament ){
-                        <app-image-loader [fullpath]="tournament.imagePath" [basepath]="getBasePath()" (onload)="fileLoaded($event)" (ondelete)="fileDeleted($event)"></app-image-loader>
+                        <app-image-loader [fullpath]="tournament.imagePath" [basepath]="getBasePath()" [url]="tournament.imageUrl" (onload)="fileLoaded($event)" (ondelete)="fileDeleted($event)"></app-image-loader>
                     }
                 </mat-grid-tile>
                 <mat-grid-tile colspan="3">

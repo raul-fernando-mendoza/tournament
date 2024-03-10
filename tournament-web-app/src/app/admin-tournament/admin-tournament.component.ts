@@ -21,7 +21,7 @@ import { MatGridListModule} from '@angular/material/grid-list';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatMenuModule} from '@angular/material/menu';
-import { ImageLoaderComponent } from '../image-loader/image-loader.component';
+import { FileLoaded, ImageLoaderComponent } from '../image-loader/image-loader.component';
 import {  ref , getDownloadURL} from "firebase/storage";
 import { storage } from '../../environments/environment';
 import { QuillModule } from 'ngx-quill'
@@ -384,38 +384,28 @@ export class AdminTournamentComponent implements OnInit{
 
   }
   
-  fileLoaded(fullpath:string){
+  fileLoaded(fileLoaded:FileLoaded){
     console.log("files has been loaded")
-    var storageRef = ref(storage, fullpath )
-    getDownloadURL(storageRef).then((downloadURL) => {
-      if( this.tournament ){
-        this.tournament.imageUrl = downloadURL 
-        this.tournament.imagePath = fullpath  
-        let obj:Tournament = {
-          imageUrl:this.tournament.imageUrl,
-          imagePath:this.tournament.imagePath
-        }
-        this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-          console.log( "imagen Updated" )
-        },
-        reason=>{
-          alert("ERROR: guardando la imagen:" + reason)
-        })    
-
-        
+    if( this.tournament ){
+      this.tournament.imageUrl = fileLoaded.url 
+      this.tournament.imagePath = fileLoaded.fullpath
+      let obj:Tournament = {
+        imageUrl:this.tournament.imageUrl,
+        imagePath:this.tournament.imagePath
       }
-      else{
-        this.form.controls.imageUrl.setValue(fullpath)
-      }      
-    })
-
-
+      this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+        console.log( "imagen Updated" )
+      },
+      reason=>{
+        alert("ERROR: guardando la imagen:" + reason)
+      })    
+    }
   }  
   fileDeleted(fullpath:string){
     console.log("files has been deleted")
     if( this.tournament ){
-      this.tournament.imageUrl = ""
-      this.tournament.imagePath = ""
+      this.tournament.imageUrl = null
+      this.tournament.imagePath = null
       let obj:Tournament = {
         imageUrl:this.tournament.imageUrl,
         imagePath:this.tournament.imagePath
