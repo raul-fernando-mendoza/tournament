@@ -62,7 +62,7 @@ interface PerformanceReference{
   templateUrl: './admin-tournament.component.html',
   styleUrl: './admin-tournament.component.css'
 })
-export class TournamentComponent implements OnInit{
+export class AdminTournamentComponent implements OnInit{
 
   tournamentId :string | null= null
   tournament:TournamentObj| null = null
@@ -383,6 +383,7 @@ export class TournamentComponent implements OnInit{
     return this.tournamentId!
 
   }
+  
   fileLoaded(fullpath:string){
     console.log("files has been loaded")
     var storageRef = ref(storage, fullpath )

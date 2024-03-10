@@ -8,31 +8,33 @@
 <form [formGroup]="form">
     <mat-card>
         <mat-card-content>
-            <div class="name-container">
-                <mat-form-field class="name-input">
-                    <mat-label>Nombre del evento</mat-label>
-                    <input matInput placeholder="" formControlName="label" (change)="onNameChange($event)">
-                </mat-form-field>
-                <div>
+            <mat-grid-list cols="5" rowHeight="5em">
+                <mat-grid-tile colspan="3">
+                    <mat-form-field class="name-input">
+                        <mat-label>Nombre del evento</mat-label>
+                        <input matInput placeholder="" formControlName="label" (change)="onNameChange($event)">
+                    </mat-form-field>                </mat-grid-tile>
+                <mat-grid-tile colspan="2" rowspan="5">
+                    @if( tournament ){
+                        <app-image-loader [fullpath]="tournament.imagePath" [basepath]="getBasePath()" (onload)="fileLoaded($event)" (ondelete)="fileDeleted($event)"></app-image-loader>
+                    }
+                </mat-grid-tile>
+                <mat-grid-tile colspan="3">
                     <mat-form-field color="accent" appearance="fill">
                         <mat-label>Fecha del evento</mat-label>
                         <input matInput [matDatepicker]="picker1" formControlName="eventDate"  (change)="onChange($event, tournamentId,'eventDate')">
                         <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
                         <mat-datepicker #picker1></mat-datepicker>
                     </mat-form-field>
-                </div>
-                <div>
+                </mat-grid-tile>
+                <mat-grid-tile colspan="3">
                     <mat-form-field color="accent" appearance="fill">
                         <mat-label>Hora del evento</mat-label>            
                         <input matInput formControlName="eventTime" [format]="24" [ngxTimepicker]="picker" (change)="onChange($event,tournamentId,'eventTime')">
                         <ngx-material-timepicker #picker></ngx-material-timepicker> 
                     </mat-form-field> 
-                </div>                        
-
-                @if( tournament ){
-                <app-image-loader [fullpath]="tournament.imagePath" [basepath]="getBasePath()" (onload)="fileLoaded($event)" (ondelete)="fileDeleted($event)"></app-image-loader>                    
-                }                  
-            </div>
+                </mat-grid-tile>
+            </mat-grid-list>
         </mat-card-content>   
         @if( !tournamentId ){        
         <mat-card-actions>

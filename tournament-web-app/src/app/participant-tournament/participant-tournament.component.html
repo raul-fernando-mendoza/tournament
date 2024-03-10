@@ -1,1 +1,105 @@
-<p>participant-tournament works!</p>
+<a routerLink="/participant"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
+<h1>Torneo</h1>    
+@if( tournament ){
+    <mat-grid-list cols="5" rowHeight="2em">
+        <mat-grid-tile colspan="3">{{ tournament.label }}</mat-grid-tile>
+        <mat-grid-tile colspan="2" rowspan="3"><img mat-card-lg-image [src]="tournament.imageUrl" ></mat-grid-tile>
+        <mat-grid-tile colspan="3">
+            Fecha:{{tournament.eventDate.toDate() | date: 'dd/MM/yyyy'}}
+        </mat-grid-tile>
+        <mat-grid-tile colspan="3">
+            Hora:{{tournament.eventTime}}
+        </mat-grid-tile>
+    </mat-grid-list>
+    <mat-accordion>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Categorias</mat-panel-title>
+            </mat-expansion-panel-header>    
+                <mat-accordion>
+                @for( category of tournament.categories; track category){
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>{{category.label}}</mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <p>
+                            <quill-view-html [content]="category.description"></quill-view-html> 
+                        </p>
+                    </mat-expansion-panel>
+                } 
+                </mat-accordion>                 
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Evaluaciones</mat-panel-title>
+            </mat-expansion-panel-header>    
+            <mat-accordion>
+                    @for( medal of tournament.medals; track medal){
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>{{medal.label}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <p>
+                                <quill-view-html [content]="medal.description"></quill-view-html> 
+                            </p>
+                        </mat-expansion-panel>
+                    } 
+            </mat-accordion> 
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Premiacion</mat-panel-title>
+            </mat-expansion-panel-header>    
+            <mat-accordion>
+                    @for( medal of tournament.medals; track medal){
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>{{medal.label}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <p>
+                                <quill-view-html [content]="medal.description"></quill-view-html> 
+                            </p>
+                        </mat-expansion-panel>
+                    } 
+                </mat-accordion> 
+        </mat-expansion-panel>     
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Performances</mat-panel-title>
+            </mat-expansion-panel-header>  
+            <a [routerLink]="['/','tournament',tournamentId,'performances']">
+                <button mat-button-icon><mat-icon>edit</mat-icon></button>
+            </a>   
+                                
+            <mat-list>
+                @for( p of performances; track p){
+                    <mat-list-item>
+                    {{ p.performance.label }}
+                    @if( p.isInProgram ){
+                        <mat-icon>done</mat-icon>
+                    }
+                    </mat-list-item>
+                }                
+            </mat-list>  
+        </mat-expansion-panel>  
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Programa</mat-panel-title>
+            </mat-expansion-panel-header>  
+            <mat-list>
+                @for( p of program; track p){
+                    <mat-list-item>
+                    {{ p.performance.label }}
+                    </mat-list-item>
+                }    
+                @empty{
+                    <h3>No se han adicionado performances al programa</h3>
+                }                             
+            </mat-list>  
+        </mat-expansion-panel>                               
+    </mat-accordion>    
+    <p>
+        <mat-divider></mat-divider>
+    </p>
+}     
+

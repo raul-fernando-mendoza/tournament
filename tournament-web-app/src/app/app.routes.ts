@@ -1,6 +1,6 @@
 import { CanActivateFn, Router, Routes } from '@angular/router';
 import { LoginFormComponent } from './login-form/login-form.component';
-import { TournamentComponent } from './admin-tournament/admin-tournament.component';
+import { AdminTournamentComponent } from './admin-tournament/admin-tournament.component';
 import { TournamentSearchComponent } from './tournament-search/tournament-search.component';
 import { EvaluationGradeComponent } from './evaluationgrade/evaluationgrade-component';
 import { MedalsListComponent } from './medals-list/medals-list.component';
@@ -17,6 +17,7 @@ import { WelcomeJurorComponent } from './welcome-juror/welcome-juror.component';
 import { AuthService } from './auth.service';
 import { inject } from '@angular/core';
 import { AdminTournamentWelcomeComponent } from './admin-welcome/admin-welcome.component';
+import { ParticipantTournamentComponent } from './participant-tournament/participant-tournament.component';
 
 export function loginGuard(
     redirectRoute: string
@@ -36,8 +37,9 @@ export const routes: Routes = [
     { path:"loginForm/:intendedPath",component:LoginFormComponent}, 
     { path:"loginForm",component:LoginFormComponent},    
     { path:"registerForm",component:LoginFormComponent},
-    { path:"tournamentNew",component:TournamentComponent},
-    { path:"tournament/:id",component:TournamentComponent},
+    { path:"tournamentNew",component:AdminTournamentComponent},
+    { path:"participantTournament/:id",component:ParticipantTournamentComponent},
+    { path:"tournament/:id",component:AdminTournamentComponent},
 
 //    { path:"tournament/:tournamentId/evaluationgradeNew",component:EvaluationGradeComponent},          
 //    { path:"tournament/:tournamentId/evaluationGrade/:id",component:EvaluationGradeComponent}, 
