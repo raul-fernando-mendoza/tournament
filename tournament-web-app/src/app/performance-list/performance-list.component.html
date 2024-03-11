@@ -1,13 +1,8 @@
-<a [routerLink]="['/','tournament',tournamentId]">
-    <button mat-icon-button><mat-icon>arrow_back</mat-icon></button>
-</a>
 @if( tournament ){
-    <h1>{{  tournament.label }}</h1>
-
-    <h1>Performances
+    <h2>Performances
         @if( !isAdding){
             <button mat-button-icon (click)="onAdd()"><mat-icon>add</mat-icon></button>
-        }</h1>
+        }</h2>
     @for(g of getGroups(); track g){
         <mat-card [formGroup]="g">
             <mat-card-header>

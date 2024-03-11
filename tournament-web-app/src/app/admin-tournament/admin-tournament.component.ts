@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FirebaseService,Filter } from '../firebase.service';
-import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror} from '../types'
+import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection} from '../types'
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -27,6 +27,8 @@ import { storage } from '../../environments/environment';
 import { QuillModule } from 'ngx-quill'
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatListModule} from '@angular/material/list';
+import { findSourceMap } from 'module';
+import { PerformanceListComponent } from '../performance-list/performance-list.component';
 
 interface PerformanceReference{
   id:string
@@ -34,6 +36,12 @@ interface PerformanceReference{
   isInProgram:boolean
 }
 
+
+interface InscriptionRequestLink{
+  id:string
+  inscriptionRequest:InscriptionRequest
+  isAccepted:boolean
+}
 
 @Component({
   selector: 'app-tournament',
@@ -58,6 +66,7 @@ interface PerformanceReference{
   ,QuillModule
   ,MatExpansionModule
   ,MatListModule
+  ,PerformanceListComponent
   ],
   templateUrl: './admin-tournament.component.html',
   styleUrl: './admin-tournament.component.css'
@@ -71,7 +80,6 @@ export class AdminTournamentComponent implements OnInit{
   isLoggedIn = false
 
   performanceColor = 'lightblue'
-
 
   form = this.fb.group({
     label:['',Validators.required],
@@ -90,6 +98,8 @@ export class AdminTournamentComponent implements OnInit{
   currentProfile:Profile = null
 
   isParticipant = false
+
+  inscriptionRequestLinks:Array<InscriptionRequestLink> = []
 
   constructor(
      private activatedRoute: ActivatedRoute
@@ -159,6 +169,7 @@ export class AdminTournamentComponent implements OnInit{
         
         this.readPerformances()
         this.readProgram()
+        this.loadInscriptionRequests()
       })
     }
   }
@@ -472,8 +483,63 @@ export class AdminTournamentComponent implements OnInit{
     }
   }
   
+  loadInscriptionRequests(){
+    this.firebase.getDocuments([TournamentCollection.collectionName, this.tournamentId, InscriptionRequestCollection.collectionName].join("/")).then( set =>{
+      this.inscriptionRequestLinks.length = 0
+      set.map( doc => {
+        let inscriptionRequest:InscriptionRequest = doc.data() as InscriptionRequest
+        
+        if( !this.tournament!.participantEmails.find( e=>e == inscriptionRequest.email )){
+          var accepted = false
+        }
+        else{
+          var accepted = true
+        }
+        let inscriptionRequestLink:InscriptionRequestLink = {
+          id: doc.id,
+          inscriptionRequest: inscriptionRequest,
+          isAccepted: accepted
+        }
 
+        this.inscriptionRequestLinks.push( inscriptionRequestLink )
+      })
 
-   
+    },
+    reason =>{
+      alert("ERROR:inscripciones no pueden ser leidas:" + reason)
+    })    
+  }
+  onAcceptInscriptionRequest(e:InscriptionRequestLink){
+    let inscription:InscriptionRequest = e.inscriptionRequest
+    if( !this.tournament!.participantEmails.find( e => e == inscription.email)){
+      this.tournament!.participantEmails.push( inscription.email )
+      let obj:Tournament = {
+        participantEmails:this.tournament!.participantEmails
+      }
+      this.firebase.updateDocument(TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+        this.update()
+      },
+      reason =>{
+        alert("ERROR: aceptando inscripciones" + reason )
+      })
+    }  
+  } 
+
+  onRejectInscriptionRequest(e:InscriptionRequestLink){
+    let idx = this.tournament!.participantEmails.findIndex( p => p == e.inscriptionRequest.email)
+    if( idx >=0 ){
+      this.tournament!.participantEmails.splice( idx, 1)
+      let obj:Tournament = {
+        participantEmails:this.tournament!.participantEmails
+      }
+      this.firebase.updateDocument(TournamentCollection.collectionName, this.tournamentId, obj).then( () =>{
+        this.update()
+      },
+      reason =>{
+        alert("Error:Error removing inscription")
+      })
+    }
+  }
+
 
 }

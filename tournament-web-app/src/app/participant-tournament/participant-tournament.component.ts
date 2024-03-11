@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj } from '../types';
+import { InscriptionRequest, InscriptionRequestCollection, PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj } from '../types';
 import { FirebaseService,Filter } from '../firebase.service';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,6 +11,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { QuillModule } from 'ngx-quill';
+import { PerformanceListComponent } from '../performance-list/performance-list.component';
 
 
 interface PerformanceReference{
@@ -32,15 +33,17 @@ interface PerformanceReference{
     ,RouterModule    
     ,MatGridListModule
     ,QuillModule
+    ,PerformanceListComponent
   ],
   templateUrl: './participant-tournament.component.html',
   styleUrl: './participant-tournament.component.css'
 })
 export class ParticipantTournamentComponent {
 
-  tournamentId :string | null= null
+  tournamentId! :string 
   tournament:TournamentObj| null = null
   isParticipant = false  
+  isInscriptionInProgress = false
   isLoggedIn = false
 
   performances:Array<PerformanceReference> = []
@@ -55,9 +58,9 @@ export class ParticipantTournamentComponent {
       var thiz = this
       this.activatedRoute.paramMap.subscribe( {
         next(paramMap){
-          thiz.tournamentId = null
-          if( paramMap.get('id') )
-            thiz.tournamentId = paramMap.get('id')
+          let tournamentId = paramMap.get('tournamentId')
+          if( tournamentId )
+            thiz.tournamentId = tournamentId
             thiz.update()
           }
   
@@ -72,11 +75,38 @@ export class ParticipantTournamentComponent {
         let email = this.auth.getUserEmail()
 
         if(this.auth.isloggedIn() ){
+          this.isLoggedIn = true
           let email = this.auth.getUserEmail()
           if( this.tournament.participantEmails.find( e=>e==email ) ){
             this.isParticipant = true
           }
+
+          if( this.isParticipant == false ){
+            //find out if the registration is in progress
+            let filter:Array<Filter> =[{
+              field: "email",
+              operator: '==',
+              value: email
+            }]
+            this.firebase.getDocuments([TournamentCollection.collectionName, this.tournamentId, InscriptionRequestCollection.collectionName].join("/"), filter).then( set =>{
+              let found = set.find( doc => {
+                let inscriptionRequest:InscriptionRequest = doc.data() as InscriptionRequest
+                if( inscriptionRequest.email == email ){
+                  return inscriptionRequest
+                }
+                return null
+                })
+              if( found ){
+                this.isInscriptionInProgress = true
+              }
+            })  
+              
+  
+          }          
         } 
+
+
+
         var t:any = this.tournament.eventDate
 
         var d = t.toDate()
@@ -134,8 +164,7 @@ export class ParticipantTournamentComponent {
     }
   }  
   isInProgram( id:string ):boolean{
-    let idx = this.tournament!.program.findIndex( e => e == id)
-    if( idx >= 0){
+    if(  this.tournament!.program.find( e => e == id) ){
       return true
     }
     else{
@@ -145,10 +174,10 @@ export class ParticipantTournamentComponent {
     
   onInscribe(){
     if( !this.auth.isloggedIn() ){
-      this.router.navigate(['/loginForm', encodeURI("tournament/" + this.tournamentId)])
+      this.router.navigate(['/loginForm', encodeURI("participantTournament/" + this.tournamentId + "/inscribe")])
     }
     else{
-      this.addParticipant( this.auth.getUserEmail()! )
+      this.router.navigate(["participantTournament",this.tournamentId, "inscribe"])
     }
   }
   addParticipant(email:string){

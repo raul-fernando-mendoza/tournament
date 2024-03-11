@@ -1,0 +1,12 @@
+<mat-card [formGroup]="form">
+    <mat-card-content>
+        <p>Solicitud de inscripcion para:{{ currentEmail }}</p>
+        
+        <p>Desea addicionar un mensje al organizador:</p>
+        <quill-editor formControlName="description" placeholder="Descripción"></quill-editor>            
+    </mat-card-content>
+    <mat-card-actions>
+        <button mat-button (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+        <button mat-button (click)="onCancel()"><mat-icon>cancel</mat-icon></button>
+    </mat-card-actions>
+</mat-card>    

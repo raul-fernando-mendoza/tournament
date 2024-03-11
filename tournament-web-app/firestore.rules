@@ -22,6 +22,7 @@ service cloud.firestore {
           allow read: if true
           allow read, write: if isAdmin(request) 
           allow read, write: if request.resource.data.email == request.auth.token.email
+          allow read, write: if resource.data.email == request.auth.token.email
         }   
         match /{path=**}/performance/{performanceId}/evaluationgrade/{evaluationGradeId} {    
           

@@ -101,26 +101,31 @@
                     <mat-list-item>{{medal.label}}</mat-list-item>
                 }
             </mat-list>  
-        </mat-expansion-panel>     
+        </mat-expansion-panel>   
+        
+        
         <mat-expansion-panel>
             <mat-expansion-panel-header>
-                <mat-panel-title>Performances</mat-panel-title>
+                <mat-panel-title>Solicitudes de inscription</mat-panel-title>
             </mat-expansion-panel-header>  
-            <a [routerLink]="['/','tournament',tournamentId,'performances']">
-                <button mat-button-icon><mat-icon>edit</mat-icon></button>
-            </a>   
-                                
-            <mat-list>
-                @for( p of performances; track p){
-                    <mat-list-item>
-                    {{ p.performance.label }}
-                    @if( p.isInProgram ){
-                        <mat-icon>done</mat-icon>
+                @for( e of inscriptionRequestLinks; track e.id){
+                    {{ e.inscriptionRequest.email }}
+                    @if( !e.isAccepted ){
+                        <button mat-icon-button (click)="onAcceptInscriptionRequest(e)"><mat-icon>add</mat-icon></button>                    
                     }
-                    </mat-list-item>
-                }                
-            </mat-list>  
+                    @else{
+                        <button mat-icon-button (click)="onRejectInscriptionRequest(e)"><mat-icon>cancel</mat-icon></button>                    
+                        <div class="performances">
+                            <app-performance-list [tournamentId]="tournamentId" [tournament]="tournament" [email]="e.inscriptionRequest.email"></app-performance-list>
+                        </div>
+                    }
+
+                } 
+                @empty{
+                    <p>No hay solicitudes de inscription</p>
+                }               
         </mat-expansion-panel>  
+
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Programa</mat-panel-title>

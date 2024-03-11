@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { AfterViewInit, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -34,9 +34,10 @@ import { AuthService } from '../auth.service';
   styleUrl: './performance-list.component.css',
 
 })
-export class PerformanceListComponent {
-  tournamentId!:string
-  tournament!:TournamentObj
+export class PerformanceListComponent implements AfterViewInit{
+  @Input() tournamentId!:string
+  @Input() tournament!:TournamentObj
+  @Input() email:string | null = null
 
   isAdding = false
   isAdmin = false
@@ -46,16 +47,9 @@ export class PerformanceListComponent {
     ,private activatedRoute: ActivatedRoute    
     ,private auth:AuthService
   ){
-    var thiz = this
-    this.activatedRoute.paramMap.subscribe({
-        next(paramMap){
-          let tournamentId = paramMap.get('tournamentId')
-          if( tournamentId!=null ){
-            thiz.tournamentId = tournamentId
-            thiz.update()
-          }
-        }
-      })
+  }
+  ngAfterViewInit(): void {
+    this.update()
   }
 
   formArray= new FormArray([])
@@ -66,22 +60,14 @@ export class PerformanceListComponent {
   }
 
   update(){
-    this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( (data)=>{
-      this.tournament = data 
-      if( this.auth.getUserUid() == this.tournament.creatorUid){
-        this.isAdmin = true
-      }
-    },
-    reason =>{
-      alert("Error reading tournament:" + reason)
-    }).then( ()=>{
-      this.readPerformances()
-    })    
-  }
 
-  readPerformances(){
     this.formArray.clear()
     let filter:Array<Filter> = []
+
+    if( this.auth.getUserUid() == this.tournament.creatorUid ){
+      this.isAdmin = true
+    }
+
     if( !this.isAdmin ){
       let userFilter:Filter = {
         field: 'email',
@@ -89,6 +75,14 @@ export class PerformanceListComponent {
         value: this.auth.getUserEmail()
       }
       filter.push( userFilter )
+    }
+    else{
+      let userFilter:Filter = {
+        field: 'email',
+        operator: '==',
+        value: this.email
+      }
+      filter.push( userFilter )      
     }
     this.firebaseService.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"), filter).then( set =>{
       set.map( e =>{
@@ -101,7 +95,6 @@ export class PerformanceListComponent {
           email:[p.email,Validators.required],
         }) 
         if( !this.isAdmin ){
-          g.controls["email"].setValue( this.auth.getUserEmail() )       
           g.controls["email"].disable()
         }
         this.getGroups().push(g)
@@ -122,6 +115,10 @@ export class PerformanceListComponent {
     if( !this.isAdmin ){
       g.controls["email"].setValue( this.auth.getUserEmail() )       
       g.controls["email"].disable()
+    }
+    else{
+      g.controls["email"].setValue( this.email )       
+
     }
     this.getGroups().push(g);
     this.isAdding = true
@@ -269,4 +266,6 @@ export class PerformanceListComponent {
     }
     return false
   }
+
+
 }

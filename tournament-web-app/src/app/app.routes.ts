@@ -18,6 +18,7 @@ import { AuthService } from './auth.service';
 import { inject } from '@angular/core';
 import { AdminTournamentWelcomeComponent } from './admin-welcome/admin-welcome.component';
 import { ParticipantTournamentComponent } from './participant-tournament/participant-tournament.component';
+import { InscribeRequestComponent } from './inscribe-request/inscribe-request.component';
 
 export function loginGuard(
     redirectRoute: string
@@ -38,8 +39,13 @@ export const routes: Routes = [
     { path:"loginForm",component:LoginFormComponent},    
     { path:"registerForm",component:LoginFormComponent},
     { path:"tournamentNew",component:AdminTournamentComponent},
-    { path:"participantTournament/:id",component:ParticipantTournamentComponent},
-    { path:"tournament/:id",component:AdminTournamentComponent},
+    { path:"tournament/:id",component:AdminTournamentComponent},    
+
+    { path:"participantTournament/:tournamentId",component:ParticipantTournamentComponent},
+    { path:"participantTournament/:tournamentId/inscribe",component:InscribeRequestComponent},
+    { path:"participantTournament/:tournamentId/performances",component:PerformanceListComponent},
+
+
 
 //    { path:"tournament/:tournamentId/evaluationgradeNew",component:EvaluationGradeComponent},          
 //    { path:"tournament/:tournamentId/evaluationGrade/:id",component:EvaluationGradeComponent}, 
@@ -57,6 +63,7 @@ export const routes: Routes = [
     { path:"tournament/:tournamentId/performances",component:PerformanceListComponent},
     { path:"tournament/:tournamentId/program",component:ProgramListComponent},
     { path:"tournament/:tournamentId/podium",component:PodiumListComponent},
+    
     
     
     { path:"participant",pathMatch:'full',component:TournamentSearchComponent},

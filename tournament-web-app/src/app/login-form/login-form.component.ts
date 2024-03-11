@@ -105,6 +105,8 @@ export class LoginFormComponent {
         var password = this.loginForm.controls["password"].value
 
         this.authSrv.loginWithEmail(user, password).then( () =>{
+
+          console.log( "email:" + this.authSrv.getUserEmail() )
           if( this.intendedPath ){
             this.navigateIntended()
           }

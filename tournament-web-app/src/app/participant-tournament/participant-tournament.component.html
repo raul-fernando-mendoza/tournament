@@ -11,6 +11,27 @@
             Hora:{{tournament.eventTime}}
         </mat-grid-tile>
     </mat-grid-list>
+
+    @if( !isParticipant ){
+        @if( !isInscriptionInProgress ){
+            <div class="bar">
+                <div class="spacer"></div>    
+                <button mat-raised-button color="primary" (click)="onInscribe()">Inscribete</button>
+                <div class="spacer"></div>    
+            </div>
+        }
+        @else{
+            <p>Su inscripcion esta en proceso</p>
+        }
+    }    
+
+    @if( isParticipant || isInscriptionInProgress){   
+        <p>Performances<p>
+ 
+                            
+        <app-performance-list [tournamentId]="tournamentId" [tournament]="tournament"></app-performance-list>         
+    }
+
     <mat-accordion>
         <mat-expansion-panel>
             <mat-expansion-panel-header>
@@ -63,27 +84,7 @@
                     } 
                 </mat-accordion> 
         </mat-expansion-panel>  
-        @if( isParticipant ){   
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>Performances</mat-panel-title>
-            </mat-expansion-panel-header>  
-            <a [routerLink]="['/','tournament',tournamentId,'performances']">
-                <button mat-button-icon><mat-icon>edit</mat-icon></button>
-            </a>   
-                                
-            <mat-list>
-                @for( p of performances; track p){
-                    <mat-list-item>
-                    {{ p.performance.label }}
-                    @if( p.isInProgram ){
-                        <mat-icon>done</mat-icon>
-                    }
-                    </mat-list-item>
-                }                
-            </mat-list>  
-        </mat-expansion-panel>
-        } 
+
         @if( tournament.isProgramReleased ){ 
         <mat-expansion-panel>
             <mat-expansion-panel-header>
