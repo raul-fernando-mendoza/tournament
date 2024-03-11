@@ -130,10 +130,5 @@ export class EvaluationGradeCollection{
     static readonly collectionName:string = "evaluationgrade"
 }
 
-export class ParticipantRequest{
-    email!:string
-}
 
-export class ParticipantRequestCollection{
-    static readonly collectionName:string = "performance"
-}
+
