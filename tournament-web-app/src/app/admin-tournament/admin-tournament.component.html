@@ -46,20 +46,32 @@
 
 @if( tournamentId && tournament ){
     <mat-accordion>
-        <mat-expansion-panel>
+        <mat-expansion-panel [expanded]="activePanel == 'categories'" (opened)="onPanelActivated('categories')">
             <mat-expansion-panel-header>
                 <mat-panel-title>Categorias</mat-panel-title>
-            </mat-expansion-panel-header>    
-                <a [routerLink]="['/','tournament',tournamentId,'categories']">
-                    <button mat-button-icon><mat-icon>edit</mat-icon></button>
+            </mat-expansion-panel-header>  
+                @if( tournament.categories.length > 0){  
+                <a [routerLink]="['/','tournament',tournamentId,'categoryNew']">
+                    <button mat-button-icon><mat-icon>add</mat-icon></button>
                 </a>       
+                }
                 <mat-list>
                     @for( category of tournament.categories; track category){
-                        <mat-list-item>{{category.label}}</mat-list-item>
+                        <mat-list-item>
+                            <a [routerLink]="['/','tournament',tournamentId,'category',category.id]">
+                                <button mat-button>{{category.label}}</button>
+                            </a>                                 
+                        </mat-list-item>
+                    }
+                    @empty{
+                        <p>Usted necesita por lo menos una categoria; por favor adicione una</p>
+                        <a [routerLink]="['/','tournament',tournamentId,'categoryNew']">
+                            <button mat-button-icon><mat-icon>add</mat-icon></button>
+                        </a>       
                     }
                 </mat-list>                  
         </mat-expansion-panel>
-        <mat-expansion-panel>
+        <mat-expansion-panel [expanded]="activePanel == 'evaluations'" (opened)="onPanelActivated('evaluations')">
             <mat-expansion-panel-header>
                 <mat-panel-title>Evaluaciones</mat-panel-title>
             </mat-expansion-panel-header>    

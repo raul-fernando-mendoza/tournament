@@ -25,6 +25,13 @@ export class BusinesslogicService {
     }
     this.profileSubject.next( this.profile )
   }
+
+  setStoredItem(id:string, value:string){
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(id, value ) 
+    }
+    this.profileSubject.next( this.profile )
+  }  
   getStoredItem( id:string):string | null{
     let valueStr:string | null = null
     try {

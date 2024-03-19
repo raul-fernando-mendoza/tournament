@@ -109,6 +109,8 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
 
   unsubscribe:Unsubscribe | undefined = undefined
 
+  activePanel:string | null = null
+
   constructor(
      private activatedRoute: ActivatedRoute
     ,public firebase:FirebaseFullService 
@@ -142,6 +144,8 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
       this.currentProfile = profile
     })
     this.currentProfile = this.businesslogic.getProfile()
+    this.activePanel = this.businesslogic.getStoredItem("activePanel")
+
   }
 
   update(){
@@ -550,6 +554,9 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
       })
     }
   }
-
+  onPanelActivated(activePanel:string){
+    this.activePanel = activePanel 
+    this.businesslogic.setStoredItem("activePanel", activePanel)
+  }
 
 }

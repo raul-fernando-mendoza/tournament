@@ -19,6 +19,8 @@ import { inject } from '@angular/core';
 import { AdminTournamentWelcomeComponent } from './admin-welcome/admin-welcome.component';
 import { ParticipantTournamentComponent } from './participant-tournament/participant-tournament.component';
 import { InscribeRequestComponent } from './inscribe-request/inscribe-request.component';
+import { CategoryNewComponent } from './category-new/category-new.component';
+import { CategoryEditComponent } from './category-edit/category-edit.component';
 
 export function loginGuard(
     redirectRoute: string
@@ -53,6 +55,11 @@ export const routes: Routes = [
     { path:"tournament/:tournamentId/performance/:performanceId/evaluationGrade/:evaluationGradeId",component:EvaluationGradeComponent},
 
     { path:"tournament/:tournamentId/medals",component:MedalsListComponent},
+
+    { path:"tournament/:tournamentId/categoryNew",component:CategoryNewComponent},
+    { path:"tournament/:tournamentId/category/:categoryId",component:CategoryEditComponent},
+    
+
     
     
     { path:"tournament/:tournamentId/categories",component:CategoryListComponent},
