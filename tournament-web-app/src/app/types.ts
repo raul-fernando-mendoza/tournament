@@ -39,7 +39,7 @@ export interface Dictionary<T>{
 
 export interface Tournament{
     label?:string
-    eventDate?:Timestamp
+    eventDate?:number
     eventTime?:string
     active?:boolean
     tags?:Array<string>
@@ -56,12 +56,12 @@ export interface Tournament{
     participantEmails?:Array<string>
 }
 export class TournamentObj implements Tournament{
-    label: string = ""
-    eventDate: Timestamp = new Timestamp((new Date()).getSeconds(), 0) 
-    eventTime: string = "00:00"
+    label!:string
+    eventDate!: number 
+    eventTime!: string 
     active: boolean = false
     tags?: string[] 
-    creatorUid: string = ""
+    creatorUid!: string 
     imagePath:string | null = null
     imageUrl: string | null = null
     program:Array<string> = []

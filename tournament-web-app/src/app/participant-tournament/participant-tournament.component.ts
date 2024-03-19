@@ -12,6 +12,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { QuillModule } from 'ngx-quill';
 import { PerformanceListComponent } from '../performance-list/performance-list.component';
+import { DateFormatService } from '../date-format.service';
 
 
 interface PerformanceReference{
@@ -54,7 +55,8 @@ export class ParticipantTournamentComponent {
     private activatedRoute: ActivatedRoute
     ,private auth:AuthService
     ,private router:Router
-    ,public firebase:FirebaseService  ){
+    ,private firebase:FirebaseService 
+    ,public dateSrv:DateFormatService ){
       var thiz = this
       this.activatedRoute.paramMap.subscribe( {
         next(paramMap){

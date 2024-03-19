@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
+import { DateFormatService } from '../date-format.service';
 
 interface TournamentLink{
   id:string,
@@ -34,7 +35,8 @@ export class AdminTournamentWelcomeComponent implements OnInit{
  
   constructor(
     private firebase:FirebaseService,
-    private auth:AuthService
+    private auth:AuthService,
+    public dateSrv:DateFormatService
   ){
 
 

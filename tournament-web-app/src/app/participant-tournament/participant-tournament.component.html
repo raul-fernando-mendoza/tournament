@@ -5,7 +5,7 @@
         <mat-grid-tile colspan="3">{{ tournament.label }}</mat-grid-tile>
         <mat-grid-tile colspan="2" rowspan="3"><img mat-card-lg-image [src]="tournament.imageUrl" ></mat-grid-tile>
         <mat-grid-tile colspan="3">
-            Fecha:{{tournament.eventDate.toDate() | date: 'dd/MM/yyyy'}}
+            Fecha:{{ dateSrv.getDate( tournament.eventDate) | date: 'dd/MM/yyyy'}}
         </mat-grid-tile>
         <mat-grid-tile colspan="3">
             Hora:{{tournament.eventTime}}

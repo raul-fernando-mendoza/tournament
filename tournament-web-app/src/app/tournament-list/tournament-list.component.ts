@@ -14,6 +14,7 @@ import { TournamentCollection, TournamentObj } from '../types';
 import { PathService } from '../path.service';
 import { BusinesslogicService, Profile } from '../businesslogic.service';
 import {MatListModule} from '@angular/material/list';
+import { DateFormatService } from '../date-format.service';
 
 
 interface TournamentLink{
@@ -57,7 +58,8 @@ export class TournamentListComponent implements OnInit, AfterViewInit{
     private authService:AuthService,
     public pathService:PathService,
     private router: Router,
-    private bussiness:BusinesslogicService
+    private bussiness:BusinesslogicService,
+    public dateSrv:DateFormatService
     ){
 
   }
@@ -106,6 +108,5 @@ export class TournamentListComponent implements OnInit, AfterViewInit{
     this.searchForm.controls.search.setValue(null)
     this.onSearch()
   }
-
 
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FirebaseService,Filter } from '../firebase.service';
@@ -29,6 +29,10 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {MatListModule} from '@angular/material/list';
 import { findSourceMap } from 'module';
 import { PerformanceListComponent } from '../performance-list/performance-list.component';
+import { FirebaseFullService } from '../firebasefull.service';
+import { DocumentData, QuerySnapshot } from '@firebase/firestore';
+import { DocumentSnapshot, FirestoreError, Unsubscribe } from 'firebase/firestore';
+import { DateFormatService } from '../date-format.service';
 
 interface PerformanceReference{
   id:string
@@ -71,7 +75,7 @@ interface InscriptionRequestLink{
   templateUrl: './admin-tournament.component.html',
   styleUrl: './admin-tournament.component.css'
 })
-export class AdminTournamentComponent implements OnInit{
+export class AdminTournamentComponent implements OnInit, OnDestroy{
 
   tournamentId :string | null= null
   tournament:TournamentObj| null = null
@@ -81,6 +85,8 @@ export class AdminTournamentComponent implements OnInit{
 
   performanceColor = 'lightblue'
 
+  
+
   form = this.fb.group({
     label:['',Validators.required],
     eventDate:[new Date(),Validators.required],
@@ -89,7 +95,7 @@ export class AdminTournamentComponent implements OnInit{
     imagePath:[""]
   })
 
-  collection = TournamentCollection.collectionName
+
 
   performances:Array<PerformanceReference> = []
 
@@ -101,14 +107,17 @@ export class AdminTournamentComponent implements OnInit{
 
   inscriptionRequestLinks:Array<InscriptionRequestLink> = []
 
+  unsubscribe:Unsubscribe | undefined = undefined
+
   constructor(
      private activatedRoute: ActivatedRoute
-    ,public firebase:FirebaseService 
+    ,public firebase:FirebaseFullService 
     ,private fb:FormBuilder
     ,public auth:AuthService
     ,private router: Router
     ,public pathService:PathService
-    ,public businesslogic:BusinesslogicService){
+    ,public businesslogic:BusinesslogicService
+    ,public dateSrv:DateFormatService){
 
     var thiz = this
     this.activatedRoute.paramMap.subscribe( {
@@ -122,6 +131,11 @@ export class AdminTournamentComponent implements OnInit{
       })      
 
   }
+  ngOnDestroy(): void {
+    if( this.unsubscribe ){
+      this.unsubscribe()
+    }
+  }
 
   ngOnInit(): void {
     this.businesslogic.onProfileChangeEvent().subscribe( profile =>{
@@ -131,45 +145,50 @@ export class AdminTournamentComponent implements OnInit{
   }
 
   update(){
+    if( this.unsubscribe ){
+      this.unsubscribe()
+    }    
+    let email = this.auth.getUserEmail()
     if( this.tournamentId != null){
-      this.firebase.getDocument( TournamentCollection.collectionName, this.tournamentId).then( data =>{
-        this.tournament = data as TournamentObj
+      this.unsubscribe = this.firebase.onsnapShotDoc( TournamentCollection.collectionName, this.tournamentId, {
+        'next': (doc:DocumentSnapshot<DocumentData, DocumentData>) =>{
+          this.tournament = doc.data() as TournamentObj
 
-        let email = this.auth.getUserEmail()
+          if(this.auth.isloggedIn() ){
+            if( this.tournament.participantEmails.findIndex( e=>e==email ) >= 0 ){
+              this.isParticipant = true
+            }
+          } 
+  
+          this.form.controls.label.setValue( this.tournament.label )
 
-
-        if(this.auth.isloggedIn() ){
-          let email = this.auth.getUserEmail()
-          if( this.tournament.participantEmails.findIndex( e=>e==email ) >= 0 ){
-            this.isParticipant = true
+          let eventDate = this.dateSrv.getDate( this.tournament.eventDate )
+  
+          this.form.controls.eventDate.setValue( eventDate )
+          if(  this.tournament.eventTime ){
+            this.form.controls.eventTime.setValue( this.tournament.eventTime )
           }
-        } 
-
-        
-    
-        this.form.controls.label.setValue( this.tournament.label )
-        var t:any = this.tournament.eventDate
-
-        var d = t.toDate()
-        
-        this.form.controls.eventDate.setValue( d )
-        if(  this.tournament.eventTime ){
-          this.form.controls.eventTime.setValue( this.tournament.eventTime )
-        }
-        if( this.tournament.imageUrl ){
-          this.form.controls.imageUrl.setValue( this.tournament.imageUrl )
-        }
-
-        if( this.auth.getUserUid()!= null && this.tournament?.creatorUid != null ){
-          this.isAdmin = (this.auth.getUserUid() == this.tournament?.creatorUid) 
-        } 
-        if( this.auth.getUserUid()!= null){
-          this.isLoggedIn = true
-        }
-        
-        this.readPerformances()
-        this.readProgram()
-        this.loadInscriptionRequests()
+          if( this.tournament.imageUrl ){
+            this.form.controls.imageUrl.setValue( this.tournament.imageUrl )
+          }
+  
+          if( this.auth.getUserUid()!= null && this.tournament?.creatorUid != null ){
+            this.isAdmin = (this.auth.getUserUid() == this.tournament?.creatorUid) 
+          } 
+          if( this.auth.getUserUid()!= null){
+            this.isLoggedIn = true
+          }
+          
+          this.readPerformances()
+          this.readProgram()
+          this.loadInscriptionRequests()
+        },
+        'error':(reason: FirestoreError)=>{
+          alert("ERROR reading tournament:" +  reason)
+        },
+        'complete':() =>{
+          console.log("reading program as ended")
+        }        
       })
     }
   }
@@ -180,7 +199,7 @@ export class AdminTournamentComponent implements OnInit{
       let d:Date = this.form.controls.eventDate.value!
 
       
-      let t:Timestamp = new Timestamp(d.getTime()/1000, 0)
+      let eventDate:number = this.dateSrv.getDayId(d)
 
       var label = this.form.controls.label.value!
       var tags:Array<string> =  []
@@ -194,7 +213,7 @@ export class AdminTournamentComponent implements OnInit{
 
       let tournament :TournamentObj = {
         label: label,
-        eventDate: t,
+        eventDate: eventDate,
         eventTime: this.form.controls.eventTime.value!,
         imageUrl: this.form.controls.imageUrl.value,
         imagePath: this.form.controls.imagePath.value,
@@ -212,7 +231,7 @@ export class AdminTournamentComponent implements OnInit{
         
       }
 
-      this.firebase.setDocument( this.collection, id, tournament).then( ()=>{
+      this.firebase.setDocument( TournamentCollection.collectionName, id, tournament).then( ()=>{
         this.router.navigate(['/' + TournamentCollection.collectionName + "/" + id]);
       },
       reason =>{
@@ -252,20 +271,13 @@ export class AdminTournamentComponent implements OnInit{
     
   }
   onChange($event:any, id:string | null,attr:string){
-    if( id ){
-      this.firebase.onChange($event,this.collection,id,attr).then( ()=>{
-        this.update()
-      },
-      reason=>{
-        alert("ERROR onChange:" + reason)
-      })
-    }
+
   }
   onDelete( ){
     if( !confirm("Esta seguro de querer borrar:" +  this.tournament!.label) ){
       return
     }        
-    this.firebase.deleteDocument( this.collection , this.tournamentId! ).then( ()=>{
+    this.firebase.deleteDocument( TournamentCollection.collectionName , this.tournamentId! ).then( ()=>{
       console.log( "category removed")
       this.router.navigate([""])
     },
@@ -283,18 +295,16 @@ export class AdminTournamentComponent implements OnInit{
   }
 
   onAccept( id:string ){
-    this.firebase.unionArrayElementDoc( this.collection + "/" + this.tournamentId, "program", id).then( ()=>{
+    this.firebase.unionArrayElementDoc( TournamentCollection.collectionName + "/" + this.tournamentId, "program", id).then( ()=>{
       console.log("update programa")
-      this.update()
     },
     reason =>{
       alert("Error updating programa:" + reason)
     })
   }
   onReject( id:string ){
-    this.firebase.removeArrayElementDoc( this.collection + "/" + this.tournamentId, "program", id).then( ()=>{
+    this.firebase.removeArrayElementDoc( TournamentCollection.collectionName + "/" + this.tournamentId, "program", id).then( ()=>{
       console.log("update programa")
-      this.update()
     },
     reason =>{
       alert("Error updating programa:" + reason)
@@ -309,8 +319,8 @@ export class AdminTournamentComponent implements OnInit{
         let obj:Tournament ={
           program:this.tournament.program
         }
-        this.firebase.updateDocument( this.collection, this.tournamentId, obj).then( ()=>{
-          this.update()
+        this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+          console.log("update program up")
         },
         reason =>{
           alert("ERROR moviendo programa arriba:" + reason)
@@ -327,8 +337,8 @@ export class AdminTournamentComponent implements OnInit{
         let obj:Tournament ={
           program:this.tournament.program
         }
-        this.firebase.updateDocument( this.collection, this.tournamentId, obj).then( ()=>{
-          this.update()
+        this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+          console.log("update program down")
         },
         reason =>{
           alert("ERROR moviendo programa arriba:" + reason)
@@ -343,7 +353,7 @@ export class AdminTournamentComponent implements OnInit{
     }
     this.firebase.updateDocument( [TournamentCollection.collectionName, this.tournamentId
       ,PerformanceCollection.collectionName].join("/"), performanceId, obj).then( ()=>{
-        this.update()
+        console.log("on performance release")
     },
     reason=>{
       alert("ERROR: liberando calificacion de performance"+ reason )
@@ -517,7 +527,7 @@ export class AdminTournamentComponent implements OnInit{
         participantEmails:this.tournament!.participantEmails
       }
       this.firebase.updateDocument(TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-        this.update()
+        console.log("accept inscription")
       },
       reason =>{
         alert("ERROR: aceptando inscripciones" + reason )
@@ -533,7 +543,7 @@ export class AdminTournamentComponent implements OnInit{
         participantEmails:this.tournament!.participantEmails
       }
       this.firebase.updateDocument(TournamentCollection.collectionName, this.tournamentId, obj).then( () =>{
-        this.update()
+        console.log("reject inscription")
       },
       reason =>{
         alert("Error:Error removing inscription")
