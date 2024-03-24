@@ -32,10 +32,10 @@ import { MatInputModule } from '@angular/material/input';
 
 })
 export class AspectListComponent{
-  tournamentId!:string
-  tournament!:TournamentObj
-  evaluationId!:string 
-  evaluation!:Evaluation
+  @Input() tournamentId!:string
+  @Input() tournament!:TournamentObj
+  @Input() evaluationId!:string 
+  @Input() evaluation!:Evaluation
 
   @ViewChild("edited", {static: false}) childComponentRef: ElementRef | null = null;
   

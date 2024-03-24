@@ -46,7 +46,7 @@
 
 @if( tournamentId && tournament ){
     <mat-accordion>
-        <mat-expansion-panel [expanded]="activePanel == 'categories'" (opened)="onPanelActivated('categories')">
+        <mat-expansion-panel [expanded]="activePanel == 'categories' || activePanel == null" (opened)="onPanelActivated('categories')">
             <mat-expansion-panel-header>
                 <mat-panel-title>Categorias</mat-panel-title>
             </mat-expansion-panel-header>  
@@ -74,44 +74,72 @@
         <mat-expansion-panel [expanded]="activePanel == 'evaluations'" (opened)="onPanelActivated('evaluations')">
             <mat-expansion-panel-header>
                 <mat-panel-title>Evaluaciones</mat-panel-title>
-            </mat-expansion-panel-header>    
-                <a [routerLink]="['/','tournament',tournamentId,'evaluation']">
-                    <button mat-button-icon><mat-icon>edit</mat-icon></button>
-                </a>    
+            </mat-expansion-panel-header> 
+                @if( tournament.evaluations.length > 0){     
+                <a [routerLink]="['/','tournament',tournamentId,'evaluationNew']">
+                    <button mat-button-icon><mat-icon>add</mat-icon></button>
+                </a> 
+                }   
                 <mat-list>
                     @for( evaluation of tournament.evaluations; track evaluation){
                         <mat-list-item>
-                        {{evaluation.label}}
+                            <a [routerLink]="['/','tournament',tournamentId,'evaluation',evaluation.id]">
+                                <button mat-button>{{evaluation.label}}</button>
+                            </a>                                 
                         </mat-list-item>    
                     } 
+                    @empty{
+                        <p>Usted necesita por lo menos una evauacion; por favor adicione una</p>
+                        <a [routerLink]="['/','tournament',tournamentId,'evaluationNew']">
+                            <button mat-button-icon><mat-icon>add</mat-icon></button>
+                        </a>       
+                    }                    
                 </mat-list>
         </mat-expansion-panel>
-        <mat-expansion-panel>
+        <mat-expansion-panel [expanded]="activePanel == 'jurors'" (opened)="onPanelActivated('jurors')">
             <mat-expansion-panel-header>
                 <mat-panel-title>Jurado</mat-panel-title>
             </mat-expansion-panel-header>    
-            <a [routerLink]="['/','tournament',tournamentId,'jurors']">
-                <button mat-button-icon><mat-icon>edit</mat-icon></button>
-            </a>
             <mat-list>
-                @for( j of tournament.jurors; track j){
-                    <mat-list-item>{{j.label}}</mat-list-item>
+                @if( tournament.jurors.length ){
+                <a [routerLink]="['/','tournament',tournamentId,'jurorNew']">
+                    <button mat-button-icon><mat-icon>add</mat-icon></button>
+                </a>                   
                 }
+                @for( j of tournament.jurors; track j){
+                    <a [routerLink]="['/','tournament',tournamentId,'juror',j.id]">
+                        <mat-list-item>{{j.label}}</mat-list-item>
+                    </a>
+                }
+                @empty{
+                    <p>Usted necesita por lo menos un jurado; por favor adicione uno</p>
+                    <a [routerLink]="['/','tournament',tournamentId,'jurorNew']">
+                        <button mat-button-icon><mat-icon>add</mat-icon></button>
+                    </a>       
+                }                
             </mat-list>  
         </mat-expansion-panel>  
-       
-
-        <mat-expansion-panel>
+        <mat-expansion-panel [expanded]="activePanel == 'jurors'" (opened)="onPanelActivated('jurors')">
             <mat-expansion-panel-header>
                 <mat-panel-title>Premiacion</mat-panel-title>
             </mat-expansion-panel-header>    
-            <a [routerLink]="['/','tournament',tournamentId,'medals']">
-                <button mat-button-icon><mat-icon>edit</mat-icon></button>
-            </a>
             <mat-list>
-                @for( medal of tournament.medals; track medal ){
-                    <mat-list-item>{{medal.label}}</mat-list-item>
+                @if( tournament.medals.length ){
+                <a [routerLink]="['/','tournament',tournamentId,'medalNew']">
+                    <button mat-button-icon><mat-icon>add</mat-icon></button>
+                </a>                   
                 }
+                @for( m of tournament.medals; track m){
+                    <a [routerLink]="['/','tournament',tournamentId,'medal',m.id]">
+                        <mat-list-item>{{m.label}}</mat-list-item>
+                    </a>
+                }
+                @empty{
+                    <p>Usted necesita por lo menos un premio; por favor adicione uno</p>
+                    <a [routerLink]="['/','tournament',tournamentId,'medalNew']">
+                        <button mat-button-icon><mat-icon>add</mat-icon></button>
+                    </a>       
+                }                
             </mat-list>  
         </mat-expansion-panel>   
         

@@ -1,0 +1,24 @@
+
+<span class="bar">
+    <span class="spacer"></span>
+    <button mat-button-icon color="warn" (click)="onDelete()"><mat-icon>delete</mat-icon></button> 
+</span>   
+<mat-card [formGroup]="form">
+    <mat-card-header>
+        <mat-card-title>Editar categoria</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <mat-form-field>    
+            <input matInput placeholder="label" formControlName="label" >
+        </mat-form-field>
+        <mat-form-field> 
+            <input matInput placeholder="email" formControlName="email" >
+        </mat-form-field>   
+    </mat-card-content>
+    <mat-card-actions>
+        <button mat-button-icon (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+        <a [routerLink]="'/tournament/'+tournamentId">
+            <button mat-icon-button><mat-icon>cancel</mat-icon></button>
+        </a>        
+    </mat-card-actions>
+ </mat-card>   
