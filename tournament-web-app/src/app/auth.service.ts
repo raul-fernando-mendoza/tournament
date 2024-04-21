@@ -15,7 +15,6 @@ export class AuthService {
 
   private loginSubject : Subject<any>;
   constructor(
-    private auth:FirebaseService
   ) { 
     this.loginSubject = new Subject<boolean>();
   }

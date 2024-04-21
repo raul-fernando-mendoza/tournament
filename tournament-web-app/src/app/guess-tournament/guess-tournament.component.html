@@ -1,4 +1,4 @@
-<a routerLink="'../'"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
+<a routerLink="/participant"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
 <h1>Torneo</h1>    
 @if( tournament ){
     <mat-grid-list cols="5" rowHeight="2em">
@@ -11,40 +11,11 @@
             Hora:{{tournament.eventTime}}
         </mat-grid-tile>
     </mat-grid-list>
-
-    <h2>Mis solicitudes de presentacion</h2>
-    <mat-list>
-    @for( p of performances; track p.id){
-
-            <mat-list-item>
-                <a [routerLink]="['performanceEdit',p.id]">
-                    {{ p.performance.label }}
-                </a>
-            </mat-list-item>
-        <!--
-        @if( !p.performance.isAccepted ){
-            <button mat-icon-button (click)="onAcceptInscriptionRequest(e)"><mat-icon>add</mat-icon></button>                    
-        }
-        @else{
-            <button mat-icon-button (click)="onRejectInscriptionRequest(e)"><mat-icon>cancel</mat-icon></button>                    
-            <div class="performances">
-                <app-performance-list [tournamentId]="tournamentId" [tournament]="tournament" [email]="e.inscriptionRequest.email"></app-performance-list>
-            </div>
-        }
-        -->
-
-    } 
-    @empty{
-        <p>No hay solicitudes de presentacion</p>
-        <button mat-raised-button color="primary" (click)="onPerformanceNew()">Crear una solicitud de presentacion</button>
-    } 
-    </mat-list>
-    @if( performances.length > 0){
-        <button mat-button-icon (click)="onPerformanceNew()"><mat-icon>add</mat-icon></button>
-    }
-        
-
-    <mat-divider></mat-divider>             
+    <div class="bar">
+        <span class="spacer"></span>
+        <button mat-raised-button color="primary" (click)="onWantToParticipate()">Quiero participar</button>
+        <span class="spacer"></span>
+    </div>
     <mat-accordion>
         <mat-expansion-panel>
             <mat-expansion-panel-header>
@@ -79,15 +50,15 @@
                         </mat-expansion-panel>
                     } 
                 </mat-accordion> 
-                
         </mat-expansion-panel>  
+<!--
         @if( tournament.isProgramReleased ){ 
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Programa</mat-panel-title>
             </mat-expansion-panel-header>  
             <mat-list>
-                @for( p of program; track p){
+                @for( p of tournament.program; track p){
                     <mat-list-item>
                     {{ p.performance.label }}
                     </mat-list-item>
@@ -97,11 +68,11 @@
                 }                             
             </mat-list>  
         </mat-expansion-panel>  
-        }                     
+        }                 
+    -->        
     </mat-accordion>    
     <p>
         <mat-divider></mat-divider>
     </p>
-}
-  
+}     
 

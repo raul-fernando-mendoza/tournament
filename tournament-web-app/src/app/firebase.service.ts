@@ -40,7 +40,7 @@ export class FirebaseService {
     obj["updateon"] = new Date()
     return setDoc( doc(db, collectionPath , id), obj)
   }
-  getDocument( collectionPath:string, id:string|null = null, filter:Array<Filter> | null = null):Promise<any>{
+  getDocument( collectionPath:string, id:string|null = null):Promise<any>{
     return new Promise<any>(( resolve, reject) =>{
       if( id == null ){
         var ref = doc( db,collectionPath )

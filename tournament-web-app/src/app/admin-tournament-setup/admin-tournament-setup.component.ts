@@ -656,14 +656,13 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
   }
 
   getTournamentPath():string{
-    let path:string = ""
-    if( this.tournament ){
-      let url = this.router.url 
-      let urlArr = url.split("/")
-      let urlReverse = urlArr.reverse()
-      urlReverse.splice(0,2)
-      path = urlReverse.reverse().join("/") + "/tournament/" + this.tournamentId
+      if (window
+      && "location" in window
+      && "protocol" in window.location
+      && "pathname" in window.location
+      && "host" in window.location) {
+      return window.location.protocol + "//" + window.location.host + "/tournament/" + this.tournamentId ;
     }
-    return path
+    return "";
   }
 }

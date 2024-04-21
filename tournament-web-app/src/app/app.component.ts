@@ -64,11 +64,7 @@ export class AppComponent implements OnInit{
         })
         // ...
       } else {
-        // User is signed out
-        // ...
         this.displayName = ""
-        this.router.navigate(["/"])
-
       }
     })
 

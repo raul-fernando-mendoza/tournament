@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute,  Router, RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { InscriptionRequest, InscriptionRequestCollection, PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj } from '../types';
+import { PerformanceCollection, PerformanceObj, TournamentCollection, TournamentObj } from '../types';
 import { FirebaseService,Filter } from '../firebase.service';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -90,57 +90,34 @@ export class ParticipantTournamentComponent {
     if( this.tournamentId != null){
       this.firebase.getDocument( TournamentCollection.collectionName, this.tournamentId).then( data =>{
         this.tournament = data as TournamentObj
-
-        let email = this.auth.getUserEmail()
-
-        if(this.auth.isloggedIn() ){
-          this.isLoggedIn = true
-          let email = this.auth.getUserEmail()
-          if( this.tournament.participantEmails.find( e=>e==email ) ){
-            this.isParticipant = true
-          }
-
-        } 
-
-        var t:any = this.tournament.eventDate
-
-        var d = t.toDate()
-        
         this.readPerformances()
         this.readProgram()
       })
     }
   }
-
-  onPanelActivated(activePanel:string){
-    this.activePanel = activePanel 
-    this.businesslogic.setStoredItem("activePanel", activePanel)
-  }
     
   readPerformances(){
     this.performances.length = 0
-    if( this.isLoggedIn ){
-      let userFilter:Filter = {
-        field: 'email',
-        operator: '==',
-        value: this.auth.getUserEmail()
-      }
-      let filter:Array<Filter> = [userFilter]
-      this.firebase.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"), filter).then( set =>{
-        set.map( doc =>{
-          let p = doc.data() as PerformanceObj
-
-          let pr:PerformanceReference = {
-            id: doc.id,
-            performance: p,
-            isInProgram: this.isInProgram(doc.id)
-          }
-          this.performances.push( pr )
-
-        })
-        this.performances.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
-      })
+    let userFilter:Filter = {
+      field: 'email',
+      operator: '==',
+      value: this.auth.getUserEmail()
     }
+    let filter:Array<Filter> = [userFilter]
+    this.firebase.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"), filter).then( set =>{
+      set.map( doc =>{
+        let p = doc.data() as PerformanceObj
+
+        let pr:PerformanceReference = {
+          id: doc.id,
+          performance: p,
+          isInProgram: this.isInProgram(doc.id)
+        }
+        this.performances.push( pr )
+
+      })
+      this.performances.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
+    })
   }
 
   readProgram(){
@@ -172,30 +149,10 @@ export class ParticipantTournamentComponent {
       return false
     }
   }
-    
-  onInscribe(){
-    if( !this.auth.isloggedIn() ){
-      this.router.navigate(['/loginForm', encodeURI("participantTournament/" + this.tournamentId + "/inscribe")])
-    }
-    else{
-      this.router.navigate(["participantTournament",this.tournamentId, "inscribe"])
-    }
-  }
-  addParticipant(email:string){
-    if( this.tournament && this.tournament.participantEmails.findIndex( e => e == email) < 0){
-      this.tournament.participantEmails.push( email )
-      let t:Tournament ={
-        participantEmails: this.tournament.participantEmails
-      }
-      this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, t).then( ()=>{
-        this.update()
-      },
-      reason=>{
-        alert("Error saving participant:" + reason)
-      })
-    }
-  }   
   
+  onPerformanceNew(){
+    this.router.navigate(["performanceNew"], {relativeTo: this.activatedRoute})
+  }
 }
 
 

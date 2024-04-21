@@ -30,6 +30,10 @@ import { JurorEditComponent } from './juror-edit/juror-edit.component';
 import { MedalNewComponent } from './medal-new/medal-new.component';
 import { MedalEditComponent } from './medal-edit/medal-edit.component';
 import { AdminTournamentSetupComponent } from './admin-tournament-setup/admin-tournament-setup.component';
+import { TournamentRouterComponent } from './tournament-router/tournament-router.component';
+import { GuessTournamentComponent } from './guess-tournament/guess-tournament.component';
+import { PerformanceNewComponent } from './performance-new/performance-new.component';
+import { PerformanceEditComponent } from './performance-edit/performance-edit.component';
 
 export function loginGuard(
     redirectRoute: string
@@ -49,25 +53,10 @@ export const routes: Routes = [
     { path:"loginForm/:intendedPath",component:LoginFormComponent}, 
     { path:"loginForm",component:LoginFormComponent},    
     { path:"registerForm",component:LoginFormComponent},
-    { path:"tournamentNew",component:AdminTournamentSetupComponent},
+
+    { path:"organizer",pathMatch:'full',component:AdminTournamentWelcomeComponent, canActivate: [loginGuard('loginForm/organizer')]},
+
     { path:"tournamentSetup/:id",component:AdminTournamentSetupComponent},  
-    { path:"tournament/:id",component:AdminTournamentComponent},  
-    
-
-
-    { path:"participantTournament/:tournamentId",component:ParticipantTournamentComponent},
-    { path:"participantTournament/:tournamentId/inscribe",component:InscribeRequestComponent},
-    { path:"participantTournament/:tournamentId/performances",component:PerformanceListComponent},
-
-
-
-//    { path:"tournament/:tournamentId/evaluationgradeNew",component:EvaluationGradeComponent},          
-//    { path:"tournament/:tournamentId/evaluationGrade/:id",component:EvaluationGradeComponent}, 
-    
-    { path:"tournament/:tournamentId/performance/:performanceId/evaluationGrade/:evaluationGradeId",component:EvaluationGradeComponent},
-
-    { path:"tournament/:tournamentId/medals",component:MedalsListComponent},
-
     { path:"tournamentSetup/:tournamentId/categoryNew",component:CategoryNewComponent},
     { path:"tournamentSetup/:tournamentId/category/:categoryId",component:CategoryEditComponent},
 
@@ -84,38 +73,58 @@ export const routes: Routes = [
 
     { path:"tournamentSetup/:tournamentId/medalNew",component:MedalNewComponent},
     { path:"tournamentSetup/:tournamentId/medal/:medalId",component:MedalEditComponent},
+
+    { path:"tournament/:tournamentId",component:TournamentRouterComponent},
     
-    
-    { path:"tournament/:tournamentId/categories",component:CategoryListComponent},
-    { path:"tournament/:tournamentId/evaluation",component:EvaluationListComponent},
-    { path:"tournament/:tournamentId/evaluation/:evaluationId/aspectNew",component:AspectNewComponent},
-    { path:"tournament/:tournamentId/evaluation/:evaluationId/aspect/:aspectId",component:AspectEditComponent},
+    { path:"tournamentGuess/:tournamentId",component:GuessTournamentComponent},
 
     
-    { path:"tournament/:tournamentId/jurors",component:JurorListComponent},
-
-
-    { path:"tournament/:tournamentId/jurorNew",component:JurorNewComponent},
-    { path:"tournament/:tournamentId/juror/:jurorId",component:JurorEditComponent},
-
-    { path:"tournamentSetup/:tournamentId/medalNew",component:MedalNewComponent},
-    { path:"tournamentSetup/:tournamentId/medal/:medalId",component:MedalEditComponent},
-
-    { path:"tournament/:tournamentId/medalNew",component:MedalNewComponent},
-    { path:"tournament/:tournamentId/medal/:medalId",component:MedalEditComponent},
-
-
-    { path:"tournament/:tournamentId/performances",component:PerformanceListComponent},
-    { path:"tournament/:tournamentId/program",component:ProgramListComponent},
-    { path:"tournament/:tournamentId/podium",component:PodiumListComponent},
+    { path:"tournamentAdmin/:tournamentId",component:AdminTournamentComponent},
     
+    { path:"tournamentAdmin/:tournamentId/categoryNew",component:CategoryNewComponent},
+    { path:"tournamentAdmin/:tournamentId/category/:categoryId",component:CategoryEditComponent},
+
+    { path:"tournamentAdmin/:tournamentId/evaluationNew",component:EvaluationNewComponent},
+    { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId",component:EvaluationEditComponent},
     
+    { path:"tournamentAdmin/:tournamentId/evaluationNew",component:EvaluationNewComponent},
+    { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId",component:EvaluationEditComponent},
+    { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId/aspectNew",component:AspectNewComponent},
+    { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId/aspect/:aspectId",component:AspectEditComponent},
+
+    { path:"tournamentAdmin/:tournamentId/jurorNew",component:JurorNewComponent},
+    { path:"tournamentAdmin/:tournamentId/juror/:jurorId",component:JurorEditComponent},
+
+    { path:"tournamentAdmin/:tournamentId/medalNew",component:MedalNewComponent},
+    { path:"tournamentAdmin/:tournamentId/medal/:medalId",component:MedalEditComponent},
+
+
+    { path:"tournamentAdmin/:tournamentId/performances",component:PerformanceListComponent},
+    { path:"tournamentAdmin/:tournamentId/program",component:ProgramListComponent},
+    { path:"tournamentAdmin/:tournamentId/podium",component:PodiumListComponent},
+    
+   
+    { path:"tournamentNew",component:AdminTournamentSetupComponent},
+
+    { path:"tournamentParticipant/:tournamentId",component:ParticipantTournamentComponent},
+
+    
+    { path:"tournamentParticipant/:tournamentId/performanceNew",component:PerformanceNewComponent},
+    { path:"tournamentParticipant/:tournamentId/performanceEdit/:performanceId",component:PerformanceEditComponent},
+
+//    { path:"tournament/:tournamentId/evaluationgradeNew",component:EvaluationGradeComponent},          
+//    { path:"tournament/:tournamentId/evaluationGrade/:id",component:EvaluationGradeComponent}, 
+    { path:"tournament/:tournamentId/performance/:performanceId/evaluationGrade/:evaluationGradeId",component:EvaluationGradeComponent},
+
+    { path:"tournament/:tournamentId/medals",component:MedalsListComponent},    
     
     { path:"participant",pathMatch:'full',component:TournamentSearchComponent},
     { path:"juror",pathMatch:'full',component:WelcomeJurorComponent, canActivate: [loginGuard('loginForm/juror')]},
-    { path:"organizer",pathMatch:'full',component:AdminTournamentWelcomeComponent, canActivate: [loginGuard('loginForm/organizer')]},
+    
     
     { path:"home",pathMatch:'full',component:ProfileComponent},    
+
+
     { path:"",pathMatch:'full',component:ProfileComponent}
 
 ];

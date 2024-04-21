@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule , Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FirebaseService,Filter } from '../firebase.service';
 import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection} from '../types'
@@ -112,6 +112,8 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
 
   activePanel:string | null = null
 
+  route:string = ""
+
   constructor(
      private activatedRoute: ActivatedRoute
     ,public firebase:FirebaseFullService 
@@ -120,14 +122,23 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
     ,private router: Router
     ,public pathService:PathService
     ,public businesslogic:BusinesslogicService
-    ,public dateSrv:DateFormatService){
+    ,public dateSrv:DateFormatService
+    ,location: Location){
 
     var thiz = this
+    router.events.subscribe((val) => {
+      if(location.path() != ''){
+        this.route = location.path();
+      } else {
+        this.route = 'Home'
+      }
+    });
+
     this.activatedRoute.paramMap.subscribe( {
       next(paramMap){
         thiz.tournamentId = null
-        if( paramMap.get('id') )
-          thiz.tournamentId = paramMap.get('id')
+        if( paramMap.get('tournamentId') )
+          thiz.tournamentId = paramMap.get('tournamentId')
           thiz.update()
         }
 
@@ -561,12 +572,15 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
   }
 
   getTournamentPath():string{
-    let path:string = ""
-    if( this.tournament ){
-      let url = this.router.url 
-      return url
+    if (window){
+      if ("location" in window
+        && "protocol" in window.location
+        && "pathname" in window.location
+        && "host" in window.location) {
+        return window.location.protocol + "//" + window.location.host + window.location.pathname;
+      }
     }
-    return path
+    return "";
   }  
 
 }
