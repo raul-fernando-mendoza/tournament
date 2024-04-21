@@ -34,7 +34,17 @@
                         <ngx-material-timepicker #picker></ngx-material-timepicker> 
                     </mat-form-field> 
                 </mat-grid-tile>
+                <mat-grid-tile colspan="3">
+                    <div class="tournament-url-container">
+                        <span class="spacer"></span>
+                        <span> 
+                            <h3 >{{ getTournamentPath() }}</h3>
+                        </span>
+                        <span class="spacer"></span>
+                    </div>   
+                </mat-grid-tile>                
             </mat-grid-list>
+          
         </mat-card-content>   
         @if( !tournamentId ){        
         <mat-card-actions>

@@ -560,4 +560,13 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
     this.businesslogic.setStoredItem("activePanel", activePanel)
   }
 
+  getTournamentPath():string{
+    let path:string = ""
+    if( this.tournament ){
+      let url = this.router.url 
+      return url
+    }
+    return path
+  }  
+
 }
