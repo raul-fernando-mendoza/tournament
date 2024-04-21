@@ -1,24 +1,35 @@
+<a [routerLink]="'../../'">
+    <mat-icon>arrow_back</mat-icon>    
+</a> 
+
 <mat-card [formGroup]="form">
     <mat-card-header>
-        <mat-card-title>Nueva premiacion</mat-card-title>
+        <mat-card-title>Editar Premio</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-        <mat-grid-list cols="10" rowHeight="6em">
-            <mat-grid-tile colspan="6">
-                <mat-form-field> 
-                    <mat-label>Nombre del premio</mat-label>
-                    <input matInput placeholder="Primer lugar" formControlName="label">
-                </mat-form-field>                 
-            </mat-grid-tile>
-            <mat-grid-tile colspan="4">
-                <mat-form-field> 
-                    <mat-label>Calificacion mínima</mat-label>
-                    <input matInput placeholder="9.0" formControlName="minGrade">
-                    <mat-hint>numero entre 0 y 10</mat-hint>
-                </mat-form-field> 
-            </mat-grid-tile>
-        </mat-grid-list>  
-        <quill-editor formControlName="description" placeholder="Descripción"></quill-editor>
+        @if( tournament ){
+            <h1>{{tournament.label}}</h1>
+            <span class="bar">
+                <span class="spacer"></span>
+                <button mat-button-icon color="warn" (click)="onDelete()"><mat-icon>delete</mat-icon></button> 
+            </span>         
+            <mat-grid-list cols="10" rowHeight="6em">
+                <mat-grid-tile colspan="6">
+                    <mat-form-field> 
+                        <mat-label>Nombre del premio</mat-label>
+                        <input matInput placeholder="Primer lugar" formControlName="label">
+                    </mat-form-field>                 
+                </mat-grid-tile>
+                <mat-grid-tile colspan="4">
+                    <mat-form-field> 
+                        <mat-label>Calificacion mínima</mat-label>
+                        <input matInput placeholder="9.0" formControlName="minGrade">
+                        <mat-hint>numero entre 0 y 10</mat-hint>
+                    </mat-form-field> 
+                </mat-grid-tile>
+            </mat-grid-list>  
+            <quill-editor formControlName="description" placeholder="Descripción"></quill-editor>
+        }
     </mat-card-content>
     <mat-card-actions>
         <button #edited id="edited" mat-button (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>

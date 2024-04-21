@@ -90,7 +90,12 @@ export class EvaluationEditComponent {
      
       this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
         console.log("evaluation ha sido modificada")
-        this.router.navigate(['../../'], { relativeTo: this.activatedRoute })
+        if( this.evaluation!.aspects.length > 0){
+          this.router.navigate(['../../'], { relativeTo: this.activatedRoute })
+        }
+        else{
+          alert( "Por favor adicione por lo menos un aspecto a calificar" )
+        }
 
       },
       reason =>{

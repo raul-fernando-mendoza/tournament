@@ -89,7 +89,7 @@
                         </mat-list-item>    
                     } 
                     @empty{
-                        <p>Usted necesita por lo menos una evauacion; por favor adicione una</p>
+                        <p>Usted necesita por lo menos una evaluacion; por favor adicione una</p>
                         <a [routerLink]="['/','tournament',tournamentId,'evaluationNew']">
                             <button mat-button-icon><mat-icon>add</mat-icon></button>
                         </a>       
@@ -144,13 +144,14 @@
         </mat-expansion-panel>   
         
         
-        <mat-expansion-panel>
+        <mat-expansion-panel [expanded]="activePanel == 'requests'" (opened)="onPanelActivated('requests')">
             <mat-expansion-panel-header>
-                <mat-panel-title>Solicitudes de inscription</mat-panel-title>
+                <mat-panel-title>Solicitudes de presentacion</mat-panel-title>
             </mat-expansion-panel-header>  
-                @for( e of inscriptionRequestLinks; track e.id){
-                    {{ e.inscriptionRequest.email }}
-                    @if( !e.isAccepted ){
+                @for( p of performances; track p.id){
+                    {{ p.performance.label }}
+                    <!--
+                    @if( !p.performance.isAccepted ){
                         <button mat-icon-button (click)="onAcceptInscriptionRequest(e)"><mat-icon>add</mat-icon></button>                    
                     }
                     @else{
@@ -159,10 +160,11 @@
                             <app-performance-list [tournamentId]="tournamentId" [tournament]="tournament" [email]="e.inscriptionRequest.email"></app-performance-list>
                         </div>
                     }
+                    -->
 
                 } 
                 @empty{
-                    <p>No hay solicitudes de inscription</p>
+                    <p>No hay solicitudes de presentacion</p>
                 }               
         </mat-expansion-panel>  
 

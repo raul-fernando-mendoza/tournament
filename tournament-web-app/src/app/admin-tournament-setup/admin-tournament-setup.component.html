@@ -1,0 +1,196 @@
+<a routerLink="/organizer"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
+
+<div class="bar">
+<span>
+    <h1>Torneo initializacion @if(tournament){ {{tournament.label}} }</h1>
+</span>
+<div class="spacer"></div>
+@if( tournamentId && tournament){
+    <button mat-icon-button color="warn" (click)="onDelete()"><mat-icon>delete</mat-icon></button>
+}
+</div>    
+    <mat-stepper [orientation]="(stepperOrientation | async)!" [linear]="useLinear" #stepper>
+        <mat-step>
+            <ng-template matStepLabel>Informacion General</ng-template>
+            <form [formGroup]="form">
+                <mat-grid-list cols="2" rowHeight="5em">
+                    <mat-grid-tile colspan="2">
+                        <mat-form-field class="name-input">
+                            <mat-label>Nombre del evento</mat-label>
+                            <input matInput placeholder="" formControlName="label" (change)="onNameChange($event)">
+                        </mat-form-field>                
+                    </mat-grid-tile>
+                    <!--
+                    <mat-grid-tile colspan="1" rowspan="5">
+                        @if( tournament ){
+                            <app-image-loader [fullpath]="tournament.imagePath" [basepath]="getBasePath()" [url]="tournament.imageUrl" (onload)="fileLoaded($event)" (ondelete)="fileDeleted($event)"></app-image-loader>
+                        }
+                    </mat-grid-tile>
+                    -->
+                    <mat-grid-tile colspan="1">
+                        <mat-form-field color="accent" appearance="fill">
+                            <mat-label>Fecha del evento</mat-label>
+                            <input matInput [matDatepicker]="picker1" formControlName="eventDate"  (change)="onChange($event, tournamentId,'eventDate')">
+                            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                            <mat-datepicker #picker1></mat-datepicker>
+                        </mat-form-field>
+                    </mat-grid-tile>
+                    <mat-grid-tile colspan="1">
+                        <mat-form-field color="accent" appearance="fill">
+                            <mat-label>Hora del evento</mat-label>            
+                            <input matInput formControlName="eventTime" [format]="24" [ngxTimepicker]="picker" (change)="onChange($event,tournamentId,'eventTime')">
+                            <ngx-material-timepicker #picker></ngx-material-timepicker> 
+                        </mat-form-field> 
+                    </mat-grid-tile>
+                </mat-grid-list>
+            </form>
+            @if( !tournamentId ){
+                <button mat-button matStepperNext (click)="onCreateNew()">Next</button>              
+            }
+            @else{
+                <button mat-button matStepperNext>Next</button>  
+            }
+        </mat-step>
+        <mat-step [stepControl]="firstCategory" errorMessage="Una categoria es requerida.">
+            <ng-template matStepLabel>Categorias</ng-template>
+            @if( tournamentId && tournament ){
+
+                @if( tournament.categories.length > 0){  
+                <a [routerLink]="['categoryNew']">
+                    <button mat-button-icon><mat-icon>add</mat-icon></button>
+                </a>       
+                }
+                <mat-list>
+                    @for( category of tournament.categories; track category){
+                        <mat-list-item>
+                            <a [routerLink]="['category',category.id]">
+                                <button mat-button>{{category.label}}</button>
+                            </a>                                 
+                        </mat-list-item>
+                    }
+                    @empty{
+                        <p>Usted necesita por lo menos una categoria; por favor adicione una</p>
+                        <a [routerLink]="['categoryNew']">
+                            <button mat-button-icon><mat-icon>add</mat-icon></button>
+                        </a>       
+                    }
+                </mat-list>     
+                <button mat-button matStepperPrevious>Back</button>
+                <button mat-button matStepperNext>Next</button>                   
+            }
+        </mat-step>
+        <mat-step [stepControl]="firstEvaluation" errorMessage="Una Evaluacion es requerida.">
+            <ng-template matStepLabel>Evaluaciones</ng-template> 
+            @if( tournamentId && tournament ){
+                @if( tournament.evaluations.length > 0){     
+                <a [routerLink]="['evaluationNew']">
+                    <button mat-button-icon><mat-icon>add</mat-icon></button>
+                </a> 
+                }   
+                <mat-list>
+                    @for( evaluation of tournament.evaluations; track evaluation){
+                        <mat-list-item>
+                            <a [routerLink]="['evaluation',evaluation.id]">
+                                <button mat-button>{{evaluation.label}}</button>
+                            </a>                                 
+                        </mat-list-item>    
+                    } 
+                    @empty{
+                        <p>Usted necesita por lo menos una evaluacion; por favor adicione una</p>
+                        <a [routerLink]="['evaluationNew']">
+                            <button mat-button-icon><mat-icon>add</mat-icon></button>
+                        </a>       
+                    }                    
+                </mat-list>
+                <button mat-button matStepperPrevious>Back</button>
+                <button mat-button matStepperNext>Next</button> 
+            }                
+        </mat-step>
+        <mat-step [stepControl]="firstJuror" errorMessage="un jurado es requerido.">
+            <ng-template matStepLabel>Jurado</ng-template>   
+            @if( tournamentId && tournament ){
+                <mat-list>
+                    @if( tournament.jurors.length ){
+                    <a [routerLink]="['jurorNew']">
+                        <button mat-button-icon><mat-icon>add</mat-icon></button>
+                    </a>                   
+                    }
+                    @for( j of tournament.jurors; track j){
+                        <a [routerLink]="['juror',j.id]">
+                            <mat-list-item>{{j.label}}</mat-list-item>
+                        </a>
+                    }
+                    @empty{
+                        <p>Usted necesita por lo menos un jurado; por favor adicione uno</p>
+                        <a [routerLink]="['jurorNew']">
+                            <button mat-button-icon><mat-icon>add</mat-icon></button>
+                        </a>       
+                    }                
+                </mat-list>  
+                <button mat-button matStepperPrevious>Back</button>
+                <button mat-button matStepperNext>Next</button>  
+            }               
+        </mat-step>  
+        <mat-step [stepControl]="firstMedal" errorMessage="un premio es requerido.">
+            <ng-template matStepLabel>Premiacion</ng-template>
+            @if( tournamentId && tournament ){
+                <mat-list>
+                    @if( tournament.medals.length ){
+                    <a [routerLink]="['medalNew']">
+                        <button mat-button-icon><mat-icon>add</mat-icon></button>
+                    </a>                   
+                    }
+                    @for( m of tournament.medals; track m){
+                        <a [routerLink]="['medal',m.id]">
+                            <mat-list-item>{{m.label}}</mat-list-item>
+                        </a>
+                    }
+                    @empty{
+                        <p>Usted necesita por lo menos un premio; por favor adicione uno</p>
+                        <a [routerLink]="['medalNew']">
+                            <button mat-button-icon><mat-icon>add</mat-icon></button>
+                        </a>       
+                    }                
+                </mat-list>  
+                <button mat-button matStepperPrevious>Back</button>
+                <button mat-button matStepperNext>Next</button>                 
+            }
+        </mat-step>  
+        <mat-step errorMessage="faltan datos.">
+            <ng-template matStepLabel>Revision</ng-template>
+            <div>
+            @if( tournamentId && tournament ){
+                @if( isSetupCompleted() ){
+                    <h3>
+                        Completado
+                    </h3>
+                    por favor envie el siguiente link a sus bailarines para que registren sus bailes:
+                    @if( tournamentId && tournament ){
+                        <div class="tournament-url-container">
+                            <span class="spacer"></span>
+                            <span> 
+                                <h3 >{{ getTournamentPath() }}</h3>
+                            </span>
+                            <span class="spacer"></span>
+                        </div>
+                    }                    
+                }
+                @else{
+                    <h3>La siguiente informacion es requerida:</h3>
+                    <mat-list>
+                        @for( m of getMissingInfo(); track m){
+                            <mat-list-item>{{ m }}</mat-list-item>
+                        }
+                    </mat-list>
+                }
+            }
+            </div>  
+
+            <button mat-button matStepperPrevious>Back</button>
+            @if( isSetupCompleted() ){          
+                <button mat-button matStepperNext (click)="SetupEnded()">Next</button>                 
+            }
+        </mat-step>  
+
+    </mat-stepper>    
+

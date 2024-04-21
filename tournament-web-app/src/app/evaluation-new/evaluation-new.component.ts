@@ -69,9 +69,10 @@ export class EvaluationNewComponent {
   onSubmit(){
     let label = this.form.controls.label.value
     let description = this.form.controls.description.value
+    let id = uuidv4()
     if( this.tournament && label ){
       let evaluation:Evaluation={
-        id: uuidv4(),
+        id: id,
         label: label,
         description: description ? description : "",
         aspects: []
@@ -83,7 +84,7 @@ export class EvaluationNewComponent {
      
       this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
         console.log("categoria ha sido adicionada")
-        this.router.navigate(['../'], { relativeTo: this.activatedRoute })
+        this.router.navigate(["../evaluation", id], { relativeTo: this.activatedRoute })
 
       },
       reason =>{

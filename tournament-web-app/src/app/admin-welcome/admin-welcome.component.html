@@ -2,32 +2,58 @@
 
 @if( tournamentLinks ){
 
-    <h1>Mis Torneos</h1>
-    @for( tl of tournamentLinks; track tl.id){
+    @if( tournamentLinks.length > 0){
+
+        <h1>Mis Torneos</h1>
+        @for( tl of tournamentLinks; track tl.id){
+            <mat-card>
+                <mat-card-header>
+                    <mat-card-title>
+                        @if( tl.isSetupCompleted ){
+                            <a routerLink="/tournament/{{tl.id}}">{{tl.tournament.label}}</a>
+                        }
+                        @else{
+                            <a routerLink="/tournamentSetup/{{tl.id}}">{{tl.tournament.label}} - in progress</a>
+                        }
+                    </mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="bar">
+                        <div>fecha:{{ dateSrv.getDate(tl.tournament.eventDate) | date: 'dd/MM/yyyy'}}</div>
+                        <span class="spacer"></span>
+                        <img mat-card-sm-image [src]="tl.tournament.imageUrl" >  
+                    </div>       
+                </mat-card-content>         
+            </mat-card>    
+        }
+        @empty{
+            <p>No se encontro ningun Torneo</p>
+        }
+        <div>
+            <a [routerLink]="['/','tournamentNew']">
+                <button mat-icon-button><mat-icon>add</mat-icon></button>
+            </a>
+        </div>        
+    }    
+    @else{
         <mat-card>
             <mat-card-header>
                 <mat-card-title>
-                    <a routerLink="/tournament/{{tl.id}}">{{tl.tournament.label}}</a>
+                    Usted no tiene ningun torneo 
                 </mat-card-title>
+                <mat-card-subtitle>
+                    desea crear uno ahora?
+                </mat-card-subtitle>
             </mat-card-header>
-            <mat-card-content>
-                <div class="bar">
-                    <div>fecha:{{ dateSrv.getDate(tl.tournament.eventDate) | date: 'dd/MM/yyyy'}}</div>
-                    <span class="spacer"></span>
-                    <img mat-card-sm-image [src]="tl.tournament.imageUrl" >  
-                </div>       
-            </mat-card-content>         
-        </mat-card>    
-    }
-    @empty{
-        <p>No se encontro ningun Torneo</p>
-    }
+            <mat-card-actions>
+                <a [routerLink]="['/','tournamentNew']">
+                    <button mat-raised-button color="primary">Crear nuevo torneo</button>
+                </a>
+            </mat-card-actions>
+        </mat-card>
+        
 
-    <div>
-        <a [routerLink]="['/','tournamentNew']">
-            <button mat-icon-button><mat-icon>add</mat-icon></button>
-        </a>
-    </div>
+    }
     
 }
 @else{

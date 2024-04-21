@@ -109,7 +109,7 @@ export class MedalEditComponent {
     if( !confirm("Esta seguro de querer borrar:" +  this.medal!.label) ){
       return
     }          
-    let index = this.tournament!.categories.findIndex( e => e.id == this.medalId)
+    let index = this.tournament!.medals.findIndex( e => e.id == this.medalId)
     if( index >= 0 ){
       this.tournament!.medals.splice( index, 1)
       let obj:Tournament = {
@@ -117,12 +117,12 @@ export class MedalEditComponent {
       }        
      
       this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-        console.log("premio ha sido modificado")
+        console.log("premio ha sido borrado")
         this.router.navigate(['../../'], { relativeTo: this.activatedRoute })
 
       },
       reason =>{
-        alert("Error modificando premio")
+        alert("Error borrando premio")
       })       
     }    
 

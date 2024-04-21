@@ -1,20 +1,27 @@
-<mat-card [formGroup]="form">
-    <mat-card-header>
-        <mat-card-title>Nuevo aspecto</mat-card-title>
-        @if( evaluation ){
-            <mat-card-subtitle>{{evaluation.label}}</mat-card-subtitle>
-        }
-    </mat-card-header>
-    <mat-card-content>
-        <mat-form-field>    
-            <input matInput placeholder="label" formControlName="label" >
-        </mat-form-field>
-        <quill-editor formControlName="description" placeholder="Descripción"></quill-editor>            
-    </mat-card-content>
-    <mat-card-actions>
-        <button #edited id="edited" mat-button (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
-        <a [routerLink]="'../'">
-            <button mat-icon-button><mat-icon>cancel</mat-icon></button>
-        </a>        
-    </mat-card-actions>
- </mat-card>   
+<a [routerLink]="'../'">
+    <mat-icon>arrow_back</mat-icon>    
+</a>    
+
+@if(tournament){
+    <h1>{{tournament.label}}</h1>
+    <mat-card [formGroup]="form">
+        <mat-card-header>
+            <mat-card-title>Nuevo aspecto</mat-card-title>
+            @if( evaluation ){
+                <mat-card-subtitle>{{evaluation.label}}</mat-card-subtitle>
+            }
+        </mat-card-header>
+        <mat-card-content>
+            <mat-form-field>    
+                <input matInput placeholder="label" formControlName="label" >
+            </mat-form-field>
+            <quill-editor formControlName="description" placeholder="Descripción"></quill-editor>            
+        </mat-card-content>
+        <mat-card-actions>
+            <button #edited id="edited" mat-button (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
+            <a [routerLink]="'../'">
+                <button mat-icon-button><mat-icon>cancel</mat-icon></button>
+            </a>        
+        </mat-card-actions>
+    </mat-card>   
+}

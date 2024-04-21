@@ -9,10 +9,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { DateFormatService } from '../date-format.service';
+import { BusinesslogicService } from '../businesslogic.service';
 
 interface TournamentLink{
   id:string,
   tournament:TournamentObj 
+  isSetupCompleted:boolean
 }
 
 @Component({
@@ -36,7 +38,8 @@ export class AdminTournamentWelcomeComponent implements OnInit{
   constructor(
     private firebase:FirebaseService,
     private auth:AuthService,
-    public dateSrv:DateFormatService
+    public dateSrv:DateFormatService,
+    private bussiness:BusinesslogicService
   ){
 
 
@@ -59,8 +62,9 @@ export class AdminTournamentWelcomeComponent implements OnInit{
       set.map( e => {
         let tournament:TournamentObj = e.data() as TournamentObj
         let tl:TournamentLink ={
-          id:e.id,
-          tournament:tournament
+          id: e.id,
+          tournament: tournament,
+          isSetupCompleted: this.bussiness.isSetupCompleted(tournament)
         }
         this.tournamentLinks!.push(tl)
       })

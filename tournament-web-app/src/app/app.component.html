@@ -1,69 +1,48 @@
-<mat-sidenav-container class="sidenav-container">
-    <mat-sidenav  #drawer class="sidenav" fixedInViewport
-        [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-        [mode]="(isHandset$ | async) ? 'over' : 'side'"
-        [opened]="(isHandset$ | async) === false">
-        <mat-toolbar color="accent">            
-            <button *ngIf="drawer.opened"
-                type="button"
-                aria-label="Toggle sidenav"
-                mat-icon-button
-                (click)="drawer.toggle()">
-                <mat-icon  aria-label="Side nav toggle icon">menu</mat-icon>
-            </button>
-            
-        </mat-toolbar>        
-        <mat-list role="list">
-            <mat-list-item>
-                <button mat-button >
-                    Nosotros
-                </button>       
-            </mat-list-item>
-            <mat-list-item>
-                <button mat-button >
-                    privacidad
-                </button>  
-            </mat-list-item>
-        </mat-list>
-    </mat-sidenav>    
 
-    <mat-sidenav-content>
-        <mat-toolbar color="accent">
-            @if (!drawer.opened){
-                <button  
-                    type="button"
-                    aria-label="Toggle sidenav"
-                    mat-icon-button
-                    (click)="drawer.toggle()">
-                    <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-                    
-                </button>
-            }
-           
-           
-            <a [routerLink]="['']"  mat-icon-button>
-                <mat-icon>home</mat-icon>
-            </a>             
+<mat-toolbar color="accent">
+    <a [routerLink]="['']"  mat-icon-button>
+        <mat-icon>home</mat-icon>
+    </a>             
+
+    <span class="spacer"></span> 
+
+    @if ( isLoggedIn() ){
+        @if ( !(isHandset$ | async) ) {
+            <span class="login-name">{{ displayName }}</span>
+            <button mat-button  aria-label="logout" (click)="logout()" *ngIf="isLoggedIn()">logout</button>    
+        }
         
-            <span class="spacer"></span> 
+    }    
+    @else{
+        @if ( !(isHandset$ | async) ) {
+            <button mat-button  aria-label="login" (click)="login()" >Ingresar</button>
+            <button mat-button  aria-label="register" (click)="Register()">Registrarte</button>  
+        }
+    }
+
+    <button mat-icon-button [matMenuTriggerFor]="menu"><mat-icon>menu</mat-icon></button>
 
 
-            <button mat-icon-button [matMenuTriggerFor]="menu"><mat-icon>person</mat-icon></button>
-            <mat-menu #menu="matMenu">
-           
-            @if ( isLoggedIn() ){
-                    @if ( !(isHandset$ | async) ) {
-                        <span class="login-name">{{ displayName }}</span>
-                    }
-                    <button mat-menu-item  aria-label="logout" (click)="logout()" *ngIf="isLoggedIn()">logout</button>    
-            }    
-            @else{
-                    <button mat-menu-item  aria-label="login" (click)="login()" >Ingresar</button>
-                    <button mat-menu-item  aria-label="register" (click)="Register()">Registrarte</button>  
-            }
-            </mat-menu>             
-        </mat-toolbar>
+    <mat-menu #menu="matMenu">
     
-        <router-outlet></router-outlet>
-    </mat-sidenav-content>
-</mat-sidenav-container>
+        @if ( isLoggedIn() ){
+            @if ( (isHandset$ | async) ) {
+                <button mat-menu-item  aria-label="logout" (click)="logout()" *ngIf="isLoggedIn()">logout</button> 
+            }
+               
+        }  
+        @else{
+            @if ( (isHandset$ | async) ) {
+                <button mat-menu-item  aria-label="login" (click)="login()" >Ingresar</button>
+                <button mat-menu-item  aria-label="register" (click)="Register()">Registrarte</button>  
+            }
+        }          
+            <button mat-menu-item >
+                Nosotros
+            </button>       
+            <button mat-menu-item >
+                privacidad
+            </button>  
+    </mat-menu>             
+</mat-toolbar>
+<router-outlet></router-outlet>

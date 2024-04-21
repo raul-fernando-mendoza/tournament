@@ -11,28 +11,30 @@
             Hora:{{tournament.eventTime}}
         </mat-grid-tile>
     </mat-grid-list>
-
-    @if( !isParticipant ){
-        @if( !isInscriptionInProgress ){
-            <div class="bar">
-                <div class="spacer"></div>    
-                <button mat-raised-button color="primary" (click)="onInscribe()">Inscribete</button>
-                <div class="spacer"></div>    
-            </div>
-        }
-        @else{
-            <p>Su inscripcion esta en proceso</p>
-        }
-    }    
-
-    @if( isParticipant || isInscriptionInProgress){   
-        <p>Performances<p>
- 
-                            
-        <app-performance-list [tournamentId]="tournamentId" [tournament]="tournament"></app-performance-list>         
-    }
-
     <mat-accordion>
+        <mat-expansion-panel [expanded]="activePanel == 'requests'" (opened)="onPanelActivated('requests')">
+            <mat-expansion-panel-header>
+                <mat-panel-title>Solicitudes de presentacion</mat-panel-title>
+            </mat-expansion-panel-header>  
+                @for( p of performances; track p.id){
+                    {{ p.performance.label }}
+                    <!--
+                    @if( !p.performance.isAccepted ){
+                        <button mat-icon-button (click)="onAcceptInscriptionRequest(e)"><mat-icon>add</mat-icon></button>                    
+                    }
+                    @else{
+                        <button mat-icon-button (click)="onRejectInscriptionRequest(e)"><mat-icon>cancel</mat-icon></button>                    
+                        <div class="performances">
+                            <app-performance-list [tournamentId]="tournamentId" [tournament]="tournament" [email]="e.inscriptionRequest.email"></app-performance-list>
+                        </div>
+                    }
+                    -->
+    
+                } 
+                @empty{
+                    <p>No hay solicitudes de presentacion</p>
+                }               
+        </mat-expansion-panel>          
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Categorias</mat-panel-title>
@@ -49,23 +51,6 @@
                     </mat-expansion-panel>
                 } 
                 </mat-accordion>                 
-        </mat-expansion-panel>
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>Evaluaciones</mat-panel-title>
-            </mat-expansion-panel-header>    
-            <mat-accordion>
-                    @for( medal of tournament.medals; track medal){
-                        <mat-expansion-panel>
-                            <mat-expansion-panel-header>
-                                <mat-panel-title>{{medal.label}}</mat-panel-title>
-                            </mat-expansion-panel-header>
-                            <p>
-                                <quill-view-html [content]="medal.description"></quill-view-html> 
-                            </p>
-                        </mat-expansion-panel>
-                    } 
-            </mat-accordion> 
         </mat-expansion-panel>
         <mat-expansion-panel>
             <mat-expansion-panel-header>

@@ -33,23 +33,6 @@ re-captcha{
   margin-bottom: 20px;
 }
 
-.divider{
-  position: relative;
-  margin-top:20px;
-  margin-bottom: 20px; 
-  margin-left: auto;
-  margin-right: auto;
-  height: 1em;
-  width:80%; 
-  top:0px;
-  left:0px;
-}
-
-.divider-message{
-  position:absolute;
-  left:50%;
-  top:-1em;
-}
 
 .full-width {
   width: 100%;

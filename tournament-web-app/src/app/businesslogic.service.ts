@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { FirebaseService } from './firebase.service';
 import { AuthService } from './auth.service';
 import { Observable, Subject } from 'rxjs';
+import { TournamentObj } from './types';
+import { TournamentListComponent } from './tournament-list/tournament-list.component';
 
 export type Profile = "participant" | "juror" | "organizer" | null
 
@@ -71,5 +73,19 @@ export class BusinesslogicService {
   onProfileChangeEvent(): Observable<any> {
     return this.profileSubject;
   }   
+
+  isSetupCompleted(tournament:TournamentObj):boolean {
+    let isSetupCompleted:boolean = false
+    if( tournament.categories.length > 0 &&
+      tournament.evaluations.length > 0 &&
+      tournament.jurors.length > 0 &&
+      tournament.medals.length > 0 )
+    {
+      isSetupCompleted = true
+    }
+    return isSetupCompleted
+  }
+
+  
 
 }

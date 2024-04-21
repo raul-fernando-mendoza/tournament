@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { FirebaseService,Filter } from '../firebase.service';
+import { Filter } from '../firebase.service';
 import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection} from '../types'
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,7 +11,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule} from '@angular/material/datepicker'; 
 import { MatNativeDateModule} from '@angular/material/core';
-import { Timestamp } from "firebase/firestore/lite"
+import { StepperOrientation, STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
+import {BreakpointObserver} from '@angular/cdk/layout';
 import { AuthService } from '../auth.service';
 import { v4 as uuidv4 } from 'uuid';
 import { NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
@@ -19,20 +20,20 @@ import { PathService } from '../path.service';
 import { BusinesslogicService, Profile } from '../businesslogic.service';
 import { MatGridListModule} from '@angular/material/grid-list';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
-import {MatDividerModule} from '@angular/material/divider';
-import {MatMenuModule} from '@angular/material/menu';
+import { MatDividerModule} from '@angular/material/divider';
+import { MatMenuModule} from '@angular/material/menu';
 import { FileLoaded, ImageLoaderComponent } from '../image-loader/image-loader.component';
-import {  ref , getDownloadURL} from "firebase/storage";
-import { storage } from '../../environments/environment';
 import { QuillModule } from 'ngx-quill'
-import {MatExpansionModule} from '@angular/material/expansion';
-import {MatListModule} from '@angular/material/list';
-import { findSourceMap } from 'module';
+import { MatStepper, MatStepperModule } from '@angular/material/stepper';
+import { MatListModule} from '@angular/material/list';
 import { PerformanceListComponent } from '../performance-list/performance-list.component';
 import { FirebaseFullService } from '../firebasefull.service';
 import { DocumentData, QuerySnapshot } from '@firebase/firestore';
 import { DocumentSnapshot, FirestoreError, Unsubscribe } from 'firebase/firestore';
 import { DateFormatService } from '../date-format.service';
+import { v4 } from 'uuid';
+import {AsyncPipe} from '@angular/common';
+import { map, Observable } from 'rxjs';
 
 interface PerformanceReference{
   id:string
@@ -49,6 +50,12 @@ interface InscriptionRequestLink{
 
 @Component({
   selector: 'app-tournament',
+  providers: [
+    {
+      provide: STEPPER_GLOBAL_OPTIONS,
+      useValue: {showError: true},
+    },
+  ],  
   standalone: true,
   imports: [
    CommonModule
@@ -69,15 +76,18 @@ interface InscriptionRequestLink{
   ,MatMenuModule
   ,ImageLoaderComponent
   ,QuillModule
-  ,MatExpansionModule
+  ,MatStepperModule
   ,MatListModule
   ,PerformanceListComponent
+  ,AsyncPipe
   ],
-  templateUrl: './admin-tournament.component.html',
-  styleUrl: './admin-tournament.component.css'
+  templateUrl: './admin-tournament-setup.component.html',
+  styleUrl: './admin-tournament-setup.component.css'
 })
-export class AdminTournamentComponent implements OnInit, OnDestroy{
+export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
 
+  @ViewChild('stepper') private tournamentStepper: MatStepper | null = null;
+  
   tournamentId :string | null= null
   tournament:TournamentObj| null = null
   submitting = false
@@ -97,6 +107,13 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
   })
 
 
+  firstCategory = new FormControl( '', Validators.required)              
+
+  firstEvaluation = new FormControl('', Validators.required)              
+
+  firstJuror = new FormControl('', Validators.required)              
+
+  firstMedal = new FormControl('', Validators.required)              
 
   performances:Array<PerformanceReference> = []
 
@@ -110,7 +127,11 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
 
   unsubscribe:Unsubscribe | undefined = undefined
 
+  useLinear = true
+
   activePanel:string | null = null
+
+  stepperOrientation: Observable<StepperOrientation>;  
 
   constructor(
      private activatedRoute: ActivatedRoute
@@ -120,7 +141,9 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
     ,private router: Router
     ,public pathService:PathService
     ,public businesslogic:BusinesslogicService
-    ,public dateSrv:DateFormatService){
+    ,public dateSrv:DateFormatService
+    ,breakpointObserver: BreakpointObserver,
+    ){
 
     var thiz = this
     this.activatedRoute.paramMap.subscribe( {
@@ -131,7 +154,10 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
           thiz.update()
         }
 
-      })      
+    })
+    this.stepperOrientation = breakpointObserver
+    .observe('(min-width: 800px)')
+    .pipe(map(({matches}) => (matches ? 'horizontal' : 'vertical')));      
 
   }
   ngOnDestroy(): void {
@@ -141,13 +167,55 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
   }
 
   ngOnInit(): void {
-    this.businesslogic.onProfileChangeEvent().subscribe( profile =>{
-      this.currentProfile = profile
-    })
-    this.currentProfile = this.businesslogic.getProfile()
-    this.activePanel = this.businesslogic.getStoredItem("activePanel")
 
   }
+
+  onCreateNew(){
+    let id = v4();
+    let d:Date = this.form.controls.eventDate.value!
+
+    
+    let eventDate:number = this.dateSrv.getDayId(d)
+
+    var label = this.form.controls.label.value!
+    var tags:Array<string> =  []
+    const matches = label.match(/(\b[^\s]+\b)/g);
+    if( matches ){
+      
+      matches.forEach((e) => {
+        tags.push(e)
+      })
+    }
+
+    let tournament :TournamentObj = {
+      label: label,
+      eventDate: eventDate,
+      eventTime: this.form.controls.eventTime.value!,
+      imageUrl: this.form.controls.imageUrl.value,
+      imagePath: this.form.controls.imagePath.value,
+      active: true,
+      creatorUid: this.auth.getUserUid()!,
+      tags: tags,
+      program: [],
+      isProgramReleased: false,
+      categories: [],
+      medals: [],
+      evaluations: [],
+      jurors: [],
+      jurorEmails: [],
+      participantEmails: [],
+      
+    }
+
+    this.firebase.setDocument( TournamentCollection.collectionName, id, tournament).then( ()=>{
+      this.tournamentId = id
+      this.router.navigate(['/tournamentSetup',id])
+    },
+    reason =>{
+      alert("Error guardando documento:" + reason)
+    })
+  }
+
 
   update(){
     if( this.unsubscribe ){
@@ -158,6 +226,9 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
       this.unsubscribe = this.firebase.onsnapShotDoc( TournamentCollection.collectionName, this.tournamentId, {
         'next': (doc:DocumentSnapshot<DocumentData, DocumentData>) =>{
           this.tournament = doc.data() as TournamentObj
+
+          this.useLinear = false
+          this.tournamentStepper!.linear = false
 
           if(this.auth.isloggedIn() ){
             if( this.tournament.participantEmails.findIndex( e=>e==email ) >= 0 ){
@@ -183,10 +254,46 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
           if( this.auth.getUserUid()!= null){
             this.isLoggedIn = true
           }
+
+          let selectedIndex: null | number = null
           
-          this.readPerformances()
-          this.readProgram()
-          this.loadInscriptionRequests()
+          if( this.tournament.categories.length > 0 && this.tournament.categories[0]){
+            this.firstCategory.setValue( this.tournament.categories[0].label )
+          }
+          else{
+            selectedIndex = 1
+          }
+          if( this.tournament.evaluations.length > 0 && this.tournament.evaluations[0]){
+            this.firstEvaluation.setValue( this.tournament.evaluations[0].label )
+          }    
+          else{
+            if(!selectedIndex) 
+              selectedIndex = 2
+          }      
+          if( this.tournament.jurors.length > 0 && this.tournament.jurors[0]){
+            this.firstJuror.setValue( this.tournament.jurors[0].label )
+          }
+          else{
+            if(!selectedIndex) 
+              selectedIndex = 3
+          }      
+
+          if( this.tournament.medals.length > 0 && this.tournament.medals[0]){
+            this.firstMedal.setValue( this.tournament.medals[0].label )
+          }    
+          else{
+            if(!selectedIndex) 
+              selectedIndex = 4
+          }      
+          if( this.isSetupCompleted() ){
+            if(!selectedIndex) 
+              selectedIndex = 5
+          }
+          
+          if( this.tournamentStepper && selectedIndex )
+            this.tournamentStepper!.selectedIndex = selectedIndex
+          
+
         },
         'error':(reason: FirestoreError)=>{
           alert("ERROR reading tournament:" +  reason)
@@ -197,56 +304,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
       })
     }
   }
-
-  onSubmit(){
-    if( !this.tournamentId ){
-      let id = uuidv4();
-      let d:Date = this.form.controls.eventDate.value!
-
-      
-      let eventDate:number = this.dateSrv.getDayId(d)
-
-      var label = this.form.controls.label.value!
-      var tags:Array<string> =  []
-      const matches = label.match(/(\b[^\s]+\b)/g);
-      if( matches ){
-        
-        matches.forEach((e) => {
-          tags.push(e)
-        })
-      }
-
-      let tournament :TournamentObj = {
-        label: label,
-        eventDate: eventDate,
-        eventTime: this.form.controls.eventTime.value!,
-        imageUrl: this.form.controls.imageUrl.value,
-        imagePath: this.form.controls.imagePath.value,
-        active: true,
-        creatorUid: this.auth.getUserUid()!,
-        tags: tags,
-        program: [],
-        isProgramReleased: false,
-        categories: [],
-        medals: [],
-        evaluations: [],
-        jurors: [],
-        jurorEmails: [],
-        participantEmails: [],
-        
-      }
-
-      this.firebase.setDocument( TournamentCollection.collectionName, id, tournament).then( ()=>{
-        this.router.navigate(['/' + TournamentCollection.collectionName + "/" + id]);
-      },
-      reason =>{
-        alert("Error guardando documento:" + reason)
-      })
-    }
-  }
-
-
-   
 
   onNameChange( $event:any ){
 
@@ -284,7 +341,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
     }        
     this.firebase.deleteDocument( TournamentCollection.collectionName , this.tournamentId! ).then( ()=>{
       console.log( "category removed")
-      this.router.navigate([""])
+      this.router.navigate(["../../"])
     },
     reason=>{
       alert("Error onDelte:" + reason)
@@ -560,4 +617,53 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
     this.businesslogic.setStoredItem("activePanel", activePanel)
   }
 
+  isSetupCompleted():boolean{
+    if( this.tournament ){
+      return this.businesslogic.isSetupCompleted( this.tournament )
+    }
+    else return false
+  }
+
+  getMissingInfo():Array<string>{
+    let errors:Array<string> = []
+    if( this.tournament ){
+      let tournament = this.tournament
+      
+      if( !(this.tournament.categories.length > 0) ){
+        errors.push("Por favor adicione una categoria");
+        
+      }
+      if( !(tournament.evaluations.length > 0) ){
+        errors.push("Por favor adicione una evaluacion");
+      }
+      if( !(tournament.jurors.length > 0)){
+        errors.push("Por favor adicione un jurado");
+      }
+      if( !(tournament.medals.length > 0)){
+        errors.push("Por favor adicione un premio");
+      }
+    }
+    return errors
+  }
+
+  SetupEnded(){
+    if( this.tournament && this.businesslogic.isSetupCompleted( this.tournament ) ){
+      this.router.navigate(["/tournament",this.tournamentId])
+    }
+    else{
+      alert("La informaicon is incompleta por favor revise y vuelva a intentar")
+    }
+  }
+
+  getTournamentPath():string{
+    let path:string = ""
+    if( this.tournament ){
+      let url = this.router.url 
+      let urlArr = url.split("/")
+      let urlReverse = urlArr.reverse()
+      urlReverse.splice(0,2)
+      path = urlReverse.reverse().join("/") + "/tournament/" + this.tournamentId
+    }
+    return path
+  }
 }

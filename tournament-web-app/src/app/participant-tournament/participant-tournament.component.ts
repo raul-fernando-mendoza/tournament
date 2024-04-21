@@ -13,6 +13,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { QuillModule } from 'ngx-quill';
 import { PerformanceListComponent } from '../performance-list/performance-list.component';
 import { DateFormatService } from '../date-format.service';
+import { BusinesslogicService, Profile } from '../businesslogic.service';
 
 
 interface PerformanceReference{
@@ -50,13 +51,18 @@ export class ParticipantTournamentComponent {
   performances:Array<PerformanceReference> = []
 
   program:Array<PerformanceReference> = []  
+  
+  currentProfile:Profile = null
+
+  activePanel:string | null = null
 
   constructor(
     private activatedRoute: ActivatedRoute
     ,private auth:AuthService
     ,private router:Router
     ,private firebase:FirebaseService 
-    ,public dateSrv:DateFormatService ){
+    ,public dateSrv:DateFormatService
+    ,public businesslogic:BusinesslogicService ){
       var thiz = this
       this.activatedRoute.paramMap.subscribe( {
         next(paramMap){
@@ -68,6 +74,17 @@ export class ParticipantTournamentComponent {
   
         })       
   }
+
+
+  ngOnInit(): void {
+    this.businesslogic.onProfileChangeEvent().subscribe( profile =>{
+      this.currentProfile = profile
+    })
+    this.currentProfile = this.businesslogic.getProfile()
+    this.activePanel = this.businesslogic.getStoredItem("activePanel")
+
+  }
+
 
   update(){
     if( this.tournamentId != null){
@@ -83,31 +100,7 @@ export class ParticipantTournamentComponent {
             this.isParticipant = true
           }
 
-          if( this.isParticipant == false ){
-            //find out if the registration is in progress
-            let filter:Array<Filter> =[{
-              field: "email",
-              operator: '==',
-              value: email
-            }]
-            this.firebase.getDocuments([TournamentCollection.collectionName, this.tournamentId, InscriptionRequestCollection.collectionName].join("/"), filter).then( set =>{
-              let found = set.find( doc => {
-                let inscriptionRequest:InscriptionRequest = doc.data() as InscriptionRequest
-                if( inscriptionRequest.email == email ){
-                  return inscriptionRequest
-                }
-                return null
-                })
-              if( found ){
-                this.isInscriptionInProgress = true
-              }
-            })  
-              
-  
-          }          
         } 
-
-
 
         var t:any = this.tournament.eventDate
 
@@ -118,6 +111,12 @@ export class ParticipantTournamentComponent {
       })
     }
   }
+
+  onPanelActivated(activePanel:string){
+    this.activePanel = activePanel 
+    this.businesslogic.setStoredItem("activePanel", activePanel)
+  }
+    
   readPerformances(){
     this.performances.length = 0
     if( this.isLoggedIn ){
