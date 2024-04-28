@@ -26,14 +26,14 @@ import { FileLoaded, ImageLoaderComponent } from '../image-loader/image-loader.c
 import { QuillModule } from 'ngx-quill'
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatListModule} from '@angular/material/list';
-import { PerformanceListComponent } from '../performance-list/performance-list.component';
 import { FirebaseFullService } from '../firebasefull.service';
-import { DocumentData, QuerySnapshot } from '@firebase/firestore';
+import { DocumentData } from '@firebase/firestore';
 import { DocumentSnapshot, FirestoreError, Unsubscribe } from 'firebase/firestore';
 import { DateFormatService } from '../date-format.service';
 import { v4 } from 'uuid';
 import {AsyncPipe} from '@angular/common';
 import { map, Observable } from 'rxjs';
+import { urlbase } from '../../environments/environment';
 
 interface PerformanceReference{
   id:string
@@ -78,7 +78,6 @@ interface InscriptionRequestLink{
   ,QuillModule
   ,MatStepperModule
   ,MatListModule
-  ,PerformanceListComponent
   ,AsyncPipe
   ],
   templateUrl: './admin-tournament-setup.component.html',
@@ -422,6 +421,7 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
     })
 
   }
+  
   formatTimestamp(t:any):string{
     
     let d:Date = new Date(t.seconds)
@@ -656,13 +656,8 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
   }
 
   getTournamentPath():string{
-      if (window
-      && "location" in window
-      && "protocol" in window.location
-      && "pathname" in window.location
-      && "host" in window.location) {
-      return window.location.protocol + "//" + window.location.host + "/tournament/" + this.tournamentId ;
-    }
-    return "";
-  }
+ 
+    return urlbase + '/tournament/' + this.tournamentId;
+
+  }  
 }

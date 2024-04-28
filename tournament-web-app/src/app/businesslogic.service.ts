@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FirebaseService } from './firebase.service';
 import { AuthService } from './auth.service';
 import { Observable, Subject } from 'rxjs';
-import { TournamentObj } from './types';
+import { TournamentObj, Performance} from './types';
 import { TournamentListComponent } from './tournament-list/tournament-list.component';
 
 export type Profile = "participant" | "juror" | "organizer" | null

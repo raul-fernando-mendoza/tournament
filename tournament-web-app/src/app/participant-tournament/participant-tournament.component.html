@@ -18,7 +18,16 @@
 
             <mat-list-item>
                 <a [routerLink]="['performanceEdit',p.id]">
-                    {{ p.performance.label }}
+                    <span>{{ p.performance.label }}</span>
+                    @if( p.isInProgram ){
+                        <span class="status">Presentacion ha sido aceptada</span>
+                    }
+                    @else{
+                        <span class="status">En proceso de aprovacion</span>
+                    }
+                    @if( p.performance.isCanceled ){
+                        <span>Cancelado!</span>
+                    }
                 </a>
             </mat-list-item>
         <!--

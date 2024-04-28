@@ -11,7 +11,6 @@ import { MatListModule } from '@angular/material/list';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { QuillModule } from 'ngx-quill';
-import { PerformanceListComponent } from '../performance-list/performance-list.component';
 import { DateFormatService } from '../date-format.service';
 import { BusinesslogicService, Profile } from '../businesslogic.service';
 
@@ -35,7 +34,6 @@ interface PerformanceReference{
     ,RouterModule    
     ,MatGridListModule
     ,QuillModule
-    ,PerformanceListComponent
   ],
   templateUrl: './participant-tournament.component.html',
   styleUrl: './participant-tournament.component.css'

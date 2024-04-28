@@ -1,3 +1,8 @@
 mat-divider{
     margin:1em;
 }
+.status{
+    color:black;
+    font-size: large;
+    margin: 5px;
+}

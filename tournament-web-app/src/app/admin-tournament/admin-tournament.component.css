@@ -48,3 +48,12 @@ p{
     margin: 1em;
     display:flex;
 }
+.cancelado{
+    color:red;
+    font-size: large;
+    margin:5px;
+}
+.status{
+    color:black;
+    margin:5px;
+}

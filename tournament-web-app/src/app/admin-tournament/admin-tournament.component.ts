@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule , Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { FirebaseService,Filter } from '../firebase.service';
+import { Filter } from '../firebase.service';
 import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection} from '../types'
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,7 +11,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule} from '@angular/material/datepicker'; 
 import { MatNativeDateModule} from '@angular/material/core';
-import { Timestamp } from "firebase/firestore/lite"
 import { AuthService } from '../auth.service';
 import { v4 as uuidv4 } from 'uuid';
 import { NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
@@ -22,17 +21,16 @@ import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluation
 import {MatDividerModule} from '@angular/material/divider';
 import {MatMenuModule} from '@angular/material/menu';
 import { FileLoaded, ImageLoaderComponent } from '../image-loader/image-loader.component';
-import {  ref , getDownloadURL} from "firebase/storage";
-import { storage } from '../../environments/environment';
 import { QuillModule } from 'ngx-quill'
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatListModule} from '@angular/material/list';
-import { findSourceMap } from 'module';
-import { PerformanceListComponent } from '../performance-list/performance-list.component';
 import { FirebaseFullService } from '../firebasefull.service';
 import { DocumentData, QuerySnapshot } from '@firebase/firestore';
 import { DocumentSnapshot, FirestoreError, Unsubscribe } from 'firebase/firestore';
 import { DateFormatService } from '../date-format.service';
+import {MatTabGroup, MatTabsModule} from '@angular/material/tabs';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { urlbase } from '../../environments/environment';
 
 interface PerformanceReference{
   id:string
@@ -71,7 +69,8 @@ interface InscriptionRequestLink{
   ,QuillModule
   ,MatExpansionModule
   ,MatListModule
-  ,PerformanceListComponent
+  ,MatTabsModule
+  ,MatProgressSpinnerModule
   ],
   templateUrl: './admin-tournament.component.html',
   styleUrl: './admin-tournament.component.css'
@@ -112,8 +111,13 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
 
   activePanel:string | null = null
 
-  route:string = ""
+  hasPendingRequests = false
 
+  pendingRequests:Array<PerformanceReference> = []
+
+  @ViewChild("tournamentTab", { static: false }) demo3Tab!: MatTabGroup;
+
+  route:string = ""
   constructor(
      private activatedRoute: ActivatedRoute
     ,public firebase:FirebaseFullService 
@@ -452,14 +456,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
     this.performances.length = 0
     if( this.isLoggedIn ){
       let filter:Array<Filter> = []
-      if( !this.isAdmin ){
-        let userFilter:Filter = {
-          field: 'email',
-          operator: '==',
-          value: this.auth.getUserEmail()
-        }
-        filter.push( userFilter )
-      }
       this.firebase.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"), filter).then( set =>{
         set.map( doc =>{
           let p = doc.data() as PerformanceObj
@@ -473,6 +469,18 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
 
         })
         this.performances.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
+        this.pendingRequests.length = 0
+        this.hasPendingRequests = false
+        if( this.performances.length > 0 ){
+          for( let i=0; i<this.performances.length; i++){
+            let p = this.performances[i]
+            if( p.performance.isCanceled == false && !p.isInProgram ){
+              this.pendingRequests.push( p )
+            }
+          }
+          this.hasPendingRequests = this.pendingRequests.length > 0
+          this.demo3Tab.selectedIndex = 0
+        }
       })
     }
   }
@@ -572,15 +580,8 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
   }
 
   getTournamentPath():string{
-    if (window){
-      if ("location" in window
-        && "protocol" in window.location
-        && "pathname" in window.location
-        && "host" in window.location) {
-        return window.location.protocol + "//" + window.location.host + window.location.pathname;
-      }
-    }
-    return "";
-  }  
+ 
+        return urlbase + '/tournament/' + this.tournamentId;
 
+  }  
 }

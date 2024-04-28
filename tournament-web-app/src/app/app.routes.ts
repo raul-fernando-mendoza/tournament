@@ -7,7 +7,6 @@ import { MedalsListComponent } from './medals-list/medals-list.component';
 import { CategoryListComponent } from './category-list/category-list.component';
 import { EvaluationListComponent } from './evaluation-list/evaluation-list.component';
 import { JurorListComponent } from './juror-list/juror-list.component';
-import { PerformanceListComponent } from './performance-list/performance-list.component';
 import { AspectListComponent } from './aspect-list/aspect-list.component';
 import { ProgramListComponent } from './program-list/program-list.component';
 import { PodiumListComponent } from './podium-list/podium-list.component';
@@ -99,9 +98,9 @@ export const routes: Routes = [
     { path:"tournamentAdmin/:tournamentId/medal/:medalId",component:MedalEditComponent},
 
 
-    { path:"tournamentAdmin/:tournamentId/performances",component:PerformanceListComponent},
     { path:"tournamentAdmin/:tournamentId/program",component:ProgramListComponent},
     { path:"tournamentAdmin/:tournamentId/podium",component:PodiumListComponent},
+    { path:"tournamentAdmin/:tournamentId/performanceEdit/:performanceId",component:PerformanceEditComponent},
     
    
     { path:"tournamentNew",component:AdminTournamentSetupComponent},

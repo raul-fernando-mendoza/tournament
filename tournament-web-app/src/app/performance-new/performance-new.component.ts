@@ -79,12 +79,12 @@ export class PerformanceNewComponent {
     let obj:PerformanceObj = {
       categoryId: categoryId!,
       fullname: fullname!,
-      email:email!,
+      email: email!,
       label: label!,
-      isAccepted: false,
       grade: 0,
       overwrittenGrade: null,
-      isReleased: false
+      isReleased: false,
+      isCanceled: false
     }
     let id=uuidv4()
     this.firebase.setDocument( [TournamentCollection.collectionName,this.tournamentId,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{

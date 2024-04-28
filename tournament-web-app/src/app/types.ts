@@ -82,7 +82,6 @@ export interface Performance{
     email?:string
     categoryId?:string
     fullname?:string
-    isAccepted?:boolean
     isCanceled?:boolean
     grade?:number,
     overwrittenGrade?:number|null
@@ -93,7 +92,7 @@ export class PerformanceObj implements Performance{
     categoryId!:string
     fullname!:string 
     email!:string
-    isAccepted:boolean = false
+    isCanceled:boolean= false
     grade:number=10
     overwrittenGrade:number|null=null
     isReleased:boolean = false

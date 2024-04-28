@@ -24,9 +24,13 @@
             </mat-form-field> 
         </mat-card-content>
         <mat-card-actions>
-            <button id="done" name="done" mat-button (click)="onSubmit()" [disabled]="!g.valid"><mat-icon>done</mat-icon></button>
-            <button mat-button (click)="onCancel()"><mat-icon>cancel</mat-icon></button>
-    </mat-card-actions>
+            @if( performance.isCanceled ){
+                <div class="cancel">Status Cancelado</div>
+            }
+            @else{
+                <button mat-raised-button color="warn" (click)="onCancel()">Cancel</button>
+            }
+        </mat-card-actions>
     </mat-card>
 
 }

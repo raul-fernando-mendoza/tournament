@@ -1,3 +1,7 @@
 mat-form-field{
     display: block;
 }
+.cancel{
+    color:red;
+    font-size: large;
+}
