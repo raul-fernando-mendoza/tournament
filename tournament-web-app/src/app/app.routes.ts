@@ -121,9 +121,9 @@ export const routes: Routes = [
     { path:"juror",pathMatch:'full',component:WelcomeJurorComponent, canActivate: [loginGuard('loginForm/juror')]},
     
     
-    { path:"home",pathMatch:'full',component:ProfileComponent},    
+    { path:"home",pathMatch:'full',component:AdminTournamentComponent},    
 
 
-    { path:"",pathMatch:'full',component:ProfileComponent}
+    { path:"",pathMatch:'full',component:AdminTournamentWelcomeComponent, canActivate: [loginGuard('loginForm/organizer')]},
 
 ];

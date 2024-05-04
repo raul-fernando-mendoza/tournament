@@ -57,3 +57,6 @@ p{
     color:black;
     margin:5px;
 }
+.evaluation-grade-list{
+    border: 1px solid black;
+}

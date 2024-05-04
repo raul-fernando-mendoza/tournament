@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule , Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Filter } from '../firebase.service';
-import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection} from '../types'
+import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection, PerformanceReference} from '../types'
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -12,7 +12,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule} from '@angular/material/datepicker'; 
 import { MatNativeDateModule} from '@angular/material/core';
 import { AuthService } from '../auth.service';
-import { v4 as uuidv4 } from 'uuid';
 import { NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
 import { PathService } from '../path.service';
 import { BusinesslogicService, Profile } from '../businesslogic.service';
@@ -32,17 +31,10 @@ import {MatTabGroup, MatTabsModule} from '@angular/material/tabs';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { urlbase } from '../../environments/environment';
 
-interface PerformanceReference{
+interface PerformanceProgramReference{
   id:string
   performance:PerformanceObj
   isInProgram:boolean
-}
-
-
-interface InscriptionRequestLink{
-  id:string
-  inscriptionRequest:InscriptionRequest
-  isAccepted:boolean
 }
 
 @Component({
@@ -77,7 +69,7 @@ interface InscriptionRequestLink{
 })
 export class AdminTournamentComponent implements OnInit, OnDestroy{
 
-  tournamentId :string | null= null
+  tournamentId! :string 
   tournament:TournamentObj| null = null
   submitting = false
   isAdmin = false
@@ -97,23 +89,22 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
 
 
 
-  performances:Array<PerformanceReference> = []
+  performanceReferences:Array<PerformanceReference> = []
 
-  program:Array<PerformanceReference> = []  
-
-  currentProfile:Profile = null
-
-  isParticipant = false
-
-  inscriptionRequestLinks:Array<InscriptionRequestLink> = []
-
-  unsubscribe:Unsubscribe | undefined = undefined
-
-  activePanel:string | null = null
+  programReferences:Array<PerformanceProgramReference> = []  
 
   hasPendingRequests = false
 
-  pendingRequests:Array<PerformanceReference> = []
+  pendingRequestReferences:Array<PerformanceProgramReference> = []
+
+  currentProfile:Profile = null
+
+  unsubscribe:Unsubscribe | undefined = undefined
+  unsubscribePerformances:Unsubscribe | undefined = undefined
+
+  activePanel:string | null = null
+
+
 
   @ViewChild("tournamentTab", { static: false }) demo3Tab!: MatTabGroup;
 
@@ -140,9 +131,9 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
 
     this.activatedRoute.paramMap.subscribe( {
       next(paramMap){
-        thiz.tournamentId = null
+       
         if( paramMap.get('tournamentId') )
-          thiz.tournamentId = paramMap.get('tournamentId')
+          thiz.tournamentId = paramMap.get('tournamentId')!
           thiz.update()
         }
 
@@ -152,6 +143,9 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
   ngOnDestroy(): void {
     if( this.unsubscribe ){
       this.unsubscribe()
+    }
+    if( this.unsubscribePerformances ){
+      this.unsubscribePerformances()
     }
   }
 
@@ -165,107 +159,42 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
   }
 
   update(){
-    if( this.unsubscribe ){
-      this.unsubscribe()
-    }    
-    let email = this.auth.getUserEmail()
-    if( this.tournamentId != null){
-      this.unsubscribe = this.firebase.onsnapShotDoc( TournamentCollection.collectionName, this.tournamentId, {
-        'next': (doc:DocumentSnapshot<DocumentData, DocumentData>) =>{
-          this.tournament = doc.data() as TournamentObj
+    this.unsubscribe = this.firebase.onsnapShotDoc( TournamentCollection.collectionName, this.tournamentId, {
+      'next': (doc:DocumentSnapshot<DocumentData, DocumentData>) =>{
+        this.tournament = doc.data() as TournamentObj
+        this.form.controls.label.setValue( this.tournament.label )
 
-          if(this.auth.isloggedIn() ){
-            if( this.tournament.participantEmails.findIndex( e=>e==email ) >= 0 ){
-              this.isParticipant = true
-            }
-          } 
-  
-          this.form.controls.label.setValue( this.tournament.label )
+        let eventDate = this.dateSrv.getDate( this.tournament.eventDate )
 
-          let eventDate = this.dateSrv.getDate( this.tournament.eventDate )
-  
-          this.form.controls.eventDate.setValue( eventDate )
-          if(  this.tournament.eventTime ){
-            this.form.controls.eventTime.setValue( this.tournament.eventTime )
-          }
-          if( this.tournament.imageUrl ){
-            this.form.controls.imageUrl.setValue( this.tournament.imageUrl )
-          }
-  
-          if( this.auth.getUserUid()!= null && this.tournament?.creatorUid != null ){
-            this.isAdmin = (this.auth.getUserUid() == this.tournament?.creatorUid) 
-          } 
-          if( this.auth.getUserUid()!= null){
-            this.isLoggedIn = true
-          }
-          
-          this.readPerformances()
-          this.readProgram()
-          this.loadInscriptionRequests()
-        },
-        'error':(reason: FirestoreError)=>{
-          alert("ERROR reading tournament:" +  reason)
-        },
-        'complete':() =>{
-          console.log("reading program as ended")
-        }        
-      })
-    }
-  }
+        this.form.controls.eventDate.setValue( eventDate )
+        if(  this.tournament.eventTime ){
+          this.form.controls.eventTime.setValue( this.tournament.eventTime )
+        }
+        if( this.tournament.imageUrl ){
+          this.form.controls.imageUrl.setValue( this.tournament.imageUrl )
+        }
 
-  onSubmit(){
-    if( !this.tournamentId ){
-      let id = uuidv4();
-      let d:Date = this.form.controls.eventDate.value!
-
-      
-      let eventDate:number = this.dateSrv.getDayId(d)
-
-      var label = this.form.controls.label.value!
-      var tags:Array<string> =  []
-      const matches = label.match(/(\b[^\s]+\b)/g);
-      if( matches ){
+        if( this.auth.getUserUid()!= null && this.tournament?.creatorUid != null ){
+          this.isAdmin = (this.auth.getUserUid() == this.tournament?.creatorUid) 
+        } 
+        if( this.auth.getUserUid()!= null){
+          this.isLoggedIn = true
+        }
+        this.updateProgramRef()
         
-        matches.forEach((e) => {
-          tags.push(e)
-        })
-      }
-
-      let tournament :TournamentObj = {
-        label: label,
-        eventDate: eventDate,
-        eventTime: this.form.controls.eventTime.value!,
-        imageUrl: this.form.controls.imageUrl.value,
-        imagePath: this.form.controls.imagePath.value,
-        active: true,
-        creatorUid: this.auth.getUserUid()!,
-        tags: tags,
-        program: [],
-        isProgramReleased: false,
-        categories: [],
-        medals: [],
-        evaluations: [],
-        jurors: [],
-        jurorEmails: [],
-        participantEmails: [],
         
-      }
-
-      this.firebase.setDocument( TournamentCollection.collectionName, id, tournament).then( ()=>{
-        this.router.navigate(['/' + TournamentCollection.collectionName + "/" + id]);
       },
-      reason =>{
-        alert("Error guardando documento:" + reason)
-      })
-    }
+      'error':(reason: FirestoreError)=>{
+        alert("ERROR reading tournament:" +  reason)
+      },
+      'complete':() =>{
+        console.log("reading program as ended")
+      }        
+    })
+    this.readPerformances()
   }
-
-
-   
 
   onNameChange( $event:any ){
-
-
     var label = this.form.controls.label.value!
     if( this.tournamentId && label ){
         
@@ -330,42 +259,8 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
       alert("Error updating programa:" + reason)
     }) 
   }  
-  onProgramUp(linkId:string){
-    if( this.tournament ){
-      let idx = this.tournament.program.findIndex( e=>e == linkId )
-      if( idx > 0){
-        this.tournament.program.splice(idx, 1);
-        this.tournament.program.splice(idx-1, 0, linkId); 
-        let obj:Tournament ={
-          program:this.tournament.program
-        }
-        this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-          console.log("update program up")
-        },
-        reason =>{
-          alert("ERROR moviendo programa arriba:" + reason)
-        })  
-      } 
-    }
-  }
-  onProgramDown(linkId:string){
-    if( this.tournament ){
-      let idx = this.tournament.program.findIndex( e=>e == linkId )
-      if( idx < (this.tournament.program.length - 1) ){
-        this.tournament.program.splice(idx, 1);
-        this.tournament.program.splice(idx+1, 0, linkId); 
-        let obj:Tournament ={
-          program:this.tournament.program
-        }
-        this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-          console.log("update program down")
-        },
-        reason =>{
-          alert("ERROR moviendo programa arriba:" + reason)
-        }) 
-      }  
-    }
-  }
+
+
   
   onPerformanceReleaseGrade(performanceId:string){
     let obj:Performance = {
@@ -398,20 +293,10 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
   
     return [year, month, day].join('-');
   } 
-  onPerformancesEdit(){
-    let parts = ['tournament',this.tournamentId,'performances']
-    let url = encodeURIComponent( parts.join("/") )
-    if( this.auth.isloggedIn() ){
-      this.router.navigate(parts)
-    }
-    else{
-      this.router.navigate(['/loginForm', url])
-    }
-  } 
+
 
   getBasePath():string{
     return this.tournamentId!
-
   }
   
   fileLoaded(fileLoaded:FileLoaded){
@@ -453,60 +338,65 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
   }  
 
   readPerformances(){
-    this.performances.length = 0
-    if( this.isLoggedIn ){
-      let filter:Array<Filter> = []
-      this.firebase.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"), filter).then( set =>{
-        set.map( doc =>{
-          let p = doc.data() as PerformanceObj
+    let filter:Array<Filter> = []
+    if( this.unsubscribePerformances ){
+      this.unsubscribePerformances()
+    }  
+    this.unsubscribePerformances = this.firebase.onsnapShotCollection(
+      [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") 
+      ,{
+        'next': (set)=>{
+          this.performanceReferences.length = 0
+          set.docs.map( doc =>{
+            let p = doc.data() as PerformanceObj
 
-          let pr:PerformanceReference = {
-            id: doc.id,
-            performance: p,
-            isInProgram: this.isInProgram(doc.id)
-          }
-          this.performances.push( pr )
-
-        })
-        this.performances.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
-        this.pendingRequests.length = 0
-        this.hasPendingRequests = false
-        if( this.performances.length > 0 ){
-          for( let i=0; i<this.performances.length; i++){
-            let p = this.performances[i]
-            if( p.performance.isCanceled == false && !p.isInProgram ){
-              this.pendingRequests.push( p )
+            let pr:PerformanceProgramReference = {
+              id: doc.id,
+              performance: p,
+              isInProgram: this.isInProgram(doc.id)
             }
-          }
-          this.hasPendingRequests = this.pendingRequests.length > 0
-          this.demo3Tab.selectedIndex = 0
-        }
-      })
-    }
+            this.performanceReferences!.push( pr )
+          })
+          this.performanceReferences.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
+
+          this.updateProgramRef()
+
+      }  
+    })
   }
 
-  readProgram(){
-    this.program.length = 0  
-
-    if( this.tournament ){
-      this.tournament.program.map( programId =>{
-        console.log("reading program:" + programId)
-        this.firebase.getDocument( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") , programId).then( (data)=>{
-          let performance = data as PerformanceObj
-          let pr:PerformanceReference = {
-            id: programId,
-            performance: performance,
-            isInProgram: this.isInProgram(programId)
-          }
-          this.program.push( pr )
-        },
-        reason =>{
-          alert("ERROR error reading perfomance in program:" + reason)
-        })  
-      })
+  updateProgramRef(){
+    //loadProgramRef
+    this.programReferences.length = 0
+    if( this.performanceReferences.length ){
+      this.tournament?.program.forEach( performanceId =>{
+        let performanceRef = this.performanceReferences.find( p => p.id == performanceId )
+        let programRef:PerformanceProgramReference = {
+          id: performanceId,
+          performance: performanceRef!.performance,
+          isInProgram: true
+        }
+        this.programReferences.push(programRef)
+      })    
     }
-  }  
 
+    //load pending
+    this.pendingRequestReferences.length = 0
+    this.hasPendingRequests = false
+    this.performanceReferences.forEach( performanceRef =>{
+      let inProgram = this.tournament!.program.find( e => e == performanceRef.id)
+      if( performanceRef.performance.isCanceled == false && !inProgram){
+        let pendingRef:PerformanceProgramReference = {
+          id: performanceRef.id,
+          performance: performanceRef.performance,
+          isInProgram: false
+        }
+        this.pendingRequestReferences.push( pendingRef )
+      }
+    })
+    this.hasPendingRequests = this.pendingRequestReferences.length > 0
+    this.demo3Tab.selectedIndex = 0    
+  }
   isInProgram( id:string ):boolean{
     let idx = this.tournament!.program.findIndex( e => e == id)
     if( idx >= 0){
@@ -517,63 +407,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
     }
   }
   
-  loadInscriptionRequests(){
-    this.firebase.getDocuments([TournamentCollection.collectionName, this.tournamentId, InscriptionRequestCollection.collectionName].join("/")).then( set =>{
-      this.inscriptionRequestLinks.length = 0
-      set.map( doc => {
-        let inscriptionRequest:InscriptionRequest = doc.data() as InscriptionRequest
-        
-        if( !this.tournament!.participantEmails.find( e=>e == inscriptionRequest.email )){
-          var accepted = false
-        }
-        else{
-          var accepted = true
-        }
-        let inscriptionRequestLink:InscriptionRequestLink = {
-          id: doc.id,
-          inscriptionRequest: inscriptionRequest,
-          isAccepted: accepted
-        }
-
-        this.inscriptionRequestLinks.push( inscriptionRequestLink )
-      })
-
-    },
-    reason =>{
-      alert("ERROR:inscripciones no pueden ser leidas:" + reason)
-    })    
-  }
-  onAcceptInscriptionRequest(e:InscriptionRequestLink){
-    let inscription:InscriptionRequest = e.inscriptionRequest
-    if( !this.tournament!.participantEmails.find( e => e == inscription.email)){
-      this.tournament!.participantEmails.push( inscription.email )
-      let obj:Tournament = {
-        participantEmails:this.tournament!.participantEmails
-      }
-      this.firebase.updateDocument(TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-        console.log("accept inscription")
-      },
-      reason =>{
-        alert("ERROR: aceptando inscripciones" + reason )
-      })
-    }  
-  } 
-
-  onRejectInscriptionRequest(e:InscriptionRequestLink){
-    let idx = this.tournament!.participantEmails.findIndex( p => p == e.inscriptionRequest.email)
-    if( idx >=0 ){
-      this.tournament!.participantEmails.splice( idx, 1)
-      let obj:Tournament = {
-        participantEmails:this.tournament!.participantEmails
-      }
-      this.firebase.updateDocument(TournamentCollection.collectionName, this.tournamentId, obj).then( () =>{
-        console.log("reject inscription")
-      },
-      reason =>{
-        alert("Error:Error removing inscription")
-      })
-    }
-  }
   onPanelActivated(activePanel:string){
     this.activePanel = activePanel 
     this.businesslogic.setStoredItem("activePanel", activePanel)
@@ -584,4 +417,65 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
         return urlbase + '/tournament/' + this.tournamentId;
 
   }  
+
+  onPerformanceUp(performanceId:string){
+    if( this.tournament ){
+      let idx = this.tournament.program.findIndex( e => e == performanceId)
+      if( idx > 0){
+        this.tournament.program.splice( idx, 1)
+        this.tournament.program.splice( idx - 1, 0, performanceId)
+        let obj:Tournament = {
+          program:this.tournament.program
+        }
+        this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+          console.log("program updated")
+        },
+        reason =>{
+          alert("Error moviendo performance arriba" + reason)
+        })
+      }
+    }
+  }
+  onPerformanceDown(performanceId:string){
+    if( this.tournament ){
+      let idx = this.tournament.program.findIndex( e => e == performanceId)
+      if( idx < (this.tournament.program.length - 1)){
+        this.tournament.program.splice( idx, 1)
+        this.tournament.program.splice( idx + 1, 0, performanceId)
+        let obj:Tournament = {
+          program:this.tournament.program
+        }
+        this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+          console.log("program updated")
+        },
+        reason =>{
+          alert("Error moviendo performance abajo" + reason)
+        })
+      }
+    }
+  }
+  onReleaseProgram(isProgramReleased:boolean){
+    let obj:Tournament = {
+      isProgramReleased : isProgramReleased
+    }
+    this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+      console.log("Tournament released")
+    },
+    reason =>{
+      alert("Error actualizando la liberacion")
+    })    
+  }
+  onRelease(id:string, performance:Performance){
+    let obj:Performance = {
+      grade:performance.grade,
+      isReleased:true
+    }
+    this.firebase.updateDocument( [TournamentCollection.collectionName, this.tournamentId,
+                                          PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{
+      console.log("Performance release updated")
+    },
+    reason =>{
+      alert("Error actualizando la liberacion")
+    })
+  }     
 }

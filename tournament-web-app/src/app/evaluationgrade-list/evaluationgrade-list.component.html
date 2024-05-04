@@ -1,6 +1,9 @@
-@if( performance ){
+<p>Lista de Examenes</p>
+@if( tournament && performance ){
     @for( e of tournament.evaluations; track e; ){
-        @for(j of getJurors();track j;){
+        Evaluacion:{{e.label}}
+        @for(j of jurors;track j;){
+            Juror:{{j.label}}
             <mat-grid-list cols="4" rowHeight="3em">
             @if( !isAdmin ){
                 @for(r of getEvaluationRefence(e.id,j.id); track r;){

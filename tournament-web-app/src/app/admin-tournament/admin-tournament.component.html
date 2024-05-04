@@ -16,9 +16,7 @@
                             <input matInput placeholder="" formControlName="label" (change)="onNameChange($event)">
                         </mat-form-field>                </mat-grid-tile>
                     <mat-grid-tile colspan="2" rowspan="5">
-                        @if( tournament ){
-                            <app-image-loader [fullpath]="tournament.imagePath" [basepath]="getBasePath()" [url]="tournament.imageUrl" (onload)="fileLoaded($event)" (ondelete)="fileDeleted($event)"></app-image-loader>
-                        }
+                        <app-image-loader [fullpath]="tournament.imagePath" [basepath]="getBasePath()" [url]="tournament.imageUrl" (onload)="fileLoaded($event)" (ondelete)="fileDeleted($event)"></app-image-loader>
                     </mat-grid-tile>
                     <mat-grid-tile colspan="3">
                         <mat-form-field color="accent" appearance="fill">
@@ -71,7 +69,7 @@
         </mat-expansion-panel-header>
             <div>
                 <mat-list>
-                @for( p of pendingRequests; track p.id){
+                @for( p of pendingRequestReferences; track p.id){
                     <mat-list-item>
                         <a [routerLink]="['performanceEdit',p.id]">
                             <span>{{ p.performance.label }}</span>
@@ -98,24 +96,92 @@
     <mat-tab-group #tournamentTab>
         <mat-tab label="Programa" > 
 
-            <mat-list>
-            @for( p of program; track p.id){
-                <mat-list-item>
-                    <a [routerLink]="['performanceEdit',p.id]">
-                        {{ p.performance.label }} 
-                    </a>
-                    @if( p.performance.isCanceled ){
-                        <span class="cancelado">Cancelado</span>
-                    }
-                    @if( p.isInProgram ){
-                        <button mat-button (click)="onReject(p.id)">Remover del programa</button>
-                    }
-                </mat-list-item>
+            @if( !tournament.isProgramReleased ){
+                <button mat-button color="warn" (click)="onReleaseProgram(true)">Publicar Programa</button>
+            }
+            @else{
+                <button mat-button color="warn" (click)="onReleaseProgram(false)">Ocultar Programa</button>
+            }    
+
+            <mat-accordion>
+            @for(p of programReferences; track p.id;let idx = $index, e = $even){
+                    <mat-expansion-panel hideToggle>
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{ idx + 1}} - {{ p.performance.label }}
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            {{ p.performance.fullname }}
+                        </mat-panel-description>
+                      </mat-expansion-panel-header>
+                      <mat-grid-list cols="11"  >
+                        <mat-grid-tile colspan="2">
+                            @if(isAdmin){
+                            <button mat-icon-button (click)="onPerformanceUp(p.id)"><mat-icon>arrow_upward</mat-icon></button>
+                            }
+                            {{ idx + 1}}
+                            @if(isAdmin){
+                            <button mat-icon-button (click)="onPerformanceDown(p.id)"><mat-icon>arrow_downward</mat-icon></button>
+                            }
+                        </mat-grid-tile>
+                        <mat-grid-tile class="evaluation-grade-list" colspan="8">
+                            <p>
+                            <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance"></app-evaluationgrade-list>                             
+                            </p>
+                        </mat-grid-tile>
+                        <mat-grid-tile>
+                            <button mat-icon-button color="warn" (click)="onReject(p.id)"><mat-icon>delete</mat-icon></button>
+                        </mat-grid-tile>
+                      </mat-grid-list>  
+                    </mat-expansion-panel>
+        
+            }
+            </mat-accordion>
+
+<!--
+                    <mat-grid-tile colspan="8" style.background="blue">
+                        <mat-accordion>
+                            <mat-expansion-panel hideToggle>
+                              <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{ p.performance.label }}
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    {{ p.performance.fullname }}
+                                </mat-panel-description>
+                              </mat-expansion-panel-header>
+                              <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance"></app-evaluationgrade-list> 
+                             <p>Hola</p>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                        
+                        <p>hola</p>                        
+                    </mat-grid-tile>
+                    
+                    <mat-grid-tile>
+                        @if( isAdmin && p.performance.isReleased  ){
+                            <span class="score">score:{{ p.performance.grade }}</span>
+                        }
+                        @if( isAdmin && !p.performance.isReleased && p.performance.grade ){ 
+                            <span class="score">score:{{ p.performance.grade }}</span>
+                            <button mat-mini-fab color="accent" (click)="onRelease(p.id, p.performance)"><mat-icon>done</mat-icon></button>
+                        }                
+                    </mat-grid-tile>
+                    -->
+                    <!--
+                    <mat-grid-tile>
+                        @if( isAdmin || p.performance.isReleased  ){
+                            <span>{{ p.medal }}</span>
+                        }
+                    </mat-grid-tile> 
+                     
+                </mat-grid-list>        
             } 
             @empty{
-                <p>No hay ningun performance en el programa</p>                
+                Por favor adicione performances al programa desde la lista de performances 
             }
-            </mat-list>      
+        -->
+        
         </mat-tab>    
         <mat-tab label="Editar"> 
             <mat-accordion>
@@ -226,7 +292,7 @@
                     </a>   
                                         
                     <mat-list>
-                        @for( p of program; track p){
+                        @for( p of programReferences; track p){
                             <mat-list-item>
                             {{ p.performance.label }}
                             </mat-list-item>

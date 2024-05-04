@@ -137,3 +137,8 @@ export class InscriptionRequest{
 export class InscriptionRequestCollection{
     static readonly collectionName:string = "inscription"
 }
+
+export interface PerformanceReference{
+    id:string
+    performance:PerformanceObj
+}

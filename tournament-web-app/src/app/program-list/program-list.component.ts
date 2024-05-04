@@ -1,26 +1,25 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { FirebaseService } from '../firebase.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import {  EvaluationGradeCollection, EvaluationGradeObj, Performance, PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj } from '../types';
+import {  EvaluationGradeCollection, EvaluationGradeObj, Performance, PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj, PerformanceReference } from '../types';
 import {MatGridListModule} from '@angular/material/grid-list';
-import { FirebaseFullService } from '../firebasefull.service';
+import { FirebaseService } from '../firebase.service';
 import { Unsubscribe } from 'firebase/auth';
 import { doc, DocumentData, QuerySnapshot } from 'firebase/firestore';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
 import { AuthService } from '../auth.service';
 import {MatExpansionModule} from '@angular/material/expansion';
 
-interface PerformanceReference{
-  id:string
-  performance:PerformanceObj
-  medal:string
-  idx:number
+class PerformanceMedalReference implements PerformanceReference{
+  id!:string
+  performance!:PerformanceObj
+  medal?:string
+  idx?:number
 }
 
 @Component({
@@ -43,145 +42,52 @@ interface PerformanceReference{
   styleUrl: './program-list.component.css',
 
 })
-export class ProgramListComponent implements OnDestroy{
-  tournamentId!:string
-  tournament!:TournamentObj
-  performances:Array<PerformanceReference> = []
+export class ProgramListComponent implements AfterViewInit{
+  @Input() tournamentId!:string
+  @Input() tournament!:TournamentObj
+  @Input() performanceReference!:PerformanceReference
 
   performanceColor = 'lightblue'
   isAdmin = false
-  tournament_unsubscribe:Unsubscribe = ()=>{}
-  performance_unsubscribers:Array<Unsubscribe> = []
-  evaluation_unsubscribers:Array<Unsubscribe> = []
 
   evaluationGradesReferences: any;
 
-  constructor( public firebaseService:FirebaseService 
-    ,private firebaseFullService:FirebaseFullService
-    ,private fb:FormBuilder
-    ,private activatedRoute: ActivatedRoute  
+  constructor(private firebaseFullService:FirebaseService
     ,private auth:AuthService  
   ){
-    var thiz = this
-    this.activatedRoute.paramMap.subscribe({
-        next(paramMap){
-          let tournamentId = paramMap.get('tournamentId')
-          if( tournamentId!=null ){
-            thiz.tournamentId = tournamentId
-            thiz.update()
-          }
-        }
-      })
-  }
-  ngOnDestroy(): void {
-    if( this.tournament_unsubscribe ){
-      this.tournament_unsubscribe()
-    }    
-    this.performance_unsubscribers.map( unsubscribe =>{
-      unsubscribe()
-    })
-    this.evaluation_unsubscribers.map( unsubscribe =>{
-      unsubscribe()
-    })    
-  }
-  update(){
-    if( this.tournament_unsubscribe ){
-      this.tournament_unsubscribe()
-    }
-    this.tournament_unsubscribe =this.firebaseFullService.onsnapShotDoc( TournamentCollection.collectionName,this.tournamentId,
-      {
-        'next':(doc) =>{      
-            this.performances.length = 0
-            this.tournament = doc.data() as TournamentObj 
-            if( this.tournament.creatorUid == this.auth.getUserUid() ){
-              this.isAdmin = true
-            }
-            this.readPerformances()
-        },
-        'error':(reason) =>{
-          alert("ha habido un error leyendo el programa:" + reason)
-        },
-        'complete':() =>{
-          console.log("reading program as ended")
-        }
-      }
-    )
 
+  }
+  ngAfterViewInit(): void {
+    this.update()
+  }
+   
+  
+  update(){
+    if( this.tournament.creatorUid == this.auth.getUserUid() ){
+      this.isAdmin = true
+    }
   }
 
   readPerformances(){
-    this.performance_unsubscribers.map( unsub => unsub() )
-    this.evaluation_unsubscribers.map( unsub => unsub() )
-    this.performances.length = 0  
-
-    
-    this.tournament.program.map( programId =>{
-      console.log("reading program:" + programId)
-      let unsubscribe =this.firebaseFullService.onsnapShotDoc( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") , programId,
-        {
-          'next':(doc) =>{
-            let performance = doc.data() as PerformanceObj
-
-            console.log("reading performance:" + performance.label)
-            let idx = this.tournament.program.findIndex( e => e == doc.id)
-            
-            if(  idx >=0 ){
-              let performanceRef:PerformanceReference={
-                id:doc.id,
-                performance:performance,
-                medal:"",
-                idx:idx
-              }
-              this.performances[idx] = performanceRef
+    /*
+    let idx = 
+      if( performance ){
+        let performanceRef:PerformanceMedalReference={
+          id:this.performanceReference.id,
+          performance:this.performanceReference.performance!,
+          medal:"",
+          idx:idx
+        }
+        this.performanceMedalReference[idx] = performanceRef
               
-              this.recalculateGrade( performanceRef )
-              if( performanceRef.performance.grade ){
-                performanceRef.medal = this.getMedalForPerformance( performanceRef.performance.grade )
-              }
-            }
-            
-          },
-          'error':(reason) =>{
-            alert("ha habido un error leyendo el programa:" + reason)
-          },
-          'complete':() =>{
-            console.log("reading program as ended")
-          }
-      })
-      this.performance_unsubscribers.push( unsubscribe )
+        this.recalculateGrade( performanceRef )
+        if( performanceRef.performance.grade ){
+          performanceRef.medal = this.getMedalForPerformance( performanceRef.performance.grade )
+        }
+      }
     })
-  }
-  onPerformanceUp(performanceId:string){
-    let idx = this.tournament.program.findIndex( e => e == performanceId)
-    if( idx > 0){
-      this.tournament.program.splice( idx, 1)
-      this.tournament.program.splice( idx - 1, 0, performanceId)
-      let obj:Tournament = {
-        program:this.tournament.program
-      }
-      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-        console.log("program updated")
-      },
-      reason =>{
-        alert("Error moviendo performance arriba" + reason)
-      })
-    }
-  }
-  onPerformanceDown(performanceId:string){
-    let idx = this.tournament.program.findIndex( e => e == performanceId)
-    if( idx < (this.tournament.program.length - 1)){
-      this.tournament.program.splice( idx, 1)
-      this.tournament.program.splice( idx + 1, 0, performanceId)
-      let obj:Tournament = {
-        program:this.tournament.program
-      }
-      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-        console.log("program updated")
-      },
-      reason =>{
-        alert("Error moviendo performance abajo" + reason)
-      })
-    }
+    */
+
   }
   getMedalForPerformance(grade:number):string{
     console.log("calculating medasl for:" + grade)
@@ -197,7 +103,7 @@ export class ProgramListComponent implements OnDestroy{
       grade:performanceRef.performance.grade,
       isReleased:true
     }
-    this.firebaseService.updateDocument( [TournamentCollection.collectionName, this.tournamentId,
+    this.firebaseFullService.updateDocument( [TournamentCollection.collectionName, this.tournamentId,
                                           PerformanceCollection.collectionName].join("/"), performanceRef.id, obj).then( ()=>{
       console.log("Performance release updated")
     },
@@ -208,6 +114,7 @@ export class ProgramListComponent implements OnDestroy{
   
 
   recalculateGrade(performanceRef:PerformanceReference){
+    /*
       let unsubscribe = this.firebaseFullService.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId
                                         , PerformanceCollection.collectionName, performanceRef.id
                                         , EvaluationGradeCollection.collectionName].join("/"),
@@ -232,7 +139,8 @@ export class ProgramListComponent implements OnDestroy{
             console.log("reading program as ended")
         }
     })
-    this.evaluation_unsubscribers.push(unsubscribe)                                        
+    this.evaluation_unsubscribers.push(unsubscribe)   
+    */                                     
   }  
 
   calculateAverage(evaluationGrades:Array<EvaluationGradeObj>):Number{
@@ -251,17 +159,5 @@ export class ProgramListComponent implements OnDestroy{
     return 0
   }
 
-  onReleaseProgram(isProgramReleased:boolean){
-    let obj:Tournament = {
-      isProgramReleased : isProgramReleased
-    }
-    this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-      console.log("Tournament released")
-      this.update()
-    },
-    reason =>{
-      alert("Error actualizando la liberacion")
-    })    
-  }
-  
+
 }

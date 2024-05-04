@@ -2,14 +2,13 @@
     <mat-icon>arrow_back</mat-icon>    
 </a>    
 
-@if(tournament){
+@if(tournament && evaluation){
     <h1>{{tournament.label}}</h1>
+    <h2>{{evaluation.label}}</h2>
     <mat-card [formGroup]="form">
         <mat-card-header>
             <mat-card-title>Nuevo aspecto</mat-card-title>
-            @if( evaluation ){
-                <mat-card-subtitle>{{evaluation.label}}</mat-card-subtitle>
-            }
+            <mat-card-subtitle>Que aspecto sera calificado en esta evaluacion</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
             <mat-form-field>    

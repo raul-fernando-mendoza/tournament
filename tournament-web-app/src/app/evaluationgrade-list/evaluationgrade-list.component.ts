@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../firebase.service';
 import { AspectGrade, EvaluationGradeCollection, EvaluationGradeObj, Juror, Performance, PerformanceCollection, PerformanceObj, TournamentCollection, TournamentObj  } from '../types';
@@ -28,7 +28,7 @@ interface EvaluationGradeReference{
   templateUrl: './evaluationgrade-list.component.html',
   styleUrl: './evaluationgrade-list.component.css'
 })
-export class EvaluationgradeListComponent implements OnInit, OnDestroy {
+export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
   
   @Input() tournamentId!:string
   @Input() tournament!:TournamentObj
@@ -39,6 +39,7 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
 
   unsubscribers:Array<Unsubscribe> = []
   isAdmin = false
+  jurors:Array<Juror> = []
 
   constructor(
     private firebaseService:FirebaseService,
@@ -47,39 +48,22 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
   ){
 
   }
+  ngAfterViewInit(): void {
+    if( this.tournament.creatorUid == this.auth.getUserUid() ){
+      this.isAdmin = true
+    }    
+    this.update()
+  }
   ngOnDestroy(): void {
     this.unsubscribers.map( unsubscribe =>{
       unsubscribe()
     })
   }
-  ngOnInit(): void {
-    this.update()
-  }
   update(){
-    if( this.tournament.creatorUid == this.auth.getUserUid() ){
-      this.isAdmin = true
-    }
-    let unsubscribe = this.firebaseFullService.onsnapShotDoc( [TournamentCollection.collectionName, this.tournamentId
-      , PerformanceCollection.collectionName].join("/"), this.performanceId, {
-        'next':(doc: DocumentSnapshot<DocumentData>) =>{
-            this.performance = doc.data() as PerformanceObj
-        },
-        'error':(reason) =>{
-          alert("there has been an error reading performances:" + reason)
-        },
-        'complete':() =>{
-          console.log("reading program as ended")
-      }
-    })
-    this.unsubscribers.push( unsubscribe )   
-    this.getEvaluationGrades()    
-  }
-
-  getEvaluationGrades(){
 
     let filter 
-    if( this.isAdmin ){
-      //use no filter
+    if( this.isAdmin == true ){
+      //no filter
     }
     else{ //force a filter
       let currentEmail:string = this.auth.getUserEmail()!
@@ -99,6 +83,7 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
               }
               this.evaluationGradesReferences.push(obj)
             })
+            this.getJurors()
           },
           'error':(reason) =>{
             alert("there has been an error reading performances:" + reason)
@@ -171,16 +156,18 @@ export class EvaluationgradeListComponent implements OnInit, OnDestroy {
     }
   }
   getJurors():Juror[]{
+    this.jurors.length = 0
    
     if( this.isAdmin ){
-      
-      return this.tournament.jurors.sort( (a,b)=>( a.label > b.label ? 1:-1))
+      let sortedJurors = this.tournament.jurors.sort( (a,b)=>( a.label > b.label ? 1:-1))
+      this.jurors.concat( sortedJurors)
     }
     else{
       let idx = this.tournament.jurors.findIndex( e => e.email == this.auth.getUserEmail())
       if( idx >=0 ){
         let jurorId = this.tournament.jurors[idx].id
-        return this.tournament.jurors.filter( j => j.id == jurorId )
+        let filtered = this.tournament.jurors.filter( j => j.id == jurorId )
+        filtered.concat(filtered)
       }      
     }
     return []
