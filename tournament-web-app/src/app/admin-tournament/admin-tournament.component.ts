@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule , Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Filter } from '../firebase.service';
@@ -67,7 +67,7 @@ interface PerformanceProgramReference{
   templateUrl: './admin-tournament.component.html',
   styleUrl: './admin-tournament.component.css'
 })
-export class AdminTournamentComponent implements OnInit, OnDestroy{
+export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewInit{
 
   tournamentId! :string 
   tournament:TournamentObj| null = null
@@ -106,7 +106,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
 
 
 
-  @ViewChild("tournamentTab", { static: false }) demo3Tab!: MatTabGroup;
+  @ViewChild("tournamentTab", {static: true}) demo3Tab!: MatTabGroup;
 
   route:string = ""
   constructor(
@@ -139,6 +139,9 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
 
       })      
 
+  }
+  ngAfterViewInit(): void {
+    //this.demo3Tab.selectedIndex = 0    
   }
   ngOnDestroy(): void {
     if( this.unsubscribe ){
@@ -367,35 +370,39 @@ export class AdminTournamentComponent implements OnInit, OnDestroy{
 
   updateProgramRef(){
     //loadProgramRef
-    this.programReferences.length = 0
-    if( this.performanceReferences.length ){
-      this.tournament?.program.forEach( performanceId =>{
-        let performanceRef = this.performanceReferences.find( p => p.id == performanceId )
-        let programRef:PerformanceProgramReference = {
-          id: performanceId,
-          performance: performanceRef!.performance,
-          isInProgram: true
-        }
-        this.programReferences.push(programRef)
-      })    
-    }
-
-    //load pending
-    this.pendingRequestReferences.length = 0
-    this.hasPendingRequests = false
-    this.performanceReferences.forEach( performanceRef =>{
-      let inProgram = this.tournament!.program.find( e => e == performanceRef.id)
-      if( performanceRef.performance.isCanceled == false && !inProgram){
-        let pendingRef:PerformanceProgramReference = {
-          id: performanceRef.id,
-          performance: performanceRef.performance,
-          isInProgram: false
-        }
-        this.pendingRequestReferences.push( pendingRef )
+    if( this.tournament ){
+      this.programReferences.length = 0
+      if( this.performanceReferences.length ){
+        this.tournament.program.forEach( performanceId =>{
+          let performanceRef = this.performanceReferences.find( p => p.id == performanceId )
+          let programRef:PerformanceProgramReference = {
+            id: performanceId,
+            performance: performanceRef!.performance,
+            isInProgram: true
+          }
+          this.programReferences.push(programRef)
+        })    
       }
-    })
-    this.hasPendingRequests = this.pendingRequestReferences.length > 0
-    this.demo3Tab.selectedIndex = 0    
+
+      //load pending
+      this.pendingRequestReferences.length = 0
+      this.hasPendingRequests = false
+      for( let i =0; i<this.performanceReferences.length; i++){
+        let performanceRef = this.performanceReferences[i]
+        let inProgram = this.tournament.program.find( e => e == performanceRef.id)
+        if( performanceRef.performance.isCanceled == false && !inProgram){
+          let pendingRef:PerformanceProgramReference = {
+            id: performanceRef.id,
+            performance: performanceRef.performance,
+            isInProgram: false
+          }
+          this.pendingRequestReferences.push( pendingRef )
+        }
+      }
+      this.hasPendingRequests = this.pendingRequestReferences.length > 0
+
+      
+    }  
   }
   isInProgram( id:string ):boolean{
     let idx = this.tournament!.program.findIndex( e => e == id)

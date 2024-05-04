@@ -160,14 +160,18 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
    
     if( this.isAdmin ){
       let sortedJurors = this.tournament.jurors.sort( (a,b)=>( a.label > b.label ? 1:-1))
-      this.jurors.concat( sortedJurors)
+      sortedJurors.forEach(
+        e=>{ this.jurors.push( e ) }
+      )
     }
     else{
       let idx = this.tournament.jurors.findIndex( e => e.email == this.auth.getUserEmail())
       if( idx >=0 ){
         let jurorId = this.tournament.jurors[idx].id
         let filtered = this.tournament.jurors.filter( j => j.id == jurorId )
-        filtered.concat(filtered)
+        filtered.forEach( e=>{
+          this.jurors.push(e)
+        })
       }      
     }
     return []

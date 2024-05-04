@@ -60,3 +60,16 @@ p{
 .evaluation-grade-list{
     border: 1px solid black;
 }
+.attention{
+    margin:5px;
+    background-color: lightyellow;
+}
+.performance-label{
+    margin-left: 5px;
+    vertical-align:auto;
+}
+
+.performance-fullname{
+    margin-left: 50px;
+    vertical-align:auto;
+}
