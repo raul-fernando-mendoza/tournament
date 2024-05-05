@@ -22,3 +22,24 @@ mat-card{
 .score{
     margin-right: 0.5em;
 }
+
+.released{
+    margin-left: 2em;
+    color:green;
+}
+.medal{
+    margin-top:auto;
+    margin-bottom:auto;
+    margin-left: 2em;   
+}
+.program{
+    margin-bottom: 5px;
+    border: 1px solid black;
+}
+.program-bar{
+    background-color: lightgray;
+}
+.program_number{
+    margin-top:auto;
+    margin-bottom:auto;
+}

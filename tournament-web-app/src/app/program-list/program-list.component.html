@@ -1,44 +1,58 @@
-
-
-
-<!--
+<h2>Programa</h2>
+@if( tournament.program.length > 0){
     @if( !tournament.isProgramReleased ){
         <button mat-button color="warn" (click)="onReleaseProgram(true)">Publicar Programa</button>
     }
     @else{
         <button mat-button color="warn" (click)="onReleaseProgram(false)">Ocultar Programa</button>
     }    
-
-        <mat-grid-list cols="5" rowHeight="2em" [style.background]="performanceColor">
-            <mat-grid-tile><span class="label">{{ performance.label }}</span></mat-grid-tile>
-            <mat-grid-tile><span class="fullname">{{ performance.fullname }}</span></mat-grid-tile>
-            <mat-grid-tile>
-                @if( isAdmin && p.performance.isReleased  ){
-                    <span class="score">score:{{ performance.grade }}</span>
-                }
-                @if( isAdmin && !p.performance.isReleased && p.performance.grade ){ 
-                    <span class="score">score:{{ performance.grade }}</span>
-                    <button mat-mini-fab color="accent" (click)="onRelease(p)"><mat-icon>done</mat-icon></button>
-                }                
-            </mat-grid-tile>
-            <mat-grid-tile>
-                @if( isAdmin || p.performance.isReleased  ){
-                    <span>{{ performance.medal }}</span>
-                }
-            </mat-grid-tile>    
-        </mat-grid-list>        
-        <mat-accordion>
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  Examenes
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-            <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance"></app-evaluationgrade-list>
-            </mat-expansion-panel>
-        </mat-accordion>        
-
-
 }
--->
 
+<mat-accordion>
+    @for(p of programRefs; track p;let idx = $index, e = $even){
+    <mat-expansion-panel [expanded]="false" hideToggle>
+        <mat-expansion-panel-header>
+        <mat-panel-title>
+            {{idx+1}}.-{{ p.performance.label }}
+        </mat-panel-title>
+        <mat-panel-description>
+            {{ p.performance.fullname }}
+
+            @if( p.noEvaluationsFound ){
+                <span class="attention">Por favor adicione examenes!</span>
+            }
+            @if( p.performance.isReleased == false && p.newGradeAvailable ){
+                <span class="attention">Nueva calificacion disponible!</span>
+            }       
+            @if( p.performance.isReleased == true  ){
+                <span class="released">Liberado:{{p.performance.grade}}</span>
+            }   
+            <span class="medal">{{ p.medal }}</span>
+            
+        </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="bar program-bar">
+            @if(isAdmin){
+            <button mat-icon-button (click)="onPerformanceUp(p.id)"><mat-icon>arrow_upward</mat-icon></button>
+            }
+            <span class="program_number">{{ idx + 1}}</span>
+            @if(isAdmin){
+                <button mat-icon-button (click)="onPerformanceDown(p.id)"><mat-icon>arrow_downward</mat-icon></button>
+            }
+            @if( isAdmin && p.performance.isReleased  ){
+                <span class="score">score:{{ p.performance.grade }}</span>
+            }
+            @if( isAdmin || p.performance.isReleased  ){
+                <span>{{ p.medal }}</span>
+            }
+
+            <span class="spacer"></span>
+            <button mat-icon-button color="warn" (click)="onReject(p.id)"><mat-icon>remove_circle</mat-icon></button>
+        </div>      
+        <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance" (noEvaluationsFound)="onNoEvaluationFound($event,p)" (newGradeAvailable)="onNewGradeAvailable($event,p)"></app-evaluationgrade-list> 
+    </mat-expansion-panel>
+    }
+    @empty{
+        <span class="attention">Usted necesita aceptar solicitudes de presentacion en el programa</span>
+    }
+</mat-accordion>

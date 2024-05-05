@@ -31,6 +31,7 @@ import {MatTabGroup, MatTabsModule} from '@angular/material/tabs';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { urlbase } from '../../environments/environment';
 import { TournamentEditPodiumComponent } from '../podium/tournament-edit-podium.component';
+import { ProgramListComponent } from '../program-list/program-list.component';
 
 interface ProgramRef{
   id:string
@@ -67,6 +68,7 @@ interface ProgramRef{
   ,MatTabsModule
   ,MatProgressSpinnerModule
   ,TournamentEditPodiumComponent
+  ,ProgramListComponent
   ],
   templateUrl: './admin-tournament.component.html',
   styleUrl: './admin-tournament.component.css'
@@ -258,14 +260,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
       alert("Error onDelte:" + reason)
     })
   }
-  getFilter():Array<Filter>{
-    let filter:Filter = {
-      field: 'email',
-      operator: '==',
-      value: this.auth.getUserEmail()
-    }
-    return [filter]
-  }
 
   onAccept( id:string ){
     this.firebase.unionArrayElementDoc( TournamentCollection.collectionName + "/" + this.tournamentId, "program", id).then( ()=>{
@@ -364,75 +358,8 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
         return urlbase + '/tournament/' + this.tournamentId;
 
   }  
+   
 
-  onPerformanceUp(performanceId:string){
-    if( this.tournament ){
-      let idx = this.tournament.program.findIndex( e => e == performanceId)
-      if( idx > 0){
-        this.tournament.program.splice( idx, 1)
-        this.tournament.program.splice( idx - 1, 0, performanceId)
-        let obj:Tournament = {
-          program:this.tournament.program
-        }
-        this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-          console.log("program updated")
-        },
-        reason =>{
-          alert("Error moviendo performance arriba" + reason)
-        })
-      }
-    }
-  }
-  onPerformanceDown(performanceId:string){
-    if( this.tournament ){
-      let idx = this.tournament.program.findIndex( e => e == performanceId)
-      if( idx < (this.tournament.program.length - 1)){
-        this.tournament.program.splice( idx, 1)
-        this.tournament.program.splice( idx + 1, 0, performanceId)
-        let obj:Tournament = {
-          program:this.tournament.program
-        }
-        this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-          console.log("program updated")
-        },
-        reason =>{
-          alert("Error moviendo performance abajo" + reason)
-        })
-      }
-    }
-  }
 
-  onReject( id:string ){
-    this.firebase.removeArrayElementDoc( TournamentCollection.collectionName + "/" + this.tournamentId, "program", id).then( ()=>{
-      console.log("update programa")
-    },
-    reason =>{
-      alert("Error updating programa:" + reason)
-    }) 
-  }  
-    
-  onReleaseProgram(isProgramReleased:boolean){
-    let obj:Tournament = {
-      isProgramReleased : isProgramReleased
-    }
-    this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-      console.log("Tournament released")
-    },
-    reason =>{
-      alert("Error actualizando la liberacion")
-    })    
-  }
-
-  onNoEvaluationFound(noEvaluationFound:boolean, p:ProgramRef){
-    if( p.noEvaluationsFound != noEvaluationFound ){
-      p.noEvaluationsFound = noEvaluationFound
-    }
-  }
-
-  onNewGradeAvailable(newGradeAvailable:boolean, p:ProgramRef){
-    if( p.newGradeAvailable != newGradeAvailable ){
-      p.newGradeAvailable = newGradeAvailable
-    }
-  }
  
 }

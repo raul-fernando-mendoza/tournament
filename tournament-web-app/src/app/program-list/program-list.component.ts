@@ -15,16 +15,13 @@ import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluation
 import { AuthService } from '../auth.service';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { Filter, FirebaseFullService } from '../firebasefull.service';
+import { BusinesslogicService } from '../businesslogic.service';
 
-interface EvaluationRef{
-  id:string
-  evaluation:EvaluationGradeObj
-}
-
-interface PerformanceRef{
+interface ProgramRef{
   id:string
   performance:PerformanceObj
-  evaluations:Array<EvaluationRef>
+  noEvaluationsFound:boolean
+  newGradeAvailable:boolean
   medal:string
 }
 
@@ -37,10 +34,6 @@ interface PerformanceRef{
     CommonModule
     ,MatIconModule
     ,MatButtonModule      
-    ,FormsModule
-    ,ReactiveFormsModule
-    ,MatFormFieldModule
-    ,MatInputModule
     ,RouterModule
     ,MatGridListModule
     ,EvaluationgradeListComponent
@@ -53,20 +46,16 @@ interface PerformanceRef{
 export class ProgramListComponent implements AfterViewInit, OnDestroy{
   @Input() tournamentId!:string
   @Input() tournament!:TournamentObj
-  @Input() performanceReferences!:Array<PerformanceReference>
 
-  performanceColor = 'lightblue'
   isAdmin = false
 
   unsubscribePerformances:Unsubscribe | undefined = undefined
 
-  programReferences:Array<PerformanceRef> = []  
-
-
+  programRefs:Array<ProgramRef> = []  
 
   constructor(private firebase:FirebaseFullService
     ,private auth:AuthService  
-    
+    ,private business:BusinesslogicService
   ){
 
   }
@@ -86,105 +75,101 @@ export class ProgramListComponent implements AfterViewInit, OnDestroy{
     if( this.tournament.creatorUid == this.auth.getUserUid() ){
       this.isAdmin = true
     }
-    for( let i=0; i<this.performanceReferences.length; i++){
-      let p = this.performanceReferences[0]
-      let programRef:PerformanceRef={
-        id: p.id,
-        performance: p.performance,
-        evaluations:[],
-        medal: ''
-      }
-      this.firebase.onsnapShotCollection([TournamentCollection.collectionName,this.tournamentId,
-      PerformanceCollection.collectionName, p.id,
-      EvaluationGradeCollection.collectionName].join("/"),{
-        'next': (set) =>{
-          set.forEach( doc =>{
-            let evaluation = doc.data() as EvaluationGradeObj
-            let evaluacionRef:EvaluationRef = {
-              id: doc.id,
-              evaluation: evaluation
-            }
-            programRef.evaluations.push( evaluacionRef )
-            
-          })
-        },
-        'error': (reason) =>{
-          alert("Error readind evaluation collection")
-        }
-      })
-      this.programReferences.push( programRef )
-    }
+    this.readPerformances()
   }
 
-  getMedalForPerformance(grade:number):string{
-    console.log("calculating medasl for:" + grade)
-    for( let i = 0; i < this.tournament.medals.length; i++){
-      if( grade >= this.tournament.medals[i].minGrade ){
-        return this.tournament.medals[i].label  
+  readPerformances(){
+    let filter:Array<Filter> = []
+    if( this.unsubscribePerformances ){
+      this.unsubscribePerformances()
+    }  
+    this.unsubscribePerformances = this.firebase.onsnapShotCollection(
+      [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") 
+      ,{
+        'next': (set)=>{
+          this.programRefs.length = 0
+          set.docs.map( doc =>{
+            let performance = doc.data() as PerformanceObj
+            //check if the performance is in the program
+            let idx = this.tournament!.program.findIndex( e => e == doc.id )
+            if( idx >= 0 ){
+              let pr:ProgramRef = {
+                id: doc.id,
+                performance: performance,
+                noEvaluationsFound: false,
+                medal: this.business.getMedalForPerformance(this.tournament!, performance.grade),
+                newGradeAvailable: false
+              }
+              this.programRefs[idx] = pr 
+            }
+          })
+      }  
+    })
+  }
+  onNewGradeAvailable(newGradeAvailable:boolean, p:ProgramRef){
+    if( p.newGradeAvailable != newGradeAvailable ){
+      p.newGradeAvailable = newGradeAvailable
+    }
+  }
+  onNoEvaluationFound(noEvaluationFound:boolean, p:ProgramRef){
+    if( p.noEvaluationsFound != noEvaluationFound ){
+      p.noEvaluationsFound = noEvaluationFound
+    }
+  }
+  onReject( id:string ){
+    this.firebase.removeArrayElementDoc( TournamentCollection.collectionName + "/" + this.tournamentId, "program", id).then( ()=>{
+      console.log("update programa")
+    },
+    reason =>{
+      alert("Error updating programa:" + reason)
+    }) 
+  }  
+  onPerformanceUp(performanceId:string){
+    if( this.tournament ){
+      let idx = this.tournament.program.findIndex( e => e == performanceId)
+      if( idx > 0){
+        this.tournament.program.splice( idx, 1)
+        this.tournament.program.splice( idx - 1, 0, performanceId)
+        let obj:Tournament = {
+          program:this.tournament.program
+        }
+        this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+          console.log("program updated")
+        },
+        reason =>{
+          alert("Error moviendo performance arriba" + reason)
+        })
       }
     }
-    return ""
-  } 
-  onRelease(id:string, grade:number){
-    let obj:Performance = {
-      grade:grade,
-      isReleased:true
+  }
+  onPerformanceDown(performanceId:string){
+    if( this.tournament ){
+      let idx = this.tournament.program.findIndex( e => e == performanceId)
+      if( idx < (this.tournament.program.length - 1)){
+        this.tournament.program.splice( idx, 1)
+        this.tournament.program.splice( idx + 1, 0, performanceId)
+        let obj:Tournament = {
+          program:this.tournament.program
+        }
+        this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+          console.log("program updated")
+        },
+        reason =>{
+          alert("Error moviendo performance abajo" + reason)
+        })
+      }
     }
-    this.firebase.updateDocument( [TournamentCollection.collectionName, this.tournamentId,
-                                          PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{
-      console.log("Performance release updated")
+  }
+  onReleaseProgram(isProgramReleased:boolean){
+    let obj:Tournament = {
+      isProgramReleased : isProgramReleased
+    }
+    this.firebase.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+      console.log("Tournament released")
     },
     reason =>{
       alert("Error actualizando la liberacion")
-    })
-  }   
-  
-
-  recalculateGrade(performanceRef:PerformanceReference){
-    /*
-      let unsubscribe = this.firebaseFullService.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId
-                                        , PerformanceCollection.collectionName, performanceRef.id
-                                        , EvaluationGradeCollection.collectionName].join("/"),
-        {
-          'next':(snapshot: QuerySnapshot<DocumentData>) =>{
-            let evaluationGrades:Array<EvaluationGradeObj> = []
-            snapshot.docs.map( doc =>{
-              let evaluationGrade = doc.data() as EvaluationGradeObj
-              evaluationGrades.push( evaluationGrade ) 
-            })
-            let average = Number( this.calculateAverage( evaluationGrades ).toFixed(1) )
-            if( performanceRef.performance.grade != average ){
-              performanceRef.performance.isReleased = false
-            }
-            performanceRef.performance.grade = average
-            performanceRef.medal = this.getMedalForPerformance(performanceRef.performance.grade)
-          },
-          'error':(reason) =>{
-            alert("there has been an error reading performances:" + reason)
-          },
-          'complete':() =>{
-            console.log("reading program as ended")
-        }
-    })
-    this.evaluation_unsubscribers.push(unsubscribe)   
-    */                                     
-  }  
-
-  calculateAverage(evaluationGrades:Array<EvaluationGradeObj>):Number{
-    let total = 0
-    let cnt = 0
-    evaluationGrades.map( evaluationGrade =>{
-      if( evaluationGrade.isCompleted ){
-        total += evaluationGrade.grade
-        cnt += 1
-      }
-    })
-    if( cnt > 0 ){
-      let newGrade = Number((total/cnt).toFixed(1))
-      return newGrade
-    }
-    return 0
+    })    
   }
-
-
+      
 }

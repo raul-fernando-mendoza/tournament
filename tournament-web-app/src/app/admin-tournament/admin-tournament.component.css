@@ -73,27 +73,3 @@ p{
     margin-left: 50px;
     vertical-align:auto;
 }
-.program{
-    margin-bottom: 5px;
-    border: 1px solid black;
-}
-.program-bar{
-    background-color: lightgray;
-}
-.program_number{
-    margin-top:auto;
-    margin-bottom:auto;
-}
-.bar span{
-    margin-top:auto;
-    margin-bottom:auto;
-}
-.released{
-    margin-left: 2em;
-    color:green;
-}
-.medal{
-    margin-top:auto;
-    margin-bottom:auto;
-    margin-left: 2em;   
-}

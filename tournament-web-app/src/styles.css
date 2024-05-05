@@ -9,6 +9,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .spacer{
     flex:1 1 0;
 }
+.bar span{
+    margin-top:auto;
+    margin-bottom:auto;
+}
 .id{
     font-size: x-small; 
     margin-right: 10px;
