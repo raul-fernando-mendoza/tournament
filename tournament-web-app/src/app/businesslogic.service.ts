@@ -45,6 +45,13 @@ export class BusinesslogicService {
     return isSetupCompleted
   }
 
-  
+  getMedalForPerformance(tournament:TournamentObj, grade:number):string{
+    for( let i = 0; i < tournament.medals.length; i++){
+      if( grade >= tournament.medals[i].minGrade ){
+        return tournament.medals[i].label
+      }
+    }
+    return ""
+  }    
 
 }

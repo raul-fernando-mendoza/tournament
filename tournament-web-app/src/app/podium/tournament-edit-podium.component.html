@@ -1,0 +1,17 @@
+<h2>Podium</h2>
+
+<mat-grid-list cols="5" rowHeight="2em">
+    <mat-grid-tile [style.background]="'lightblue'">lugar</mat-grid-tile>
+    <mat-grid-tile [style.background]="'lightblue'">Performance</mat-grid-tile>
+    <mat-grid-tile [style.background]="'lightblue'">Bailarin</mat-grid-tile>
+    <mat-grid-tile [style.background]="'lightblue'">Calificacion</mat-grid-tile>
+    <mat-grid-tile [style.background]="'lightblue'">Premio</mat-grid-tile>
+
+    @for( p of programRefs; track p.id; let idx = $index){
+    <mat-grid-tile>{{ idx + 1}}</mat-grid-tile>
+    <mat-grid-tile>{{ p.performance.label }}</mat-grid-tile>
+    <mat-grid-tile>{{ p.performance.fullname }}</mat-grid-tile>
+    <mat-grid-tile>{{ p.performance.grade }}</mat-grid-tile>
+    <mat-grid-tile>{{ p.medal }}</mat-grid-tile>
+    }
+</mat-grid-list>

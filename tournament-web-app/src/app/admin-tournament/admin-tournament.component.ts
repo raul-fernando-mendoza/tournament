@@ -24,12 +24,13 @@ import { QuillModule } from 'ngx-quill'
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatListModule} from '@angular/material/list';
 import { FirebaseFullService } from '../firebasefull.service';
-import { DocumentData, QuerySnapshot } from '@firebase/firestore';
+import { DocumentData } from '@firebase/firestore';
 import { DocumentSnapshot, FirestoreError, Unsubscribe } from 'firebase/firestore';
 import { DateFormatService } from '../date-format.service';
 import {MatTabGroup, MatTabsModule} from '@angular/material/tabs';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { urlbase } from '../../environments/environment';
+import { TournamentEditPodiumComponent } from '../podium/tournament-edit-podium.component';
 
 interface ProgramRef{
   id:string
@@ -65,6 +66,7 @@ interface ProgramRef{
   ,MatListModule
   ,MatTabsModule
   ,MatProgressSpinnerModule
+  ,TournamentEditPodiumComponent
   ],
   templateUrl: './admin-tournament.component.html',
   styleUrl: './admin-tournament.component.css'
@@ -103,14 +105,14 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
 
   constructor(
      private activatedRoute: ActivatedRoute
-    ,public firebase:FirebaseFullService 
+    ,private firebase:FirebaseFullService 
     ,private fb:FormBuilder
-    ,public auth:AuthService
+    ,private auth:AuthService
     ,private router: Router
-    ,public pathService:PathService
-    ,public businesslogic:BusinesslogicService
-    ,public dateSrv:DateFormatService
-    ,location: Location){
+    ,private pathService:PathService
+    ,private business:BusinesslogicService
+    ,private dateSrv:DateFormatService
+    ,private location: Location){
 
     var thiz = this
 
@@ -138,7 +140,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   ngOnInit(): void {
-    this.activePanel = this.businesslogic.getStoredItem("activePanel")
+    this.activePanel = this.business.getStoredItem("activePanel")
   }
 
   update(){
@@ -203,7 +205,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
                 id: doc.id,
                 performance: performance,
                 noEvaluationsFound: false,
-                medal: '',
+                medal: this.business.getMedalForPerformance(this.tournament!, performance.grade),
                 newGradeAvailable: false
               }
               this.programRefs[idx] = pr 
@@ -354,7 +356,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
 
   onPanelActivated(activePanel:string){
     this.activePanel = activePanel 
-    this.businesslogic.setStoredItem("activePanel", activePanel)
+    this.business.setStoredItem("activePanel", activePanel)
   }
 
   getTournamentPath():string{

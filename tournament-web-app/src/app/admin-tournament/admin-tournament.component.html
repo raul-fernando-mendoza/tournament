@@ -73,7 +73,9 @@
                             }       
                             @if( p.performance.isReleased == true  ){
                                 <span class="released">Liberado:{{p.performance.grade}}</span>
-                            }                                                   
+                            }   
+                            <span class="medal">{{ p.medal }}</span>
+                            
                         </mat-panel-description>
                         </mat-expansion-panel-header>
                         <div class="bar program-bar">
@@ -106,161 +108,159 @@
             </div>
                   
         </mat-tab>
-        <mat-tab label="Info">
-            <form [formGroup]="form">
-                <mat-card>
-                    <mat-card-content>
-                        <mat-grid-list cols="5" rowHeight="5em">
-                            <mat-grid-tile colspan="3">
-                                <mat-form-field class="name-input">
-                                    <mat-label>Nombre del evento</mat-label>
-                                    <input matInput placeholder="" formControlName="label" (change)="onNameChange($event)">
-                                </mat-form-field>                </mat-grid-tile>
-                            <mat-grid-tile colspan="2" rowspan="5">
-                                <app-image-loader [fullpath]="tournament.imagePath" [basepath]="getBasePath()" [url]="tournament.imageUrl" (onload)="fileLoaded($event)" (ondelete)="fileDeleted($event)"></app-image-loader>
-                            </mat-grid-tile>
-                            <mat-grid-tile colspan="3">
-                                <mat-form-field color="accent" appearance="fill">
-                                    <mat-label>Fecha del evento</mat-label>
-                                    <input matInput [matDatepicker]="picker1" formControlName="eventDate"  (change)="onChange($event, tournamentId,'eventDate')">
-                                    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker1></mat-datepicker>
-                                </mat-form-field>
-                            </mat-grid-tile>
-                            <mat-grid-tile colspan="3">
-                                <mat-form-field color="accent" appearance="fill">
-                                    <mat-label>Hora del evento</mat-label>            
-                                    <input matInput formControlName="eventTime" [format]="24" [ngxTimepicker]="picker" (change)="onChange($event,tournamentId,'eventTime')">
-                                    <ngx-material-timepicker #picker></ngx-material-timepicker> 
-                                </mat-form-field> 
-                            </mat-grid-tile>
-                        </mat-grid-list>
-                    
-                    </mat-card-content>   
-                </mat-card>    
-            </form>            
+        <mat-tab label="podium">
+            <app-tournament-edit-podium [tournamentId]="tournamentId" [tournament]="tournament"></app-tournament-edit-podium>
         </mat-tab>
-        <mat-tab label="Categorias"> 
-            @if( tournament.categories.length > 0){  
-            <a [routerLink]="['categoryNew']">
-                <button mat-button-icon><mat-icon>add</mat-icon></button>
-            </a>       
-            }
-            <mat-list>
-                @for( category of tournament.categories; track category){
-                    <mat-list-item>
-                        <a [routerLink]="['category',category.id]">
-                            <button mat-button>{{category.label}}</button>
-                        </a>                                 
-                    </mat-list-item>
-                }
-                @empty{
-                    <p>Usted necesita por lo menos una categoria; por favor adicione una</p>
-                    <a [routerLink]="['categoryNew']">
-                        <button mat-button-icon><mat-icon>add</mat-icon></button>
-                    </a>       
-                }
-            </mat-list>                  
-        </mat-tab>  
-        <mat-tab label="Evaluaciones">
-            @if( tournament.evaluations.length > 0){     
-            <a [routerLink]="['evaluationNew']">
-                <button mat-button-icon><mat-icon>add</mat-icon></button>
-            </a> 
-            }   
-            <mat-list>
-                @for( evaluation of tournament.evaluations; track evaluation){
-                    <mat-list-item>
-                        <a [routerLink]="['evaluation',evaluation.id]">
-                            <button mat-button>{{evaluation.label}}</button>
-                        </a>                                 
-                    </mat-list-item>    
-                } 
-                @empty{
-                    <p>Usted necesita por lo menos una evaluacion; por favor adicione una</p>
-                    <a [routerLink]="['evaluationNew']">
-                        <button mat-button-icon><mat-icon>add</mat-icon></button>
-                    </a>       
-                }                    
-            </mat-list>
-        </mat-tab>
-        <mat-tab label="jurados">
-            @if( tournament.jurors.length ){
-            <a [routerLink]="['jurorNew']">
-                <button mat-button-icon><mat-icon>add</mat-icon></button>
-            </a>                   
-            }
-            <mat-list>
-            @for( j of tournament.jurors; track j){
-                <a [routerLink]="['juror',j.id]">
-                    <mat-list-item>{{j.label}}</mat-list-item>
-                </a>
-            }
-            @empty{
-                <p>Usted necesita por lo menos un jurado; por favor adicione uno</p>
-                <a [routerLink]="['jurorNew']">
-                    <button mat-button-icon><mat-icon>add</mat-icon></button>
-                </a>       
-            }                
-            </mat-list>  
-         </mat-tab>
-            <mat-tab label="Premiacion">
-                <mat-list>
-                    @if( tournament.medals.length ){
-                    <a [routerLink]="['medalNew']">
-                        <button mat-button-icon><mat-icon>add</mat-icon></button>
-                    </a>                   
-                    }
-                    @for( m of tournament.medals; track m){
-                        <a [routerLink]="['medal',m.id]">
-                            <mat-list-item>{{m.label}}</mat-list-item>
-                        </a>
-                    }
-                    @empty{
-                        <p>Usted necesita por lo menos un premio; por favor adicione uno</p>
-                        <a [routerLink]="['medalNew']">
+        <mat-tab label="Editar">
+            <mat-accordion>
+                <mat-expansion-panel hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      General
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <form [formGroup]="form">
+                    <mat-card>
+                        <mat-card-content>
+                            <mat-grid-list cols="5" rowHeight="5em">
+                                <mat-grid-tile colspan="3">
+                                    <mat-form-field class="name-input">
+                                        <mat-label>Nombre del evento</mat-label>
+                                        <input matInput placeholder="" formControlName="label" (change)="onNameChange($event)">
+                                    </mat-form-field>                </mat-grid-tile>
+                                <mat-grid-tile colspan="2" rowspan="5">
+                                    <app-image-loader [fullpath]="tournament.imagePath" [basepath]="getBasePath()" [url]="tournament.imageUrl" (onload)="fileLoaded($event)" (ondelete)="fileDeleted($event)"></app-image-loader>
+                                </mat-grid-tile>
+                                <mat-grid-tile colspan="3">
+                                    <mat-form-field color="accent" appearance="fill">
+                                        <mat-label>Fecha del evento</mat-label>
+                                        <input matInput [matDatepicker]="picker1" formControlName="eventDate"  (change)="onChange($event, tournamentId,'eventDate')">
+                                        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                                        <mat-datepicker #picker1></mat-datepicker>
+                                    </mat-form-field>
+                                </mat-grid-tile>
+                                <mat-grid-tile colspan="3">
+                                    <mat-form-field color="accent" appearance="fill">
+                                        <mat-label>Hora del evento</mat-label>            
+                                        <input matInput formControlName="eventTime" [format]="24" [ngxTimepicker]="picker" (change)="onChange($event,tournamentId,'eventTime')">
+                                        <ngx-material-timepicker #picker></ngx-material-timepicker> 
+                                    </mat-form-field> 
+                                </mat-grid-tile>
+                            </mat-grid-list>
+                        
+                        </mat-card-content>   
+                    </mat-card>    
+                </form>            
+
+                </mat-expansion-panel>
+                <mat-expansion-panel hideToggle>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        Categorias
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    @if( tournament.categories.length > 0){  
+                        <a [routerLink]="['categoryNew']">
                             <button mat-button-icon><mat-icon>add</mat-icon></button>
                         </a>       
-                    }                
-                </mat-list>  
-            </mat-tab>    
-    </mat-tab-group>
+                        }
+                        <mat-list>
+                            @for( category of tournament.categories; track category){
+                                <mat-list-item>
+                                    <a [routerLink]="['category',category.id]">
+                                        <button mat-button>{{category.label}}</button>
+                                    </a>                                 
+                                </mat-list-item>
+                            }
+                            @empty{
+                                <p>Usted necesita por lo menos una categoria; por favor adicione una</p>
+                                <a [routerLink]="['categoryNew']">
+                                    <button mat-button-icon><mat-icon>add</mat-icon></button>
+                                </a>       
+                            }
+                        </mat-list>                  
+                      </mat-expansion-panel>
+                  <mat-expansion-panel hideToggle>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        Evaluaciones
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    @if( tournament.evaluations.length > 0){     
+                        <a [routerLink]="['evaluationNew']">
+                            <button mat-button-icon><mat-icon>add</mat-icon></button>
+                        </a> 
+                        }   
+                        <mat-list>
+                            @for( evaluation of tournament.evaluations; track evaluation){
+                                <mat-list-item>
+                                    <a [routerLink]="['evaluation',evaluation.id]">
+                                        <button mat-button>{{evaluation.label}}</button>
+                                    </a>                                 
+                                </mat-list-item>    
+                            } 
+                            @empty{
+                                <p>Usted necesita por lo menos una evaluacion; por favor adicione una</p>
+                                <a [routerLink]="['evaluationNew']">
+                                    <button mat-button-icon><mat-icon>add</mat-icon></button>
+                                </a>       
+                            }                    
+                        </mat-list>
+                      </mat-expansion-panel>
+                  <mat-expansion-panel hideToggle>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        Jurados
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    @if( tournament.jurors.length ){
+                        <a [routerLink]="['jurorNew']">
+                            <button mat-button-icon><mat-icon>add</mat-icon></button>
+                        </a>                   
+                        }
+                        <mat-list>
+                        @for( j of tournament.jurors; track j){
+                            <a [routerLink]="['juror',j.id]">
+                                <mat-list-item>{{j.label}}</mat-list-item>
+                            </a>
+                        }
+                        @empty{
+                            <p>Usted necesita por lo menos un jurado; por favor adicione uno</p>
+                            <a [routerLink]="['jurorNew']">
+                                <button mat-button-icon><mat-icon>add</mat-icon></button>
+                            </a>       
+                        }                
+                        </mat-list>  
+                  </mat-expansion-panel>
+                  <mat-expansion-panel hideToggle>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        Premios
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <mat-list>
+                        @if( tournament.medals.length ){
+                        <a [routerLink]="['medalNew']">
+                            <button mat-button-icon><mat-icon>add</mat-icon></button>
+                        </a>                   
+                        }
+                        @for( m of tournament.medals; track m){
+                            <a [routerLink]="['medal',m.id]">
+                                <mat-list-item>{{m.label}}</mat-list-item>
+                            </a>
+                        }
+                        @empty{
+                            <p>Usted necesita por lo menos un premio; por favor adicione uno</p>
+                            <a [routerLink]="['medalNew']">
+                                <button mat-button-icon><mat-icon>add</mat-icon></button>
+                            </a>       
+                        }                
+                    </mat-list>  
+              </mat-expansion-panel>                                                                      
+            </mat-accordion>                
+        </mat-tab>    
+    </mat-tab-group>        
     <mat-divider></mat-divider>
-
-
-<!--
-                <mat-grid-tile colspan="8" style.background="blue">
-                    <mat-accordion>
-                        <mat-expansion-panel hideToggle>
-                          <mat-expansion-panel-header>
-                            <mat-panel-title>
-                                {{ p.performance.label }}
-                            </mat-panel-title>
-                            <mat-panel-description>
-                                {{ p.performance.fullname }}
-                            </mat-panel-description>
-                          </mat-expansion-panel-header>
-                          <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance"></app-evaluationgrade-list> 
-                         <p>Hola</p>
-                        </mat-expansion-panel>
-                    </mat-accordion>
-                    
-                    <p>hola</p>                        
-                </mat-grid-tile>
-                
-
-                 
-            </mat-grid-list>        
-        } 
-        @empty{
-            Por favor adicione performances al programa desde la lista de performances 
-        }
-    -->
-    
-     
-    <mat-divider></mat-divider>
-
-
 }     
 @else{
     <mat-spinner></mat-spinner>

@@ -5,7 +5,6 @@ import { TournamentSearchComponent } from './tournament-search/tournament-search
 import { EvaluationGradeComponent } from './evaluationgrade/evaluationgrade-component';
 import { MedalsListComponent } from './medals-list/medals-list.component';
 import { ProgramListComponent } from './program-list/program-list.component';
-import { PodiumListComponent } from './podium-list/podium-list.component';
 import { WelcomeJurorComponent } from './welcome-juror/welcome-juror.component';
 import { AuthService } from './auth.service';
 import { inject } from '@angular/core';
@@ -93,7 +92,7 @@ export const routes: Routes = [
 
 
     { path:"tournamentAdmin/:tournamentId/program",pathMatch:'full',component:ProgramListComponent},
-    { path:"tournamentAdmin/:tournamentId/podium",pathMatch:'full',component:PodiumListComponent},
+    //{ path:"tournamentAdmin/:tournamentId/podium",pathMatch:'full',component:PodiumListComponent},
     { path:"tournamentAdmin/:tournamentId/performanceEdit/:performanceId",pathMatch:'full',component:PerformanceEditComponent},
 
     { path:"tournamentAdmin/:tournamentId/performance/:performanceId/evaluationGrade/:evaluationGradeId",pathMatch:'full',component:EvaluationGradeComponent},
