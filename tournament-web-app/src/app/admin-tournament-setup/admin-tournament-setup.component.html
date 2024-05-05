@@ -132,7 +132,7 @@
             }               
         </mat-step>  
         <mat-step [stepControl]="firstMedal" errorMessage="un premio es requerido.">
-            <ng-template matStepLabel>Premiacion</ng-template>
+            <ng-template matStepLabel>Premios</ng-template>
             @if( tournamentId && tournament ){
                 <mat-list>
                     @if( tournament.medals.length ){
