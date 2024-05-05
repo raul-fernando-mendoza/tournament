@@ -77,3 +77,10 @@ p{
     margin-bottom: 5px;
     border: 1px solid black;
 }
+.program-bar{
+    background-color: lightgray;
+}
+.program_number{
+    margin-top:auto;
+    margin-bottom:auto;
+}

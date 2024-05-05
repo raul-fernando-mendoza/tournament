@@ -1,4 +1,11 @@
-<p>Examenes</p>
+<div class="bar">
+    <span>Examenes</span>
+    
+    @if( this.performance.isReleased == false && isNewGradeAvailable ){
+        <span>Nueva Calificacion :{{ newGrade }}</span>
+        <button mat-raised-button color="primary" (click)="onRelease()">Liberar Calificacion</button>
+    }
+</div>
 @if( tournament && performance ){
     @for( e of tournament.evaluations; track e; ){
         @for(j of jurors;track j;){

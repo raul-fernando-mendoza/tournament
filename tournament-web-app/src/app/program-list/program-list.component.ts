@@ -125,13 +125,13 @@ export class ProgramListComponent implements AfterViewInit, OnDestroy{
     }
     return ""
   } 
-  onRelease(performanceRef:PerformanceReference){
+  onRelease(id:string, grade:number){
     let obj:Performance = {
-      grade:performanceRef.performance.grade,
+      grade:grade,
       isReleased:true
     }
     this.firebase.updateDocument( [TournamentCollection.collectionName, this.tournamentId,
-                                          PerformanceCollection.collectionName].join("/"), performanceRef.id, obj).then( ()=>{
+                                          PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{
       console.log("Performance release updated")
     },
     reason =>{

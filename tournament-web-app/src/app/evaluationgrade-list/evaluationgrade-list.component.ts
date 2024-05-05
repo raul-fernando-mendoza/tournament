@@ -41,11 +41,13 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
   isAdmin = false
   jurors:Array<Juror> = []
 
+  newGrade = 0.0
+  isNewGradeAvailable = false
+
   unsubscribeEvaluationGrade:Unsubscribe | undefined = undefined
 
   constructor(
-    private firebaseService:FirebaseService,
-    private firebaseFullService:FirebaseFullService,
+    private firebase:FirebaseFullService,
     private auth:AuthService
   ){
 
@@ -74,12 +76,16 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
       let currentEmail:string = this.auth.getUserEmail()!
       filter = where("jurorId", "==", currentEmail)
     }     
-    this.unsubscribeEvaluationGrade = this.firebaseFullService.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId
+    this.unsubscribeEvaluationGrade = this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId
                                       , PerformanceCollection.collectionName, this.performanceId
                                       , EvaluationGradeCollection.collectionName].join("/"),
       {
         'next':(snapshot: QuerySnapshot<DocumentData>) =>{
           this.evaluationGradesReferences.length = 0
+
+          this.isNewGradeAvailable = false
+          let sumGrade = 0
+          let numGrades = 0
           snapshot.docs.map( doc =>{
             let evaluationGrade = doc.data() as EvaluationGradeObj
             let obj:EvaluationGradeReference = {
@@ -87,12 +93,22 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
               evaluationGrade:evaluationGrade
             }
             this.evaluationGradesReferences.push(obj)
+            if( evaluationGrade.isCompleted ){
+              sumGrade += evaluationGrade.grade
+              numGrades += 1
+            }
           })
           if( this.evaluationGradesReferences.length == 0){
             this.noEvaluationsFound.emit( true )
           }
           else{
             this.noEvaluationsFound.emit( false )
+          }
+          if( numGrades > 0 ){
+            this.newGrade = Number( (sumGrade / numGrades).toFixed(2) )
+            if( this.performance.grade != this.newGrade ){
+              this.isNewGradeAvailable = true
+            }
           }
           this.getJurors()
         },
@@ -137,7 +153,7 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
     })
 
     let newId = uuidv4()
-    this.firebaseService.setDocument([TournamentCollection.collectionName,this.tournamentId
+    this.firebase.setDocument([TournamentCollection.collectionName,this.tournamentId
                                       ,PerformanceCollection.collectionName,this.performanceId
                                       ,EvaluationGradeCollection.collectionName].join("/"), newId, evaluationGrade).then( ()=>{
       console.log( "evaluation has been created")
@@ -154,7 +170,7 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
     })
       
     if( idx >= 0){
-      this.firebaseService.deleteDocument( [TournamentCollection.collectionName,this.tournamentId
+      this.firebase.deleteDocument( [TournamentCollection.collectionName,this.tournamentId
         ,PerformanceCollection.collectionName,this.performanceId
         ,EvaluationGradeCollection.collectionName].join("/"), this.evaluationGradesReferences[idx].id ).then( ()=>{
         console.log("evaluationGrade has been deleted")
@@ -185,4 +201,21 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
     }
     return []
   }
+  onRelease(){
+    if( !confirm("La calificacion :" +  this.newGrade + " ya no podra ser modificada. Desea continuar.") ){
+      return
+    }         
+    let obj:Performance = {
+      grade:this.newGrade,
+      isReleased:true
+    }
+    this.firebase.updateDocument( [TournamentCollection.collectionName, this.tournamentId,
+                                          PerformanceCollection.collectionName].join("/"), this.performanceId, obj).then( ()=>{
+      console.log("Performance release updated")
+      this.isNewGradeAvailable = false
+    },
+    reason =>{
+      alert("Error actualizando la liberacion")
+    })
+  }    
 }

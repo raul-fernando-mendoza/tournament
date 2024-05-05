@@ -418,17 +418,5 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
       alert("Error actualizando la liberacion")
     })    
   }
-  onRelease(id:string, performance:Performance){
-    let obj:Performance = {
-      grade:performance.grade,
-      isReleased:true
-    }
-    this.firebase.updateDocument( [TournamentCollection.collectionName, this.tournamentId,
-                                          PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{
-      console.log("Performance release updated")
-    },
-    reason =>{
-      alert("Error actualizando la liberacion")
-    })
-  }  
+ 
 }
