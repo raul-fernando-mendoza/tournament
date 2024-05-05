@@ -35,6 +35,7 @@ interface ProgramRef{
   id:string
   performance:PerformanceObj
   noEvaluationsFound:boolean
+  newGradeAvailable:boolean
   medal:string
 }
 
@@ -203,6 +204,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
                 performance: performance,
                 noEvaluationsFound: false,
                 medal: '',
+                newGradeAvailable: false
               }
               this.programRefs[idx] = pr 
             }
@@ -417,6 +419,18 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
     reason =>{
       alert("Error actualizando la liberacion")
     })    
+  }
+
+  onNoEvaluationFound(noEvaluationFound:boolean, p:ProgramRef){
+    if( p.noEvaluationsFound != noEvaluationFound ){
+      p.noEvaluationsFound = noEvaluationFound
+    }
+  }
+
+  onNewGradeAvailable(newGradeAvailable:boolean, p:ProgramRef){
+    if( p.newGradeAvailable != newGradeAvailable ){
+      p.newGradeAvailable = newGradeAvailable
+    }
   }
  
 }

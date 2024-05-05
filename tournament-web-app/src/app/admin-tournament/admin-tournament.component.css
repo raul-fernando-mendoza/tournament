@@ -84,3 +84,11 @@ p{
     margin-top:auto;
     margin-bottom:auto;
 }
+.bar span{
+    margin-top:auto;
+    margin-bottom:auto;
+}
+.released{
+    margin-left: 2em;
+    color:green;
+}

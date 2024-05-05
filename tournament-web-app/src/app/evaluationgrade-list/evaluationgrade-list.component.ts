@@ -35,6 +35,8 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
   @Input() performanceId!:string 
   @Input() performance!:PerformanceObj
   @Output()  noEvaluationsFound = new EventEmitter<boolean>();
+  @Output()  newGradeAvailable = new EventEmitter<boolean>();
+
 
   evaluationGradesReferences:Array<EvaluationGradeReference> = []  
 
@@ -86,6 +88,7 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
           this.isNewGradeAvailable = false
           let sumGrade = 0
           let numGrades = 0
+          this.newGrade = 0
           snapshot.docs.map( doc =>{
             let evaluationGrade = doc.data() as EvaluationGradeObj
             let obj:EvaluationGradeReference = {
@@ -108,6 +111,10 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
             this.newGrade = Number( (sumGrade / numGrades).toFixed(2) )
             if( this.performance.grade != this.newGrade ){
               this.isNewGradeAvailable = true
+              this.newGradeAvailable.emit(true)
+            }
+            else{
+              this.newGradeAvailable.emit(false)
             }
           }
           this.getJurors()
@@ -213,6 +220,7 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
                                           PerformanceCollection.collectionName].join("/"), this.performanceId, obj).then( ()=>{
       console.log("Performance release updated")
       this.isNewGradeAvailable = false
+      this.newGradeAvailable.emit(false)
     },
     reason =>{
       alert("Error actualizando la liberacion")

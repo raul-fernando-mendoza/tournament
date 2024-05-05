@@ -36,7 +36,7 @@
                             <span class="cancelado">Cancelado</span> 
                             } 
                         </a>
-                        <button mat-button (click)="onAccept(p.id)">Aceptar en el programa</button>
+                        <button mat-raised-button color="primary" (click)="onAccept(p.id)">Aceptar en el programa</button>
                     </mat-list-item>
                 } 
                 @empty{
@@ -56,17 +56,24 @@
                 }
 
                 <mat-accordion>
-                    @for(p of programRefs; track p.id;let idx = $index, e = $even){
-                    <mat-expansion-panel [expanded]="idx==0" hideToggle>
+                    @for(p of programRefs; track p;let idx = $index, e = $even){
+                    <mat-expansion-panel [expanded]="false" hideToggle>
                         <mat-expansion-panel-header>
                         <mat-panel-title>
                             {{ p.performance.label }}
                         </mat-panel-title>
                         <mat-panel-description>
                             {{ p.performance.fullname }}
+
                             @if( p.noEvaluationsFound ){
                                 <span class="attention">Por favor adicione examenes!</span>
                             }
+                            @if( p.performance.isReleased == false && p.newGradeAvailable ){
+                                <span class="attention">Nueva calificacion disponible!</span>
+                            }       
+                            @if( p.performance.isReleased == true  ){
+                                <span class="released">Liberado:{{p.performance.grade}}</span>
+                            }                                                   
                         </mat-panel-description>
                         </mat-expansion-panel-header>
                         <div class="bar program-bar">
@@ -87,7 +94,7 @@
                             <span class="spacer"></span>
                             <button mat-icon-button color="warn" (click)="onReject(p.id)"><mat-icon>remove_circle</mat-icon></button>
                         </div>      
-                        <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance"></app-evaluationgrade-list> 
+                        <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance" (noEvaluationsFound)="onNoEvaluationFound($event,p)" (newGradeAvailable)="onNewGradeAvailable($event,p)"></app-evaluationgrade-list> 
                     </mat-expansion-panel>
                     }
                     @empty{

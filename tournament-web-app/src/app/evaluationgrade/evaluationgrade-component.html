@@ -15,7 +15,7 @@
                 </div>
             </div>
         </div>
-        @if( performance ){
+        @if( performance && canEdit ){
             <button mat-button-icon (click)="onSubmit()" ><mat-icon>done</mat-icon></button>
         }
         

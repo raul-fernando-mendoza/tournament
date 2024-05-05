@@ -124,7 +124,7 @@ export class EvaluationGradeComponent implements OnInit{
           this.evaluationGrade = data as EvaluationGradeObj
 
 
-          if( this.evaluationGrade.jurorId == this.auth.getUserEmail() || this.tournament.creatorUid == this.auth.getUserUid()){
+          if( this.performance.isReleased == false && (this.evaluationGrade.jurorId == this.auth.getUserEmail() || this.tournament.creatorUid == this.auth.getUserUid()) ){
             this.canEdit = true
           }
 
@@ -133,7 +133,7 @@ export class EvaluationGradeComponent implements OnInit{
           this.aspects.controls.length = 0
           this.evaluationGrade.aspectGrades.map( aspect =>{
             let newControl = this.fb.control([aspect.grade])
-            if( !(this.isAdmin || this.canEdit)  ){
+            if( !(this.canEdit)  ){
               newControl.disable()
             }
             this.aspects.push(newControl);
