@@ -1,9 +1,7 @@
-<p>Lista de Examenes</p>
+<p>Examenes</p>
 @if( tournament && performance ){
     @for( e of tournament.evaluations; track e; ){
-
         @for(j of jurors;track j;){
-
             <mat-grid-list cols="4" rowHeight="3em">
             @if( !isAdmin ){
                 @for(r of getEvaluationRefence(e.id,j.id); track r;){
@@ -12,7 +10,7 @@
                     <mat-grid-tile>
                         @if( !r.evaluationGrade.isCompleted ){
                             @if( !performance.isReleased ){
-                                <a [routerLink]="['/tournament',tournamentId,'performance',performanceId,'evaluationGrade',r.id]"><button mat-icon-button><mat-icon>edit</mat-icon></button></a>            
+                                <a [routerLink]="['performance',performanceId,'evaluationGrade',r.id]"><button mat-icon-button><mat-icon>edit</mat-icon></button></a>            
                             }
                         }
                         @else{
@@ -37,17 +35,17 @@
                     <mat-grid-tile>
                         @if( !r.evaluationGrade.isCompleted ){
                             @if( !performance.isReleased ){
-                                <a [routerLink]="['/tournament',tournamentId,'performance',performanceId,'evaluationGrade',r.id]"><button mat-icon-button><mat-icon>edit</mat-icon></button></a>            
+                                <a [routerLink]="['performance',performanceId,'evaluationGrade',r.id]"><button mat-icon-button><mat-icon>edit</mat-icon></button></a>            
                             }
                         }
                         @else{
                             {{ r.evaluationGrade.grade }}
-                            <a [routerLink]="['/tournament',tournamentId,'performance',performanceId,'evaluationGrade',r.id]"><button mat-icon-button><mat-icon>rate_review</mat-icon></button></a>            
+                            <a [routerLink]="['performance',performanceId,'evaluationGrade',r.id]"><button mat-icon-button><mat-icon>rate_review</mat-icon></button></a>            
                         }
                     </mat-grid-tile>
                     <mat-grid-tile>
                         @if( isAdmin && !performance.isReleased){
-                            <button mat-icon-button color="warn" (click)="onRemoveEvaluationGrade(e.id,j.id!)"><mat-icon>delete</mat-icon></button>
+                            <button mat-icon-button color="warn" (click)="onRemoveEvaluationGrade(e.id,j.id!)"><mat-icon>clear</mat-icon></button>
                         }                    
                     </mat-grid-tile>
                 }

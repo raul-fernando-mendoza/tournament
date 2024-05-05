@@ -12,7 +12,7 @@ import { AuthService } from '../auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { TournamentCollection, TournamentObj } from '../types';
 import { PathService } from '../path.service';
-import { BusinesslogicService, Profile } from '../businesslogic.service';
+import { BusinesslogicService } from '../businesslogic.service';
 
 @Component({
   selector: 'app-tournament-list',
@@ -42,7 +42,6 @@ export class TournamentSearchComponent implements OnInit, AfterViewInit{
   });
 
   tournamentList:Array<any> = []
-  currentProfile :Profile = null
   
   constructor( private fb:FormBuilder,
     private firebaseService:FirebaseService,
@@ -54,11 +53,6 @@ export class TournamentSearchComponent implements OnInit, AfterViewInit{
 
   }
   ngOnInit(): void {
-    this.bussiness.onProfileChangeEvent().subscribe( profile =>{
-      this.currentProfile = profile
-      this.onSearch()
-    })
-    this.currentProfile = this.bussiness.getProfile()
   }
   ngAfterViewInit(): void {
     this.onSearch()
@@ -68,9 +62,6 @@ export class TournamentSearchComponent implements OnInit, AfterViewInit{
     var tag:string = this.searchForm.controls.search.value ? this.searchForm.controls.search.value : ""
 
     let uid = null
-    if( this.currentProfile == 'organizer' ) {
-      uid = this.authService.getUserUid()
-    }
 
     this.tournamentList.length = 0
     this.firebaseService.getCollectionByTag(TournamentCollection.collectionName, tag, uid).then( set =>{
@@ -78,25 +69,7 @@ export class TournamentSearchComponent implements OnInit, AfterViewInit{
       
       set.map( e =>{
         let t:TournamentObj = e.data() as TournamentObj
-        if( this.currentProfile == 'organizer' ) {
-          if( t.creatorUid == this.authService.getUserUid() ){
-            this.tournamentList.push(e)
-          }
-        }
         
-        else if( this.currentProfile == 'juror' ){
-          
-          let currentEmail = this.authService.getUserEmail()
-          if( currentEmail ){
-            if(  t.jurors.findIndex( juror => juror.email == currentEmail ) >= 0){
-              this.tournamentList.push(e)
-            }    
-          }
-        }
-        
-        else{
-          this.tournamentList.push(e)
-        }
       })
       
     },

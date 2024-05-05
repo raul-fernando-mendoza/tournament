@@ -7,8 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators ,FormArray} from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { v4 as uuidv4 } from 'uuid';
+import { ActivatedRoute, Route, Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { PathService } from '../path.service';
@@ -18,7 +17,6 @@ import { BusinesslogicService } from '../businesslogic.service';
 import { StarSliderComponent } from '../star-slider/star-slider.component';
 import { DescriptionApplyDialog } from './description-apply-dlg';
 import { MatDialog } from '@angular/material/dialog';
-import { resolve } from 'path';
 
 @Component({
   selector: 'app-evaluationgrade-component',
@@ -71,7 +69,7 @@ export class EvaluationGradeComponent implements OnInit{
     ,public pathService: PathService
     ,private auth: AuthService 
     ,private bussinesslogicService:BusinesslogicService
-    ,public dialog: MatDialog   
+    ,private dialog: MatDialog   
     ){
       var thiz = this
       this.activatedRoute.paramMap.subscribe({
@@ -184,8 +182,7 @@ export class EvaluationGradeComponent implements OnInit{
       ,PerformanceCollection.collectionName,this.performanceId
       ,EvaluationGradeCollection.collectionName].join("/"),
       this.evaluationGradeId, obj).then( () =>{
-        this.router.navigate( ["/", TournamentCollection.collectionName, this.tournamentId,
-                                    'program'])
+        this.router.navigate( ['../../../../'], {relativeTo: this.activatedRoute})
       },
       reason=>{
         alert("ERROR salvando calificacion:" + reason)

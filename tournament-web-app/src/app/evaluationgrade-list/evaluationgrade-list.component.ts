@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../firebase.service';
 import { AspectGrade, EvaluationGradeCollection, EvaluationGradeObj, Juror, Performance, PerformanceCollection, PerformanceObj, TournamentCollection, TournamentObj  } from '../types';
@@ -34,12 +34,14 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
   @Input() tournament!:TournamentObj
   @Input() performanceId!:string 
   @Input() performance!:PerformanceObj
+  @Output()  noEvaluationsFound = new EventEmitter<boolean>();
 
   evaluationGradesReferences:Array<EvaluationGradeReference> = []  
 
-  unsubscribers:Array<Unsubscribe> = []
   isAdmin = false
   jurors:Array<Juror> = []
+
+  unsubscribeEvaluationGrade:Unsubscribe | undefined = undefined
 
   constructor(
     private firebaseService:FirebaseService,
@@ -55,11 +57,14 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
     this.update()
   }
   ngOnDestroy(): void {
-    this.unsubscribers.map( unsubscribe =>{
-      unsubscribe()
-    })
+    if(this.unsubscribeEvaluationGrade){
+      this.unsubscribeEvaluationGrade()
+    }
   }
   update(){
+    if(this.unsubscribeEvaluationGrade){
+      this.unsubscribeEvaluationGrade()
+    }
 
     let filter 
     if( this.isAdmin == true ){
@@ -68,33 +73,37 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
     else{ //force a filter
       let currentEmail:string = this.auth.getUserEmail()!
       filter = where("jurorId", "==", currentEmail)
-    }  
-      let unsubscribe = this.firebaseFullService.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId
-                                        , PerformanceCollection.collectionName, this.performanceId
-                                        , EvaluationGradeCollection.collectionName].join("/"),
-        {
-          'next':(snapshot: QuerySnapshot<DocumentData>) =>{
-            this.evaluationGradesReferences.length = 0
-            snapshot.docs.map( doc =>{
-              let evaluationGrade = doc.data() as EvaluationGradeObj
-              let obj:EvaluationGradeReference = {
-                id:doc.id,
-                evaluationGrade:evaluationGrade
-              }
-              this.evaluationGradesReferences.push(obj)
-            })
-            this.getJurors()
-          },
-          'error':(reason) =>{
-            alert("there has been an error reading performances:" + reason)
-          },
-          'complete':() =>{
-            console.log("reading program as ended")
-        }
-      },
-      filter)
-      this.unsubscribers.push( unsubscribe )                                        
-
+    }     
+    this.unsubscribeEvaluationGrade = this.firebaseFullService.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId
+                                      , PerformanceCollection.collectionName, this.performanceId
+                                      , EvaluationGradeCollection.collectionName].join("/"),
+      {
+        'next':(snapshot: QuerySnapshot<DocumentData>) =>{
+          this.evaluationGradesReferences.length = 0
+          snapshot.docs.map( doc =>{
+            let evaluationGrade = doc.data() as EvaluationGradeObj
+            let obj:EvaluationGradeReference = {
+              id:doc.id,
+              evaluationGrade:evaluationGrade
+            }
+            this.evaluationGradesReferences.push(obj)
+          })
+          if( this.evaluationGradesReferences.length == 0){
+            this.noEvaluationsFound.emit( true )
+          }
+          else{
+            this.noEvaluationsFound.emit( false )
+          }
+          this.getJurors()
+        },
+        'error':(reason) =>{
+          alert("there has been an error reading performances:" + reason)
+        },
+        'complete':() =>{
+          console.log("reading program as ended")
+      }
+    },
+    filter)
   }  
 
   getEvaluationRefence( evaluationId:string, jurorId:string ):EvaluationGradeReference[]{

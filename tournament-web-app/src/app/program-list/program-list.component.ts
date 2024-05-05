@@ -14,13 +14,21 @@ import { doc, DocumentData, QuerySnapshot } from 'firebase/firestore';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
 import { AuthService } from '../auth.service';
 import {MatExpansionModule} from '@angular/material/expansion';
+import { Filter, FirebaseFullService } from '../firebasefull.service';
 
-class PerformanceMedalReference implements PerformanceReference{
-  id!:string
-  performance!:PerformanceObj
-  medal?:string
-  idx?:number
+interface EvaluationRef{
+  id:string
+  evaluation:EvaluationGradeObj
 }
+
+interface PerformanceRef{
+  id:string
+  performance:PerformanceObj
+  evaluations:Array<EvaluationRef>
+  medal:string
+}
+
+
 
 @Component({
   selector: 'app-program-list',
@@ -42,18 +50,23 @@ class PerformanceMedalReference implements PerformanceReference{
   styleUrl: './program-list.component.css',
 
 })
-export class ProgramListComponent implements AfterViewInit{
+export class ProgramListComponent implements AfterViewInit, OnDestroy{
   @Input() tournamentId!:string
   @Input() tournament!:TournamentObj
-  @Input() performanceReference!:PerformanceReference
+  @Input() performanceReferences!:Array<PerformanceReference>
 
   performanceColor = 'lightblue'
   isAdmin = false
 
-  evaluationGradesReferences: any;
+  unsubscribePerformances:Unsubscribe | undefined = undefined
 
-  constructor(private firebaseFullService:FirebaseService
+  programReferences:Array<PerformanceRef> = []  
+
+
+
+  constructor(private firebase:FirebaseFullService
     ,private auth:AuthService  
+    
   ){
 
   }
@@ -61,34 +74,48 @@ export class ProgramListComponent implements AfterViewInit{
     this.update()
   }
    
+
+  ngOnDestroy(): void {
+
+    if( this.unsubscribePerformances ){
+      this.unsubscribePerformances()
+    }
+  }  
   
   update(){
     if( this.tournament.creatorUid == this.auth.getUserUid() ){
       this.isAdmin = true
     }
-  }
-
-  readPerformances(){
-    /*
-    let idx = 
-      if( performance ){
-        let performanceRef:PerformanceMedalReference={
-          id:this.performanceReference.id,
-          performance:this.performanceReference.performance!,
-          medal:"",
-          idx:idx
-        }
-        this.performanceMedalReference[idx] = performanceRef
-              
-        this.recalculateGrade( performanceRef )
-        if( performanceRef.performance.grade ){
-          performanceRef.medal = this.getMedalForPerformance( performanceRef.performance.grade )
-        }
+    for( let i=0; i<this.performanceReferences.length; i++){
+      let p = this.performanceReferences[0]
+      let programRef:PerformanceRef={
+        id: p.id,
+        performance: p.performance,
+        evaluations:[],
+        medal: ''
       }
-    })
-    */
-
+      this.firebase.onsnapShotCollection([TournamentCollection.collectionName,this.tournamentId,
+      PerformanceCollection.collectionName, p.id,
+      EvaluationGradeCollection.collectionName].join("/"),{
+        'next': (set) =>{
+          set.forEach( doc =>{
+            let evaluation = doc.data() as EvaluationGradeObj
+            let evaluacionRef:EvaluationRef = {
+              id: doc.id,
+              evaluation: evaluation
+            }
+            programRef.evaluations.push( evaluacionRef )
+            
+          })
+        },
+        'error': (reason) =>{
+          alert("Error readind evaluation collection")
+        }
+      })
+      this.programReferences.push( programRef )
+    }
   }
+
   getMedalForPerformance(grade:number):string{
     console.log("calculating medasl for:" + grade)
     for( let i = 0; i < this.tournament.medals.length; i++){
@@ -103,7 +130,7 @@ export class ProgramListComponent implements AfterViewInit{
       grade:performanceRef.performance.grade,
       isReleased:true
     }
-    this.firebaseFullService.updateDocument( [TournamentCollection.collectionName, this.tournamentId,
+    this.firebase.updateDocument( [TournamentCollection.collectionName, this.tournamentId,
                                           PerformanceCollection.collectionName].join("/"), performanceRef.id, obj).then( ()=>{
       console.log("Performance release updated")
     },

@@ -13,8 +13,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../environments/environment';
 import {MatMenuModule} from '@angular/material/menu';
-import { BusinesslogicService, Profile } from './businesslogic.service';
-import { Init } from 'v8';
+import { BusinesslogicService } from './businesslogic.service';
+
 
 
 
@@ -38,8 +38,6 @@ import { Init } from 'v8';
 export class AppComponent implements OnInit{
   title = 'tournament-web-app';
   displayName = ""
-  currentProfile :Profile = null
-  profileName:string = ""
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
@@ -72,12 +70,6 @@ export class AppComponent implements OnInit{
  
   ngOnInit(): void {
     
-    this.bussiness.onProfileChangeEvent().subscribe( profile =>{
-      this.currentProfile = profile
-      this.profileName = this.bussiness.getProfileName()
-    })
-    this.currentProfile = this.bussiness.getProfile()
-    this.profileName = this.bussiness.getProfileName()
     
   }
   
@@ -92,7 +84,6 @@ export class AppComponent implements OnInit{
   }  
   logout(){
     this.authService.logout()
-    this.bussiness.setCurrentProfile("participant")
   }
   isEmailVerified(){
     return this.authService.isEmailVerified()

@@ -6,7 +6,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { DateFormatService } from '../date-format.service';
 import { BusinesslogicService } from '../businesslogic.service';
@@ -39,9 +39,9 @@ export class AdminTournamentWelcomeComponent implements OnInit{
     private firebase:FirebaseService,
     private auth:AuthService,
     public dateSrv:DateFormatService,
-    private bussiness:BusinesslogicService
+    private bussiness:BusinesslogicService,
+    private router:Router
   ){
-
 
   }
   ngOnInit(): void {

@@ -17,7 +17,7 @@ import { AuthService } from '../auth.service';
 import { v4 as uuidv4 } from 'uuid';
 import { NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
 import { PathService } from '../path.service';
-import { BusinesslogicService, Profile } from '../businesslogic.service';
+import { BusinesslogicService } from '../businesslogic.service';
 import { MatGridListModule} from '@angular/material/grid-list';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
 import { MatDividerModule} from '@angular/material/divider';
@@ -117,8 +117,6 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
   performances:Array<PerformanceReference> = []
 
   program:Array<PerformanceReference> = []  
-
-  currentProfile:Profile = null
 
   isParticipant = false
 

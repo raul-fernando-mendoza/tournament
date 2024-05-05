@@ -12,7 +12,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { QuillModule } from 'ngx-quill';
 import { DateFormatService } from '../date-format.service';
-import { BusinesslogicService, Profile } from '../businesslogic.service';
+import { BusinesslogicService } from '../businesslogic.service';
 
 
 interface PerformanceReference{
@@ -50,8 +50,6 @@ export class ParticipantTournamentComponent {
 
   program:Array<PerformanceReference> = []  
   
-  currentProfile:Profile = null
-
   activePanel:string | null = null
 
   constructor(
@@ -75,10 +73,6 @@ export class ParticipantTournamentComponent {
 
 
   ngOnInit(): void {
-    this.businesslogic.onProfileChangeEvent().subscribe( profile =>{
-      this.currentProfile = profile
-    })
-    this.currentProfile = this.businesslogic.getProfile()
     this.activePanel = this.businesslogic.getStoredItem("activePanel")
 
   }

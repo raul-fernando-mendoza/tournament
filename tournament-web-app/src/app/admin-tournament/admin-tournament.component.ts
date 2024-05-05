@@ -14,7 +14,7 @@ import { MatNativeDateModule} from '@angular/material/core';
 import { AuthService } from '../auth.service';
 import { NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
 import { PathService } from '../path.service';
-import { BusinesslogicService, Profile } from '../businesslogic.service';
+import { BusinesslogicService } from '../businesslogic.service';
 import { MatGridListModule} from '@angular/material/grid-list';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
 import {MatDividerModule} from '@angular/material/divider';
@@ -31,10 +31,11 @@ import {MatTabGroup, MatTabsModule} from '@angular/material/tabs';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { urlbase } from '../../environments/environment';
 
-interface PerformanceProgramReference{
+interface ProgramRef{
   id:string
   performance:PerformanceObj
-  isInProgram:boolean
+  noEvaluationsFound:boolean
+  medal:string
 }
 
 @Component({
@@ -76,9 +77,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
   isLoggedIn = false
 
   performanceColor = 'lightblue'
-
-  
-
   form = this.fb.group({
     label:['',Validators.required],
     eventDate:[new Date(),Validators.required],
@@ -86,21 +84,15 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
     imageUrl:[""],
     imagePath:[""]
   })
-
-
-
-  performanceReferences:Array<PerformanceReference> = []
-
-  programReferences:Array<PerformanceProgramReference> = []  
-
+  pendingRefs:Array<PerformanceReference> = []  
+  programRefs:Array<ProgramRef> = []
   hasPendingRequests = false
 
-  pendingRequestReferences:Array<PerformanceProgramReference> = []
-
-  currentProfile:Profile = null
+  
 
   unsubscribe:Unsubscribe | undefined = undefined
   unsubscribePerformances:Unsubscribe | undefined = undefined
+
 
   activePanel:string | null = null
 
@@ -108,7 +100,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
 
   @ViewChild("tournamentTab", {static: true}) demo3Tab!: MatTabGroup;
 
-  route:string = ""
   constructor(
      private activatedRoute: ActivatedRoute
     ,public firebase:FirebaseFullService 
@@ -121,13 +112,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
     ,location: Location){
 
     var thiz = this
-    router.events.subscribe((val) => {
-      if(location.path() != ''){
-        this.route = location.path();
-      } else {
-        this.route = 'Home'
-      }
-    });
 
     this.activatedRoute.paramMap.subscribe( {
       next(paramMap){
@@ -149,16 +133,11 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
     }
     if( this.unsubscribePerformances ){
       this.unsubscribePerformances()
-    }
+    }    
   }
 
   ngOnInit(): void {
-    this.businesslogic.onProfileChangeEvent().subscribe( profile =>{
-      this.currentProfile = profile
-    })
-    this.currentProfile = this.businesslogic.getProfile()
     this.activePanel = this.businesslogic.getStoredItem("activePanel")
-
   }
 
   update(){
@@ -183,7 +162,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
         if( this.auth.getUserUid()!= null){
           this.isLoggedIn = true
         }
-        this.updateProgramRef()
+        this.readPerformances()
         
         
       },
@@ -194,8 +173,46 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
         console.log("reading program as ended")
       }        
     })
-    this.readPerformances()
   }
+
+  readPerformances(){
+    let filter:Array<Filter> = []
+    if( this.unsubscribePerformances ){
+      this.unsubscribePerformances()
+    }  
+    this.unsubscribePerformances = this.firebase.onsnapShotCollection(
+      [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") 
+      ,{
+        'next': (set)=>{
+          this.programRefs.length = 0
+          this.pendingRefs.length = 0
+          set.docs.map( doc =>{
+            let performance = doc.data() as PerformanceObj
+            //check if the performance is in the program
+            let idx = this.tournament!.program.findIndex( e => e == doc.id )
+            if( idx < 0 ){
+              let pending:PerformanceReference={
+                id: doc.id,
+                performance: performance,
+              }
+              this.pendingRefs.push(pending)
+            }
+            else{
+              let pr:ProgramRef = {
+                id: doc.id,
+                performance: performance,
+                noEvaluationsFound: false,
+                medal: '',
+              }
+              this.programRefs[idx] = pr 
+            }
+          })
+          this.pendingRefs.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
+      }  
+    })
+  }
+
+
 
   onNameChange( $event:any ){
     var label = this.form.controls.label.value!
@@ -254,14 +271,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
       alert("Error updating programa:" + reason)
     })
   }
-  onReject( id:string ){
-    this.firebase.removeArrayElementDoc( TournamentCollection.collectionName + "/" + this.tournamentId, "program", id).then( ()=>{
-      console.log("update programa")
-    },
-    reason =>{
-      alert("Error updating programa:" + reason)
-    }) 
-  }  
+
 
 
   
@@ -340,80 +350,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
     }        
   }  
 
-  readPerformances(){
-    let filter:Array<Filter> = []
-    if( this.unsubscribePerformances ){
-      this.unsubscribePerformances()
-    }  
-    this.unsubscribePerformances = this.firebase.onsnapShotCollection(
-      [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") 
-      ,{
-        'next': (set)=>{
-          this.performanceReferences.length = 0
-          set.docs.map( doc =>{
-            let p = doc.data() as PerformanceObj
-
-            let pr:PerformanceProgramReference = {
-              id: doc.id,
-              performance: p,
-              isInProgram: this.isInProgram(doc.id)
-            }
-            this.performanceReferences!.push( pr )
-          })
-          this.performanceReferences.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
-
-          this.updateProgramRef()
-
-      }  
-    })
-  }
-
-  updateProgramRef(){
-    //loadProgramRef
-    if( this.tournament ){
-      this.programReferences.length = 0
-      if( this.performanceReferences.length ){
-        this.tournament.program.forEach( performanceId =>{
-          let performanceRef = this.performanceReferences.find( p => p.id == performanceId )
-          let programRef:PerformanceProgramReference = {
-            id: performanceId,
-            performance: performanceRef!.performance,
-            isInProgram: true
-          }
-          this.programReferences.push(programRef)
-        })    
-      }
-
-      //load pending
-      this.pendingRequestReferences.length = 0
-      this.hasPendingRequests = false
-      for( let i =0; i<this.performanceReferences.length; i++){
-        let performanceRef = this.performanceReferences[i]
-        let inProgram = this.tournament.program.find( e => e == performanceRef.id)
-        if( performanceRef.performance.isCanceled == false && !inProgram){
-          let pendingRef:PerformanceProgramReference = {
-            id: performanceRef.id,
-            performance: performanceRef.performance,
-            isInProgram: false
-          }
-          this.pendingRequestReferences.push( pendingRef )
-        }
-      }
-      this.hasPendingRequests = this.pendingRequestReferences.length > 0
-
-      
-    }  
-  }
-  isInProgram( id:string ):boolean{
-    let idx = this.tournament!.program.findIndex( e => e == id)
-    if( idx >= 0){
-      return true
-    }
-    else{
-      return false
-    }
-  }
-  
   onPanelActivated(activePanel:string){
     this.activePanel = activePanel 
     this.businesslogic.setStoredItem("activePanel", activePanel)
@@ -461,6 +397,16 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
       }
     }
   }
+
+  onReject( id:string ){
+    this.firebase.removeArrayElementDoc( TournamentCollection.collectionName + "/" + this.tournamentId, "program", id).then( ()=>{
+      console.log("update programa")
+    },
+    reason =>{
+      alert("Error updating programa:" + reason)
+    }) 
+  }  
+    
   onReleaseProgram(isProgramReleased:boolean){
     let obj:Tournament = {
       isProgramReleased : isProgramReleased
@@ -484,5 +430,5 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
     reason =>{
       alert("Error actualizando la liberacion")
     })
-  }     
+  }  
 }

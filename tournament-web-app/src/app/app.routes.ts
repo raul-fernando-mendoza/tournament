@@ -4,20 +4,13 @@ import { AdminTournamentComponent } from './admin-tournament/admin-tournament.co
 import { TournamentSearchComponent } from './tournament-search/tournament-search.component';
 import { EvaluationGradeComponent } from './evaluationgrade/evaluationgrade-component';
 import { MedalsListComponent } from './medals-list/medals-list.component';
-import { CategoryListComponent } from './category-list/category-list.component';
-import { EvaluationListComponent } from './evaluation-list/evaluation-list.component';
-import { JurorListComponent } from './juror-list/juror-list.component';
-import { AspectListComponent } from './aspect-list/aspect-list.component';
 import { ProgramListComponent } from './program-list/program-list.component';
 import { PodiumListComponent } from './podium-list/podium-list.component';
-import { ProfileComponent } from './profile/profile.component';
-import { TournamentListComponent } from './tournament-list/tournament-list.component';
 import { WelcomeJurorComponent } from './welcome-juror/welcome-juror.component';
 import { AuthService } from './auth.service';
 import { inject } from '@angular/core';
 import { AdminTournamentWelcomeComponent } from './admin-welcome/admin-welcome.component';
 import { ParticipantTournamentComponent } from './participant-tournament/participant-tournament.component';
-import { InscribeRequestComponent } from './inscribe-request/inscribe-request.component';
 import { CategoryNewComponent } from './category-new/category-new.component';
 import { CategoryEditComponent } from './category-edit/category-edit.component';
 import { EvaluationEditComponent } from './evaluation-edit/evaluation-edit.component';
@@ -33,6 +26,7 @@ import { TournamentRouterComponent } from './tournament-router/tournament-router
 import { GuessTournamentComponent } from './guess-tournament/guess-tournament.component';
 import { PerformanceNewComponent } from './performance-new/performance-new.component';
 import { PerformanceEditComponent } from './performance-edit/performance-edit.component';
+import { NotfoundComponent } from './notfound/notfound.component';
 
 export function loginGuard(
     redirectRoute: string
@@ -43,7 +37,7 @@ export function loginGuard(
       
       const isFlagEnabled = oauthService.isloggedIn()
       let val = isFlagEnabled || router.createUrlTree([redirectRoute]);
-      console.log("val:" + val)
+      console.log("Can activate:" + val)
       return isFlagEnabled || router.createUrlTree([redirectRoute]);
     };
   }
@@ -53,7 +47,7 @@ export const routes: Routes = [
     { path:"loginForm",component:LoginFormComponent},    
     { path:"registerForm",component:LoginFormComponent},
 
-    { path:"organizer",pathMatch:'full',component:AdminTournamentWelcomeComponent, canActivate: [loginGuard('loginForm/organizer')]},
+    //{ path:"organizer",pathMatch:'full',component:AdminTournamentWelcomeComponent, canActivate: [loginGuard('loginForm/organizer')]},
 
     { path:"tournamentSetup/:id",component:AdminTournamentSetupComponent},  
     { path:"tournamentSetup/:tournamentId/categoryNew",component:CategoryNewComponent},
@@ -86,44 +80,51 @@ export const routes: Routes = [
     { path:"tournamentAdmin/:tournamentId/evaluationNew",component:EvaluationNewComponent},
     { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId",component:EvaluationEditComponent},
     
-    { path:"tournamentAdmin/:tournamentId/evaluationNew",component:EvaluationNewComponent},
-    { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId",component:EvaluationEditComponent},
-    { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId/aspectNew",component:AspectNewComponent},
-    { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId/aspect/:aspectId",component:AspectEditComponent},
+    { path:"tournamentAdmin/:tournamentId/evaluationNew",pathMatch:'full',component:EvaluationNewComponent},
+    { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId",pathMatch:'full',component:EvaluationEditComponent},
+    { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId/aspectNew",pathMatch:'full',component:AspectNewComponent},
+    { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId/aspect/:aspectId",pathMatch:'full',component:AspectEditComponent},
 
-    { path:"tournamentAdmin/:tournamentId/jurorNew",component:JurorNewComponent},
-    { path:"tournamentAdmin/:tournamentId/juror/:jurorId",component:JurorEditComponent},
+    { path:"tournamentAdmin/:tournamentId/jurorNew",pathMatch:'full',component:JurorNewComponent},
+    { path:"tournamentAdmin/:tournamentId/juror/:jurorId",pathMatch:'full',component:JurorEditComponent},
 
-    { path:"tournamentAdmin/:tournamentId/medalNew",component:MedalNewComponent},
-    { path:"tournamentAdmin/:tournamentId/medal/:medalId",component:MedalEditComponent},
+    { path:"tournamentAdmin/:tournamentId/medalNew",pathMatch:'full',component:MedalNewComponent},
+    { path:"tournamentAdmin/:tournamentId/medal/:medalId",pathMatch:'full',component:MedalEditComponent},
 
 
-    { path:"tournamentAdmin/:tournamentId/program",component:ProgramListComponent},
-    { path:"tournamentAdmin/:tournamentId/podium",component:PodiumListComponent},
-    { path:"tournamentAdmin/:tournamentId/performanceEdit/:performanceId",component:PerformanceEditComponent},
+    { path:"tournamentAdmin/:tournamentId/program",pathMatch:'full',component:ProgramListComponent},
+    { path:"tournamentAdmin/:tournamentId/podium",pathMatch:'full',component:PodiumListComponent},
+    { path:"tournamentAdmin/:tournamentId/performanceEdit/:performanceId",pathMatch:'full',component:PerformanceEditComponent},
+
+    { path:"tournamentAdmin/:tournamentId/performance/:performanceId/evaluationGrade/:evaluationGradeId",pathMatch:'full',component:EvaluationGradeComponent},
     
+
    
-    { path:"tournamentNew",component:AdminTournamentSetupComponent},
+    { path:"tournamentNew",pathMatch:'full',component:AdminTournamentSetupComponent},
 
-    { path:"tournamentParticipant/:tournamentId",component:ParticipantTournamentComponent},
+    { path:"tournamentParticipant/:tournamentId",pathMatch:'full',component:ParticipantTournamentComponent},
 
     
-    { path:"tournamentParticipant/:tournamentId/performanceNew",component:PerformanceNewComponent},
-    { path:"tournamentParticipant/:tournamentId/performanceEdit/:performanceId",component:PerformanceEditComponent},
+    { path:"tournamentParticipant/:tournamentId/performanceNew",pathMatch:'full',component:PerformanceNewComponent},
+    { path:"tournamentParticipant/:tournamentId/performanceEdit/:performanceId",pathMatch:'full',component:PerformanceEditComponent},
 
 //    { path:"tournament/:tournamentId/evaluationgradeNew",component:EvaluationGradeComponent},          
 //    { path:"tournament/:tournamentId/evaluationGrade/:id",component:EvaluationGradeComponent}, 
-    { path:"tournament/:tournamentId/performance/:performanceId/evaluationGrade/:evaluationGradeId",component:EvaluationGradeComponent},
+    { path:"tournament/:tournamentId/performance/:performanceId/evaluationGrade/:evaluationGradeId",pathMatch:'full',component:EvaluationGradeComponent},
 
-    { path:"tournament/:tournamentId/medals",component:MedalsListComponent},    
+    { path:"tournament/:tournamentId/medals",pathMatch:'full',component:MedalsListComponent},    
     
     { path:"participant",pathMatch:'full',component:TournamentSearchComponent},
-    { path:"juror",pathMatch:'full',component:WelcomeJurorComponent, canActivate: [loginGuard('loginForm/juror')]},
+    { path:"juror",pathMatch:'full',component:WelcomeJurorComponent},
     
     
     { path:"home",pathMatch:'full',component:AdminTournamentComponent},    
 
 
-    { path:"",pathMatch:'full',component:AdminTournamentWelcomeComponent, canActivate: [loginGuard('loginForm/organizer')]},
+    { path:"",pathMatch:'full',component:AdminTournamentWelcomeComponent},
+
+    {path:"**", component:NotfoundComponent}
+
+
 
 ];
