@@ -248,37 +248,6 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
             this.isLoggedIn = true
           }
 
-          let selectedIndex: null | number = null
-          
-          if( this.tournament.categories.length > 0 && this.tournament.categories[0]){
-            this.firstCategory.setValue( this.tournament.categories[0].label )
-          }
-          else{
-            selectedIndex = 1
-          }
-          if( this.tournament.evaluations.length > 0 && this.tournament.evaluations[0]){
-            this.firstEvaluation.setValue( this.tournament.evaluations[0].label )
-          }    
-          else{
-            if(!selectedIndex) 
-              selectedIndex = 2
-          }      
-
-          if( this.tournament.medals.length > 0 && this.tournament.medals[0]){
-            this.firstMedal.setValue( this.tournament.medals[0].label )
-          }    
-          else{
-            if(!selectedIndex) 
-              selectedIndex = 4
-          }      
-          if( this.isSetupCompleted() ){
-            if(!selectedIndex) 
-              selectedIndex = 5
-          }
-          
-          if( this.tournamentStepper && selectedIndex )
-            this.tournamentStepper!.selectedIndex = selectedIndex
-
           this.loadJurors()  
           //this.readPerformances()
 
@@ -292,12 +261,58 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
       })
     }
   }
+  selectTab(){
+    let selectedIndex: null | number = null
+
+    if( this.tournament ){
+          
+      if( this.tournament.categories.length > 0 && this.tournament.categories[0]){
+        this.firstCategory.setValue( this.tournament.categories[0].label )
+      }
+      else{
+        selectedIndex = 1
+      }
+      if( this.tournament.evaluations.length > 0 && this.tournament.evaluations[0]){
+        this.firstEvaluation.setValue( this.tournament.evaluations[0].label )
+      }    
+      else{
+        if(!selectedIndex) 
+          selectedIndex = 2
+      } 
+      
+      if( this.jurors.length > 0){
+        this.firstJuror.setValue( this.jurors[0].id )
+        
+      }
+      else{
+        selectedIndex = 3
+      }
+
+      if( this.tournament.medals.length > 0 && this.tournament.medals[0]){
+        this.firstMedal.setValue( this.tournament.medals[0].label )
+      }    
+      else{
+        if(!selectedIndex) 
+          selectedIndex = 4
+      }      
+      if( this.isSetupCompleted() ){
+        if(!selectedIndex) 
+          selectedIndex = 5
+      }
+      
+      if( this.tournamentStepper && selectedIndex ){
+        this.tournamentStepper!.selectedIndex = selectedIndex
+      }
+    }
+
+  }
 
   loadJurors(){
     if( this.tournamentId != null){
       this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId,
       JurorCollection.collectionName ].join("/"), {
         'next': (set) =>{
+            this.jurors.length = 0
             set.docs.forEach( doc =>{
               let juror = doc.data() as JurorObj
               let jurorRef:JurorRef={
@@ -307,8 +322,10 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
               this.jurors.push( jurorRef )
             })
             this.jurors.sort( (a,b) => a.juror.label > b.juror.label ? 1:-1)
+            this.selectTab()
         } 
       })
+      
     }
   }
 

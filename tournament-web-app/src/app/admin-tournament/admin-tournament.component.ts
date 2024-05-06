@@ -188,6 +188,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
       this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId,
       JurorCollection.collectionName ].join("/"), {
         'next': (set) =>{
+            this.jurors.length = 0
             set.docs.forEach( doc =>{
               let juror = doc.data() as JurorObj
               let jurorRef:JurorRef={
