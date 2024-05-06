@@ -4,12 +4,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Unsubscribe } from 'firebase/firestore';
 import { AuthService } from '../auth.service';
 import { BusinesslogicService } from '../businesslogic.service';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
 import { FirebaseFullService, Filter } from '../firebasefull.service';
+import { TournamentEditPodiumComponent } from '../podium/tournament-edit-podium.component';
 import { PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj } from '../types';
 
 interface ProgramRef{
@@ -28,7 +30,9 @@ interface ProgramRef{
     ,RouterModule
     ,MatGridListModule
     ,EvaluationgradeListComponent
-    ,MatExpansionModule    
+    ,MatExpansionModule  
+    ,TournamentEditPodiumComponent  
+    ,MatTabsModule
   ],
   templateUrl: './welcome-juror.component.html',
   styleUrl: './welcome-juror.component.css'
