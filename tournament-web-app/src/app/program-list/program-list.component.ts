@@ -49,6 +49,7 @@ export class ProgramListComponent implements AfterViewInit, OnDestroy{
 
   isAdmin = false
 
+  unsubscribe:Unsubscribe | undefined = undefined
   unsubscribePerformances:Unsubscribe | undefined = undefined
 
   programRefs:Array<ProgramRef> = []  
@@ -66,6 +67,9 @@ export class ProgramListComponent implements AfterViewInit, OnDestroy{
 
   ngOnDestroy(): void {
 
+    if( this.unsubscribe ){
+      this.unsubscribe()
+    }
     if( this.unsubscribePerformances ){
       this.unsubscribePerformances()
     }
@@ -75,7 +79,16 @@ export class ProgramListComponent implements AfterViewInit, OnDestroy{
     if( this.tournament.creatorUid == this.auth.getUserUid() ){
       this.isAdmin = true
     }
-    this.readPerformances()
+    this.unsubscribe = this.firebase.onsnapShotDoc( TournamentCollection.collectionName, this.tournamentId, 
+      {
+      'next': (doc) =>{
+        this.tournament = doc.data() as TournamentObj
+        this.readPerformances()
+      },
+      'error': (reason)=>{
+        alert("Error reading tournament:" + reason)
+      }
+    })    
   }
 
   readPerformances(){

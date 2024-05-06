@@ -1,19 +1,25 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../firebase.service';
-import { AspectGrade, EvaluationGradeCollection, EvaluationGradeObj, Juror, Performance, PerformanceCollection, PerformanceObj, TournamentCollection, TournamentObj  } from '../types';
+import { AspectGrade, EvaluationGradeCollection, EvaluationGradeObj, Juror, JurorCollection, JurorObj, Performance, PerformanceCollection, PerformanceObj, TournamentCollection, TournamentObj  } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule} from '@angular/material/grid-list';
 import { RouterModule } from '@angular/router';
-import { DocumentData, DocumentSnapshot, QuerySnapshot, Unsubscribe, where, WhereFilterOp } from 'firebase/firestore';
-import { FirebaseFullService } from '../firebasefull.service';
+import { and, DocumentData, DocumentSnapshot, QueryFieldFilterConstraint, QuerySnapshot, Unsubscribe, where, WhereFilterOp } from 'firebase/firestore';
+import { Filter, FirebaseFullService } from '../firebasefull.service';
 import { AuthService } from '../auth.service';
 
 interface EvaluationGradeReference{
   id:string
   evaluationGrade:EvaluationGradeObj
+}
+
+interface JurorRef{
+  id:string
+  juror:JurorObj
+
 }
 
 @Component({
@@ -41,7 +47,7 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
   evaluationGradesReferences:Array<EvaluationGradeReference> = []  
 
   isAdmin = false
-  jurors:Array<Juror> = []
+  jurors:Array<JurorRef> = []
 
   newGrade = 0.0
   isNewGradeAvailable = false
@@ -69,14 +75,18 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
     if(this.unsubscribeEvaluationGrade){
       this.unsubscribeEvaluationGrade()
     }
-
+    this.loadJurors()
+    
     let filter 
     if( this.isAdmin == true ){
       //no filter
     }
     else{ //force a filter
-      let currentEmail:string = this.auth.getUserEmail()!
-      filter = where("jurorId", "==", currentEmail)
+      let juror = this.jurors.find( e => e.juror.email == this.auth.getUserEmail())
+      if( juror ){
+        let id:string = juror.id
+        filter = where("jurorId", "==", id)
+      }       
     }     
     this.unsubscribeEvaluationGrade = this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId
                                       , PerformanceCollection.collectionName, this.performanceId
@@ -117,7 +127,6 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
               this.newGradeAvailable.emit(false)
             }
           }
-          this.getJurors()
         },
         'error':(reason) =>{
           alert("there has been an error reading performances:" + reason)
@@ -187,27 +196,35 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
       })
     }
   }
-  getJurors():Juror[]{
-    this.jurors.length = 0
-   
-    if( this.isAdmin ){
-      let sortedJurors = this.tournament.jurors.sort( (a,b)=>( a.label > b.label ? 1:-1))
-      sortedJurors.forEach(
-        e=>{ this.jurors.push( e ) }
-      )
+
+  loadJurors(){
+    
+    let filter:QueryFieldFilterConstraint | undefined = undefined
+    if( !this.isAdmin ){
+      let email:string | null = this.auth.getUserEmail() 
+      filter = where("email","==", email)      
     }
-    else{
-      let idx = this.tournament.jurors.findIndex( e => e.email == this.auth.getUserEmail())
-      if( idx >=0 ){
-        let jurorId = this.tournament.jurors[idx].id
-        let filtered = this.tournament.jurors.filter( j => j.id == jurorId )
-        filtered.forEach( e=>{
-          this.jurors.push(e)
-        })
-      }      
+
+    if( this.tournamentId != null){
+      this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId,
+      JurorCollection.collectionName ].join("/"), {
+        'next': (set) =>{
+            this.jurors.length = 0
+            set.docs.forEach( doc =>{
+              let juror = doc.data() as JurorObj
+              let jurorRef:JurorRef={
+                id: doc.id,
+                juror: juror
+              }
+              this.jurors.push( jurorRef )
+            })
+            this.jurors.sort( (a,b) => a.juror.label > b.juror.label ? 1:-1)
+        } 
+      },
+      filter)
     }
-    return []
   }
+
   onRelease(){
     if( !confirm("La calificacion :" +  this.newGrade + " ya no podra ser modificada. Desea continuar.") ){
       return

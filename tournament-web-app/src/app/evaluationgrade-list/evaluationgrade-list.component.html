@@ -1,7 +1,7 @@
 <div class="bar">
     <span>Examenes</span>
     
-    @if( this.performance.isReleased == false && newGrade > 0){
+    @if( isAdmin && this.performance.isReleased == false && newGrade > 0){
         <span>Nueva Calificacion :{{ newGrade }}</span>
         <button mat-raised-button color="primary" (click)="onRelease()">Liberar Calificacion</button>
     }
@@ -13,7 +13,7 @@
             @if( !isAdmin ){
                 @for(r of getEvaluationRefence(e.id,j.id); track r;){
                     <mat-grid-tile>{{e.label}}</mat-grid-tile>
-                    <mat-grid-tile>{{j.label}}</mat-grid-tile>                
+                    <mat-grid-tile>{{j.juror.label}}</mat-grid-tile>                
                     <mat-grid-tile>
                         @if( !r.evaluationGrade.isCompleted ){
                             @if( !performance.isReleased ){
@@ -36,7 +36,7 @@
             }
             @else{
                 <mat-grid-tile>{{e.label}}</mat-grid-tile>
-                <mat-grid-tile>{{j.label}}</mat-grid-tile>                   
+                <mat-grid-tile>{{j.juror.label}}</mat-grid-tile>                   
                 @for(r of getEvaluationRefence(e.id,j.id); track r;){
              
                     <mat-grid-tile>

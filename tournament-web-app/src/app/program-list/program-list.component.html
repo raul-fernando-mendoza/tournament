@@ -32,22 +32,18 @@
         </mat-panel-description>
         </mat-expansion-panel-header>
         <div class="bar program-bar">
-            @if(isAdmin){
             <button mat-icon-button (click)="onPerformanceUp(p.id)"><mat-icon>arrow_upward</mat-icon></button>
-            }
             <span class="program_number">{{ idx + 1}}</span>
-            @if(isAdmin){
-                <button mat-icon-button (click)="onPerformanceDown(p.id)"><mat-icon>arrow_downward</mat-icon></button>
-            }
-            @if( isAdmin && p.performance.isReleased  ){
+            <button mat-icon-button (click)="onPerformanceDown(p.id)"><mat-icon>arrow_downward</mat-icon></button>
+            @if( p.performance.isReleased  ){
                 <span class="score">score:{{ p.performance.grade }}</span>
             }
-            @if( isAdmin || p.performance.isReleased  ){
+            @if( p.performance.isReleased  ){
                 <span>{{ p.medal }}</span>
             }
-
             <span class="spacer"></span>
             <button mat-icon-button color="warn" (click)="onReject(p.id)"><mat-icon>remove_circle</mat-icon></button>
+
         </div>      
         <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance" (noEvaluationsFound)="onNoEvaluationFound($event,p)" (newGradeAvailable)="onNewGradeAvailable($event,p)"></app-evaluationgrade-list> 
     </mat-expansion-panel>

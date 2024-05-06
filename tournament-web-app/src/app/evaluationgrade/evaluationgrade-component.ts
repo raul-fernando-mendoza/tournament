@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../firebase.service';
-import { EvaluationGradeObj, TournamentCollection, EvaluationGradeCollection, PerformanceCollection, PerformanceObj, EvaluationGrade, TournamentObj} from '../types'
+import { EvaluationGradeObj, TournamentCollection, EvaluationGradeCollection, PerformanceCollection, PerformanceObj, EvaluationGrade, TournamentObj, JurorCollection, JurorObj} from '../types'
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
@@ -46,6 +46,7 @@ export class EvaluationGradeComponent implements OnInit{
   tournament!:TournamentObj
   performance!:PerformanceObj
   evaluationGrade!:EvaluationGradeObj
+  juror!:JurorObj
 
   collection = EvaluationGradeCollection.collectionName
   submitting = false
@@ -122,9 +123,17 @@ export class EvaluationGradeComponent implements OnInit{
         ,EvaluationGradeCollection.collectionName].join("/"),
         this.evaluationGradeId).then( data =>{
           this.evaluationGrade = data as EvaluationGradeObj
-
-
-          if( this.performance.isReleased == false && (this.evaluationGrade.jurorId == this.auth.getUserEmail() || this.tournament.creatorUid == this.auth.getUserUid()) ){
+        })
+    })
+    .then( ()=>{
+      return this.firebaseService.getDocument(
+        [TournamentCollection.collectionName,this.tournamentId
+        ,JurorCollection.collectionName].join("/"),
+        this.evaluationGrade.jurorId).then( data =>{
+          this.juror = data as JurorObj
+          let currentEmail = this.auth.getUserEmail()
+  
+          if( this.performance.isReleased == false && (this.juror.email == currentEmail || this.isAdmin )){
             this.canEdit = true
           }
 

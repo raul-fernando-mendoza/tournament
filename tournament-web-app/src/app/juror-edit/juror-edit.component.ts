@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { QuillModule } from 'ngx-quill';
 import { FirebaseService } from '../firebase.service';
-import { Juror, Tournament, TournamentCollection, TournamentObj } from '../types';
+import { Juror, JurorCollection, JurorObj, Tournament, TournamentCollection, TournamentObj } from '../types';
 
 @Component({
   selector: 'app-juror-edit',
@@ -63,16 +63,16 @@ export class JurorEditComponent {
     this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( (data)=>{
       
       this.tournament = data as TournamentObj
-      
-      let juror = this.tournament.jurors.find( e => e.id == this.jurorId)
-      if( juror ){
-        this.juror = juror
-        this.form.controls.label.setValue( juror.label )
-        this.form.controls.email.setValue( juror.email )
-      }
-    },
-    reason =>{
-      alert("Error leyendo categoria")
+    }).then( ()=>{
+      this.firebaseService.getDocument( [TournamentCollection.collectionName, this.tournamentId
+        , JurorCollection.collectionName].join("/"),this.jurorId).then( juror =>{
+          this.juror = juror
+          this.form.controls.label.setValue( juror.label )
+          this.form.controls.email.setValue( juror.email )
+  
+        })
+    }).catch( (reason) =>{
+      alert("Error leyendo juror:" + reason)
     })    
   }
 
@@ -80,13 +80,13 @@ export class JurorEditComponent {
     let label = this.form.controls.label.value
     let email = this.form.controls.email.value
     if( this.tournament && this.juror && label && email){
-      this.juror.label = label
-      this.juror.email = email 
-      let obj:Tournament = {
-        jurors:this.tournament.jurors
+      let obj:JurorObj = {
+        label: label,
+        email: email
       }        
      
-      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
+      this.firebaseService.updateDocument(  [TournamentCollection.collectionName, this.tournamentId
+        , JurorCollection.collectionName].join("/"), this.jurorId, obj).then( ()=>{
         console.log("jurado ha sido modificado")
         this.router.navigate(['../../'], { relativeTo: this.activatedRoute })
 
@@ -101,28 +101,15 @@ export class JurorEditComponent {
     if( !confirm("Esta seguro de querer borrar:" +  this.juror!.label) ){
       return
     }          
-    let index = this.tournament!.jurors.findIndex( e => e.id == this.jurorId)
-    if( index >= 0 ){
-      this.tournament!.jurors.splice( index, 1)
-      this.tournament!.jurorEmails = []
-      this.tournament!.jurors.map( e =>
-        this.tournament!.jurorEmails.push( e.email )
-      )       
-      let obj:Tournament = {
-        jurors:this.tournament!.jurors,
-        jurorEmails:this.tournament!.jurorEmails
-      }        
-     
-      this.firebaseService.updateDocument( TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-        console.log("categoria ha sido modificada")
-        this.router.navigate(['../../'], { relativeTo: this.activatedRoute })
+    this.firebaseService.deleteDocument(  [TournamentCollection.collectionName, this.tournamentId
+      , JurorCollection.collectionName].join("/"), this.jurorId).then( ()=>{
+      console.log("Jurado ha sido eliminado")
+      this.router.navigate(['../../'], { relativeTo: this.activatedRoute })
 
-      },
-      reason =>{
-        alert("Error modificando categoria")
-      })       
-    }    
-
+    },
+    reason =>{
+      alert("Error borrando juror:" + reason)
+    })       
   }
 }
 

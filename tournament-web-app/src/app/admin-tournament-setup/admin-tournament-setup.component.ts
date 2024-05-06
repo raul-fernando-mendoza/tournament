@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Filter } from '../firebase.service';
-import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection} from '../types'
+import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection, JurorCollection, JurorObj} from '../types'
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -46,6 +46,12 @@ interface InscriptionRequestLink{
   id:string
   inscriptionRequest:InscriptionRequest
   isAccepted:boolean
+}
+
+interface JurorRef{
+  id:string
+  juror:JurorObj
+
 }
 
 @Component({
@@ -118,8 +124,6 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
 
   program:Array<PerformanceReference> = []  
 
-  isParticipant = false
-
   inscriptionRequestLinks:Array<InscriptionRequestLink> = []
 
   unsubscribe:Unsubscribe | undefined = undefined
@@ -128,7 +132,9 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
 
   activePanel:string | null = null
 
-  stepperOrientation: Observable<StepperOrientation>;  
+  stepperOrientation: Observable<StepperOrientation>; 
+  
+  jurors:Array<JurorRef> = []
 
   constructor(
      private activatedRoute: ActivatedRoute
@@ -198,10 +204,6 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
       categories: [],
       medals: [],
       evaluations: [],
-      jurors: [],
-      jurorEmails: [],
-      participantEmails: [],
-      
     }
 
     this.firebase.setDocument( TournamentCollection.collectionName, id, tournament).then( ()=>{
@@ -227,12 +229,6 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
           this.useLinear = false
           this.tournamentStepper!.linear = false
 
-          if(this.auth.isloggedIn() ){
-            if( this.tournament.participantEmails.findIndex( e=>e==email ) >= 0 ){
-              this.isParticipant = true
-            }
-          } 
-  
           this.form.controls.label.setValue( this.tournament.label )
 
           let eventDate = this.dateSrv.getDate( this.tournament.eventDate )
@@ -267,13 +263,6 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
             if(!selectedIndex) 
               selectedIndex = 2
           }      
-          if( this.tournament.jurors.length > 0 && this.tournament.jurors[0]){
-            this.firstJuror.setValue( this.tournament.jurors[0].label )
-          }
-          else{
-            if(!selectedIndex) 
-              selectedIndex = 3
-          }      
 
           if( this.tournament.medals.length > 0 && this.tournament.medals[0]){
             this.firstMedal.setValue( this.tournament.medals[0].label )
@@ -289,7 +278,9 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
           
           if( this.tournamentStepper && selectedIndex )
             this.tournamentStepper!.selectedIndex = selectedIndex
-          
+
+          this.loadJurors()  
+          //this.readPerformances()
 
         },
         'error':(reason: FirestoreError)=>{
@@ -298,6 +289,25 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
         'complete':() =>{
           console.log("reading program as ended")
         }        
+      })
+    }
+  }
+
+  loadJurors(){
+    if( this.tournamentId != null){
+      this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId,
+      JurorCollection.collectionName ].join("/"), {
+        'next': (set) =>{
+            set.docs.forEach( doc =>{
+              let juror = doc.data() as JurorObj
+              let jurorRef:JurorRef={
+                id: doc.id,
+                juror: juror
+              }
+              this.jurors.push( jurorRef )
+            })
+            this.jurors.sort( (a,b) => a.juror.label > b.juror.label ? 1:-1)
+        } 
       })
     }
   }
@@ -491,7 +501,7 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
       this.form.controls.imageUrl.setValue("")
     }        
   }  
-
+/*
   readPerformances(){
     this.performances.length = 0
     if( this.isLoggedIn ){
@@ -552,64 +562,7 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
       return false
     }
   }
-  
-  loadInscriptionRequests(){
-    this.firebase.getDocuments([TournamentCollection.collectionName, this.tournamentId, InscriptionRequestCollection.collectionName].join("/")).then( set =>{
-      this.inscriptionRequestLinks.length = 0
-      set.map( doc => {
-        let inscriptionRequest:InscriptionRequest = doc.data() as InscriptionRequest
-        
-        if( !this.tournament!.participantEmails.find( e=>e == inscriptionRequest.email )){
-          var accepted = false
-        }
-        else{
-          var accepted = true
-        }
-        let inscriptionRequestLink:InscriptionRequestLink = {
-          id: doc.id,
-          inscriptionRequest: inscriptionRequest,
-          isAccepted: accepted
-        }
-
-        this.inscriptionRequestLinks.push( inscriptionRequestLink )
-      })
-
-    },
-    reason =>{
-      alert("ERROR:inscripciones no pueden ser leidas:" + reason)
-    })    
-  }
-  onAcceptInscriptionRequest(e:InscriptionRequestLink){
-    let inscription:InscriptionRequest = e.inscriptionRequest
-    if( !this.tournament!.participantEmails.find( e => e == inscription.email)){
-      this.tournament!.participantEmails.push( inscription.email )
-      let obj:Tournament = {
-        participantEmails:this.tournament!.participantEmails
-      }
-      this.firebase.updateDocument(TournamentCollection.collectionName, this.tournamentId, obj).then( ()=>{
-        console.log("accept inscription")
-      },
-      reason =>{
-        alert("ERROR: aceptando inscripciones" + reason )
-      })
-    }  
-  } 
-
-  onRejectInscriptionRequest(e:InscriptionRequestLink){
-    let idx = this.tournament!.participantEmails.findIndex( p => p == e.inscriptionRequest.email)
-    if( idx >=0 ){
-      this.tournament!.participantEmails.splice( idx, 1)
-      let obj:Tournament = {
-        participantEmails:this.tournament!.participantEmails
-      }
-      this.firebase.updateDocument(TournamentCollection.collectionName, this.tournamentId, obj).then( () =>{
-        console.log("reject inscription")
-      },
-      reason =>{
-        alert("Error:Error removing inscription")
-      })
-    }
-  }
+*/  
   onPanelActivated(activePanel:string){
     this.activePanel = activePanel 
     this.businesslogic.setStoredItem("activePanel", activePanel)
@@ -633,9 +586,6 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
       }
       if( !(tournament.evaluations.length > 0) ){
         errors.push("Por favor adicione una evaluacion");
-      }
-      if( !(tournament.jurors.length > 0)){
-        errors.push("Por favor adicione un jurado");
       }
       if( !(tournament.medals.length > 0)){
         errors.push("Por favor adicione un premio");

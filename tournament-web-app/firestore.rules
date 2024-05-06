@@ -9,13 +9,12 @@ service cloud.firestore {
 
         allow read: if true
         allow read, write: if request.resource.data.creatorUid == request.auth.uid
-        allow read, write: if request.auth.token.email in request.resource.data.participants 
 
         function isAdmin(request) {
             return ( get(/databases/$(database)/documents/tournament/$(tournamentId)).data.creatorUid == request.auth.uid)
         }   
         function isJuror(request, id, email) {
-            return ( get(/databases/$(database)/documents/tournament/$(tournamentId)).data.jurors[id].email == email )
+            return ( get(/databases/$(database)/documents/tournament/$(tournamentId)/juror/$(id)).data.email == email )
         }               
         match /{document=**} {    
           

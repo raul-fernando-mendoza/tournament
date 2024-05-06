@@ -114,7 +114,8 @@ export const routes: Routes = [
     { path:"tournament/:tournamentId/medals",pathMatch:'full',component:MedalsListComponent},    
     
     { path:"participant",pathMatch:'full',component:TournamentSearchComponent},
-    { path:"juror",pathMatch:'full',component:WelcomeJurorComponent},
+    { path:"tournamentJuror/:tournamentId",pathMatch:'full',component:WelcomeJurorComponent},
+    { path:"tournamentJuror/:tournamentId/performance/:performanceId/evaluationGrade/:evaluationGradeId",pathMatch:'full',component:EvaluationGradeComponent},
     
     
     { path:"home",pathMatch:'full',component:AdminTournamentComponent},    

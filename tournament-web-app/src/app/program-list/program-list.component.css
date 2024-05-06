@@ -43,3 +43,7 @@ mat-card{
     margin-top:auto;
     margin-bottom:auto;
 }
+.attention{
+    margin:5px;
+    background-color: yellow;
+}

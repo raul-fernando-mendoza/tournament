@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { CommonModule , Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Filter } from '../firebase.service';
-import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection, PerformanceReference} from '../types'
+import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection, PerformanceReference, JurorCollection, JurorObj} from '../types'
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -39,6 +39,11 @@ interface ProgramRef{
   noEvaluationsFound:boolean
   newGradeAvailable:boolean
   medal:string
+}
+
+interface JurorRef{
+  id:string
+  juror:JurorObj
 }
 
 @Component({
@@ -90,10 +95,8 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
     imagePath:[""]
   })
   pendingRefs:Array<PerformanceReference> = []  
-  programRefs:Array<ProgramRef> = []
-  hasPendingRequests = false
 
-  
+  jurors:Array<JurorRef> = []
 
   unsubscribe:Unsubscribe | undefined = undefined
   unsubscribePerformances:Unsubscribe | undefined = undefined
@@ -167,6 +170,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
         if( this.auth.getUserUid()!= null){
           this.isLoggedIn = true
         }
+        this.loadJurors()
         this.readPerformances()
         
         
@@ -179,6 +183,25 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
       }        
     })
   }
+  loadJurors(){
+    if( this.tournamentId != null){
+      this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId,
+      JurorCollection.collectionName ].join("/"), {
+        'next': (set) =>{
+            set.docs.forEach( doc =>{
+              let juror = doc.data() as JurorObj
+              let jurorRef:JurorRef={
+                id: doc.id,
+                juror: juror
+              }
+              this.jurors.push( jurorRef )
+            })
+            this.jurors.sort( (a,b) => a.juror.label > b.juror.label ? 1:-1)
+        } 
+      })
+    }
+  }
+
 
   readPerformances(){
     let filter:Array<Filter> = []
@@ -189,7 +212,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
       [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") 
       ,{
         'next': (set)=>{
-          this.programRefs.length = 0
           this.pendingRefs.length = 0
           set.docs.map( doc =>{
             let performance = doc.data() as PerformanceObj
@@ -201,16 +223,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
                 performance: performance,
               }
               this.pendingRefs.push(pending)
-            }
-            else{
-              let pr:ProgramRef = {
-                id: doc.id,
-                performance: performance,
-                noEvaluationsFound: false,
-                medal: this.business.getMedalForPerformance(this.tournament!, performance.grade),
-                newGradeAvailable: false
-              }
-              this.programRefs[idx] = pr 
             }
           })
           this.pendingRefs.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)

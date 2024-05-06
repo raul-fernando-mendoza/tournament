@@ -37,7 +37,6 @@ export class BusinesslogicService {
     let isSetupCompleted:boolean = false
     if( tournament.categories.length > 0 &&
       tournament.evaluations.length > 0 &&
-      tournament.jurors.length > 0 &&
       tournament.medals.length > 0 )
     {
       isSetupCompleted = true
