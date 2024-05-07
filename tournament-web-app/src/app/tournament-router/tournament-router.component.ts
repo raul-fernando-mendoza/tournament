@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { onAuthStateChanged, updateCurrentUser } from 'firebase/auth';
 import { auth } from '../../environments/environment';
 import { AuthService } from '../auth.service';
+import { BusinesslogicService } from '../businesslogic.service';
 import { FirebaseFullService } from '../firebasefull.service';
 import { JurorCollection, JurorObj, TournamentCollection, TournamentObj } from '../types';
 
@@ -29,7 +30,8 @@ export class TournamentRouterComponent{
      private activatedRoute: ActivatedRoute
     ,private authService:AuthService
     ,private router: Router
-    ,private firebase:FirebaseFullService  ){
+    ,private firebase:FirebaseFullService  
+    ,private bussiness:BusinesslogicService){
 
     var thiz = this  
     this.activatedRoute.paramMap.subscribe( {
@@ -37,6 +39,7 @@ export class TournamentRouterComponent{
         thiz.tournamentId = null
         if( paramMap.get('tournamentId') )
           thiz.tournamentId = paramMap.get('tournamentId')
+          thiz.bussiness.home = "/" + TournamentCollection.collectionName + "/" + thiz.tournamentId
           thiz.update()
         }
     })  

@@ -8,6 +8,9 @@ import { TournamentObj} from './types';
   providedIn: 'root'
 })
 export class BusinesslogicService {
+
+  public home:string = "/"
+
   constructor(private firebaseService:FirebaseService
     ,private authService:AuthService) { 
 

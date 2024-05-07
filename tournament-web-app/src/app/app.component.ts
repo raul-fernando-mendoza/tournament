@@ -49,7 +49,7 @@ export class AppComponent implements OnInit{
     , private router: Router
     , private route: ActivatedRoute
     , private authService: AuthService
-    , private bussiness:BusinesslogicService
+    , public bussiness:BusinesslogicService
   ) {
 
     onAuthStateChanged( auth, (user) => {

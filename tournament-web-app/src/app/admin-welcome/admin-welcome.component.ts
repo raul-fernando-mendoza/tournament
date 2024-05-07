@@ -42,6 +42,7 @@ export class AdminTournamentWelcomeComponent implements OnInit{
     private bussiness:BusinesslogicService,
     private router:Router
   ){
+    this.bussiness.home = "/"
 
   }
   ngOnInit(): void {

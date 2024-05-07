@@ -116,12 +116,8 @@ export const routes: Routes = [
     { path:"participant",pathMatch:'full',component:TournamentSearchComponent},
     { path:"tournamentJuror/:tournamentId",pathMatch:'full',component:WelcomeJurorComponent},
     { path:"tournamentJuror/:tournamentId/performance/:performanceId/evaluationGrade/:evaluationGradeId",pathMatch:'full',component:EvaluationGradeComponent},
-    
-    
-    { path:"home",pathMatch:'full',component:AdminTournamentComponent},    
 
-
-    { path:"",pathMatch:'full',component:AdminTournamentWelcomeComponent},
+    { path:"",pathMatch:'full',component:AdminTournamentWelcomeComponent, canActivate: [loginGuard('loginForm')]},
 
     {path:"**", component:NotfoundComponent}
 

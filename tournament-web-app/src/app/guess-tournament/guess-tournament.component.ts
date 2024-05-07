@@ -62,7 +62,7 @@ export class GuessTournamentComponent implements OnInit{
     }
   }
   onWantToParticipate(){
-    let parts = ['tournamentParticipant',this.tournamentId]
+    let parts = ['tournament',this.tournamentId]
     let url = encodeURIComponent( parts.join("/") )
     this.router.navigate(['/loginForm', url])
   }
