@@ -285,7 +285,8 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
         
       }
       else{
-        selectedIndex = 3
+        if(!selectedIndex) 
+          selectedIndex = 3
       }
 
       if( this.tournament.medals.length > 0 && this.tournament.medals[0]){
@@ -308,7 +309,7 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
   }
 
   loadJurors(){
-    if( this.tournamentId != null){
+    if( this.tournament != null){
       this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId,
       JurorCollection.collectionName ].join("/"), {
         'next': (set) =>{
