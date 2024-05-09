@@ -12,6 +12,8 @@ import { FirebaseService } from '../firebase.service';
 import { Medal, Tournament, TournamentCollection, TournamentObj } from '../types';
 import { v4 as uuidv4, v4 } from 'uuid';
 import {MatGridListModule} from '@angular/material/grid-list';
+import { BusinesslogicService } from '../businesslogic.service';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-medal-new',
@@ -27,7 +29,8 @@ import {MatGridListModule} from '@angular/material/grid-list';
     ,RouterModule
     ,MatCardModule
     ,QuillModule
-    ,MatGridListModule    
+    ,MatGridListModule 
+    ,MatSelectModule   
   ],
   templateUrl: './medal-new.component.html',
   styleUrl: './medal-new.component.css'
@@ -37,6 +40,7 @@ export class MedalNewComponent {
   tournamentId!:string
 
   tournament:TournamentObj | null = null
+  minGrades:Array<Number> = []
 
   form = this.fb.group({
     id:[null],
@@ -49,6 +53,7 @@ export class MedalNewComponent {
     ,private fb:FormBuilder
     ,private activatedRoute: ActivatedRoute     
     ,private router:Router
+    ,private bussiness:BusinesslogicService
   ){
     var thiz = this
     this.activatedRoute.paramMap.subscribe({
@@ -60,6 +65,7 @@ export class MedalNewComponent {
           }
         }
       })
+    this.minGrades=this.bussiness.getMinGrades()  
   }
   update(){
     this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( (data)=>{
@@ -95,9 +101,10 @@ export class MedalNewComponent {
         alert("Error adicionando premio")
       })       
     }
-    
   }
 
+  
+  
 
 }
 

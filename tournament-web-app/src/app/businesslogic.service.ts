@@ -54,6 +54,14 @@ export class BusinesslogicService {
       }
     }
     return ""
-  }    
+  }  
+  
+  getMinGrades(){
+    let minGrades = []
+    for( let g=10.0; g>=6.0;g=g-0.1){
+      minGrades.push( Number(g.toFixed(1)) )
+    }
+    return minGrades
+  }
 
 }

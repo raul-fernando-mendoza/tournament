@@ -158,14 +158,8 @@ export class AuthService {
     return sendPasswordResetEmail(auth, email)
   }
 
-  logout(){
-    signOut(auth).then(function(result) {
-
-    },
-    function(reason:any){
-      console.error("ERROR logout reason:" + reason)
-    });
-    this.LoginEvent(null)
+  logout():Promise<void>{
+    return signOut(auth)
   }
 
   LoginEvent(user: any): void {

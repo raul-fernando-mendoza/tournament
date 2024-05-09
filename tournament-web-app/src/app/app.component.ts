@@ -83,7 +83,9 @@ export class AppComponent implements OnInit{
     this.router.navigate(['/'])
   }  
   logout(){
-    this.authService.logout()
+    this.authService.logout().then( ()=>{
+      this.router.navigate([this.bussiness.home])
+    })
   }
   isEmailVerified(){
     return this.authService.isEmailVerified()

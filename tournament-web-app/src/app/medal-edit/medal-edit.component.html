@@ -22,8 +22,14 @@
                 </mat-grid-tile>
                 <mat-grid-tile colspan="4">
                     <mat-form-field> 
-                        <mat-label>Calificacion mínima</mat-label>
-                        <input matInput placeholder="9.0" formControlName="minGrade">
+                        <mat-label>Calificacion mínima </mat-label>
+                        <mat-select formControlName="minGrade">
+                            @for (g of minGrades; track g) {
+                            <mat-option [value]="g.toFixed(1)">
+                            {{ g }}
+                            </mat-option>                 
+                            }
+                        </mat-select>
                         <mat-hint>numero entre 0 y 10</mat-hint>
                     </mat-form-field> 
                 </mat-grid-tile>

@@ -11,6 +11,8 @@ import { QuillModule } from 'ngx-quill';
 import { FirebaseService } from '../firebase.service';
 import { Medal, Tournament, TournamentCollection, TournamentObj } from '../types';
 import {MatGridListModule} from '@angular/material/grid-list';
+import { MatSelectModule } from '@angular/material/select';
+import { BusinesslogicService } from '../businesslogic.service';
 
 @Component({
   selector: 'app-medal-edit',
@@ -26,7 +28,8 @@ import {MatGridListModule} from '@angular/material/grid-list';
     ,RouterModule
     ,MatCardModule
     ,QuillModule
-    ,MatGridListModule    
+    ,MatGridListModule  
+    ,MatSelectModule          
   ],
   templateUrl: './medal-edit.component.html',
   styleUrl: './medal-edit.component.css'
@@ -45,11 +48,14 @@ export class MedalEditComponent {
     description:[''],
     minGrade:['',[Validators.required, Validators.min(0), Validators.max(10)]]
   })  
+
+  minGrades:Array<Number> = []
   
   constructor( public firebaseService:FirebaseService 
     ,private fb:FormBuilder
     ,private activatedRoute: ActivatedRoute     
     ,private router:Router
+    ,private bussiness:BusinesslogicService    
   ){
     var thiz = this
     this.activatedRoute.paramMap.subscribe({
@@ -63,6 +69,7 @@ export class MedalEditComponent {
           }
         }
       })
+      this.minGrades=this.bussiness.getMinGrades()  
   }
   update(){
     this.firebaseService.getDocument( TournamentCollection.collectionName, this.tournamentId).then( (data)=>{

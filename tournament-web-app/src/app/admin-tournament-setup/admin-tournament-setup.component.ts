@@ -270,14 +270,14 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
         this.firstCategory.setValue( this.tournament.categories[0].label )
       }
       else{
-        selectedIndex = 1
+        selectedIndex = 0
       }
       if( this.tournament.evaluations.length > 0 && this.tournament.evaluations[0]){
         this.firstEvaluation.setValue( this.tournament.evaluations[0].label )
       }    
       else{
-        if(!selectedIndex) 
-          selectedIndex = 2
+        if(selectedIndex==null) 
+          selectedIndex = 1
       } 
       
       if( this.jurors.length > 0){
@@ -285,23 +285,23 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
         
       }
       else{
-        if(!selectedIndex) 
-          selectedIndex = 3
+        if(selectedIndex==null) 
+          selectedIndex = 2
       }
 
       if( this.tournament.medals.length > 0 && this.tournament.medals[0]){
         this.firstMedal.setValue( this.tournament.medals[0].label )
       }    
       else{
-        if(!selectedIndex) 
-          selectedIndex = 4
+        if(selectedIndex==null) 
+          selectedIndex = 3
       }      
       if( this.isSetupCompleted() ){
         if(!selectedIndex) 
-          selectedIndex = 5
+          selectedIndex = 4
       }
       
-      if( this.tournamentStepper && selectedIndex ){
+      if( this.tournamentStepper && selectedIndex!=null ){
         this.tournamentStepper!.selectedIndex = selectedIndex
       }
     }

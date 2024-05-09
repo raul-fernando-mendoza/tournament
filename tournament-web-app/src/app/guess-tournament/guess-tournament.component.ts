@@ -9,6 +9,7 @@ import { MatListModule } from '@angular/material/list';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { QuillModule } from 'ngx-quill';
 import { AuthService } from '../auth.service';
+import { BusinesslogicService } from '../businesslogic.service';
 import { DateFormatService } from '../date-format.service';
 import { FirebaseService } from '../firebase.service';
 import { TournamentCollection, TournamentObj } from '../types';
@@ -37,10 +38,10 @@ export class GuessTournamentComponent implements OnInit{
 
   constructor(
     private activatedRoute: ActivatedRoute
-    ,private auth:AuthService
     ,private router:Router
     ,private firebase:FirebaseService 
-    ,public dateSrv:DateFormatService    
+    ,public dateSrv:DateFormatService  
+    ,public bussiness:BusinesslogicService  
   ){
       var thiz = this
       this.activatedRoute.paramMap.subscribe( {
@@ -48,6 +49,7 @@ export class GuessTournamentComponent implements OnInit{
           let tournamentId = paramMap.get('tournamentId')
           if( tournamentId )
             thiz.tournamentId = tournamentId
+            bussiness.home = "/" + TournamentCollection.collectionName + "/" + tournamentId
             thiz.update()
           }
         })       
