@@ -91,6 +91,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
     label:['',Validators.required],
     eventDate:[new Date(),Validators.required],
     eventTime:[""],
+    place:[""],
     imageUrl:[""],
     imagePath:[""]
   })
@@ -160,6 +161,10 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
         if(  this.tournament.eventTime ){
           this.form.controls.eventTime.setValue( this.tournament.eventTime )
         }
+        if(  this.tournament.place ){
+          this.form.controls.place.setValue( this.tournament.place )
+        }
+
         if( this.tournament.imageUrl ){
           this.form.controls.imageUrl.setValue( this.tournament.imageUrl )
         }

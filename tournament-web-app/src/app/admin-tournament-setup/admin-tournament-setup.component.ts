@@ -107,6 +107,7 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
     label:['',Validators.required],
     eventDate:[new Date(),Validators.required],
     eventTime:[""],
+    place:[""],
     imageUrl:[""],
     imagePath:[""]
   })
@@ -224,32 +225,37 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
     if( this.tournamentId != null){
       this.unsubscribe = this.firebase.onsnapShotDoc( TournamentCollection.collectionName, this.tournamentId, {
         'next': (doc:DocumentSnapshot<DocumentData, DocumentData>) =>{
-          this.tournament = doc.data() as TournamentObj
+          if( doc.exists() ){
+            this.tournament = doc.data() as TournamentObj
 
-          this.useLinear = false
-          this.tournamentStepper!.linear = false
+            this.useLinear = false
+            this.tournamentStepper!.linear = false
 
-          this.form.controls.label.setValue( this.tournament.label )
+            this.form.controls.label.setValue( this.tournament.label )
 
-          let eventDate = this.dateSrv.getDate( this.tournament.eventDate )
-  
-          this.form.controls.eventDate.setValue( eventDate )
-          if(  this.tournament.eventTime ){
-            this.form.controls.eventTime.setValue( this.tournament.eventTime )
+            let eventDate = this.dateSrv.getDate( this.tournament.eventDate )
+    
+            this.form.controls.eventDate.setValue( eventDate )
+            if(  this.tournament.eventTime ){
+              this.form.controls.eventTime.setValue( this.tournament.eventTime )
+            }
+            if( this.tournament.place ){
+              this.form.controls.imageUrl.setValue( this.tournament.place )
+            }          
+            if( this.tournament.imageUrl ){
+              this.form.controls.imageUrl.setValue( this.tournament.imageUrl )
+            }
+    
+            if( this.auth.getUserUid()!= null && this.tournament?.creatorUid != null ){
+              this.isAdmin = (this.auth.getUserUid() == this.tournament?.creatorUid) 
+            } 
+            if( this.auth.getUserUid()!= null){
+              this.isLoggedIn = true
+            }
+
+            this.loadJurors()  
+            //this.readPerformances()
           }
-          if( this.tournament.imageUrl ){
-            this.form.controls.imageUrl.setValue( this.tournament.imageUrl )
-          }
-  
-          if( this.auth.getUserUid()!= null && this.tournament?.creatorUid != null ){
-            this.isAdmin = (this.auth.getUserUid() == this.tournament?.creatorUid) 
-          } 
-          if( this.auth.getUserUid()!= null){
-            this.isLoggedIn = true
-          }
-
-          this.loadJurors()  
-          //this.readPerformances()
 
         },
         'error':(reason: FirestoreError)=>{
@@ -270,7 +276,7 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
         this.firstCategory.setValue( this.tournament.categories[0].label )
       }
       else{
-        selectedIndex = 0
+        selectedIndex = 1
       }
       if( this.tournament.evaluations.length > 0 && this.tournament.evaluations[0]){
         this.firstEvaluation.setValue( this.tournament.evaluations[0].label )

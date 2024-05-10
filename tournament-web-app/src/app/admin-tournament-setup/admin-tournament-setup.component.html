@@ -20,13 +20,6 @@
                             <input matInput placeholder="" formControlName="label" (change)="onNameChange($event)">
                         </mat-form-field>                
                     </mat-grid-tile>
-                    <!--
-                    <mat-grid-tile colspan="1" rowspan="5">
-                        @if( tournament ){
-                            <app-image-loader [fullpath]="tournament.imagePath" [basepath]="getBasePath()" [url]="tournament.imageUrl" (onload)="fileLoaded($event)" (ondelete)="fileDeleted($event)"></app-image-loader>
-                        }
-                    </mat-grid-tile>
-                    -->
                     <mat-grid-tile colspan="1">
                         <mat-form-field color="accent" appearance="fill">
                             <mat-label>Fecha del evento</mat-label>
@@ -42,6 +35,12 @@
                             <ngx-material-timepicker #picker></ngx-material-timepicker> 
                         </mat-form-field> 
                     </mat-grid-tile>
+                    <mat-grid-tile colspan="2">
+                        <mat-form-field class="name-input" appearance="fill">
+                            <mat-label>Lugar</mat-label>
+                            <input matInput formControlName="place">
+                        </mat-form-field> 
+                    </mat-grid-tile>                        
                 </mat-grid-list>
             </form>
             @if( !tournamentId ){
