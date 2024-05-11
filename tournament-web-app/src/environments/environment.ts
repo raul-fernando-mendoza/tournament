@@ -15,8 +15,6 @@ const firebaseConfig = {
   appId: "1:1037635511206:web:4802ddbe5a6a2a51fe2567"
 };
 
-export const urlbase = 'http://localhost:4200/'
-
 // Initialize Firebase
 export const app:FirebaseApp  = initializeApp(firebaseConfig);
 export const db:Firestore  = getFirestore(app);

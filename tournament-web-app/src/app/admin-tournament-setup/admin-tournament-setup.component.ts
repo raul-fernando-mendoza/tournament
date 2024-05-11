@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { CommonModule  } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Filter } from '../firebase.service';
 import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection, JurorCollection, JurorObj} from '../types'
@@ -33,7 +33,7 @@ import { DateFormatService } from '../date-format.service';
 import { v4 } from 'uuid';
 import {AsyncPipe} from '@angular/common';
 import { map, Observable } from 'rxjs';
-import { urlbase } from '../../environments/environment';
+import { DOCUMENT } from '@angular/common';
 
 interface PerformanceReference{
   id:string
@@ -146,8 +146,11 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
     ,public pathService:PathService
     ,public businesslogic:BusinesslogicService
     ,public dateSrv:DateFormatService
-    ,breakpointObserver: BreakpointObserver,
+    ,breakpointObserver: BreakpointObserver
+    ,@Inject(DOCUMENT) private document: any
     ){
+
+      
 
     var thiz = this
     this.activatedRoute.paramMap.subscribe( {
@@ -628,8 +631,10 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
   }
 
   getTournamentPath():string{
+
+    let origin = this.document.location.origin;
  
-    return urlbase + '/tournament/' + this.tournamentId;
+    return origin + '/tournament/' + this.tournamentId;
 
   }  
 }

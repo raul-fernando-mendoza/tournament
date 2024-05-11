@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { CommonModule , Location } from '@angular/common';
+import { AfterViewInit, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { CommonModule , DOCUMENT, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Filter } from '../firebase.service';
 import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection, PerformanceReference, JurorCollection, JurorObj} from '../types'
@@ -29,7 +29,6 @@ import { DocumentSnapshot, FirestoreError, Unsubscribe } from 'firebase/firestor
 import { DateFormatService } from '../date-format.service';
 import {MatTabGroup, MatTabsModule} from '@angular/material/tabs';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import { urlbase } from '../../environments/environment';
 import { TournamentEditPodiumComponent } from '../podium/tournament-edit-podium.component';
 import { ProgramListComponent } from '../program-list/program-list.component';
 
@@ -118,7 +117,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
     ,private pathService:PathService
     ,private business:BusinesslogicService
     ,private dateSrv:DateFormatService
-    ,private location: Location){
+    ,@Inject(DOCUMENT) private document: any){
 
     var thiz = this
 
@@ -372,12 +371,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   getTournamentPath():string{
- 
-        return urlbase + '/tournament/' + this.tournamentId;
-
-  }  
-   
-
-
- 
+   let origin = this.document.location.origin;
+    return origin + '/tournament/' + this.tournamentId;
+  }
 }
