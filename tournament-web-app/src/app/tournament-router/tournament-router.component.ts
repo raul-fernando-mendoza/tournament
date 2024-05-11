@@ -6,6 +6,7 @@ import { AuthService } from '../auth.service';
 import { BusinesslogicService } from '../businesslogic.service';
 import { FirebaseFullService } from '../firebasefull.service';
 import { JurorCollection, JurorObj, TournamentCollection, TournamentObj } from '../types';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 interface JurorRef{
   id:string
@@ -15,7 +16,7 @@ interface JurorRef{
 @Component({
   selector: 'app-tournament-router',
   standalone: true,
-  imports: [],
+  imports: [MatProgressSpinnerModule],
   templateUrl: './tournament-router.component.html',
   styleUrl: './tournament-router.component.css'
 })

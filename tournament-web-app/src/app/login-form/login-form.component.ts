@@ -19,6 +19,9 @@ import { environment } from '../../environments/environment';
 
 import { HttpClientModule } from '@angular/common/http';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../environments/environment';
+import { BusinesslogicService } from '../businesslogic.service';
 
 @Component({
   selector: 'app-login-form',
@@ -77,7 +80,8 @@ export class LoginFormComponent {
     private fb: UntypedFormBuilder, 
     private route: ActivatedRoute, 
     private router: Router, 
-    private authSrv:AuthService
+    private authSrv:AuthService,
+    private bussiness:BusinesslogicService
     ) {
       
       this.isRegister = ( this.route.snapshot.paramMap.get('isRegister') == "true" )
@@ -89,8 +93,17 @@ export class LoginFormComponent {
   }
 
   ngOnInit() {
-
+    onAuthStateChanged( auth, (user) => {
+      if( this.intendedPath ) {
+        this.navigateIntended()
+      }
+      else{
+        this.router.navigate([this.bussiness.home])
+      }
+    })    
   }
+
+  
   navigateIntended(){
     if( this.intendedPath ){
       let url:string = decodeURIComponent( this.intendedPath )
