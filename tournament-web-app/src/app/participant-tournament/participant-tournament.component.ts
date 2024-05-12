@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute,  Router, RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { PerformanceCollection, PerformanceObj, TournamentCollection, TournamentObj } from '../types';
-import { FirebaseService,Filter } from '../firebase.service';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +13,8 @@ import { QuillModule } from 'ngx-quill';
 import { DateFormatService } from '../date-format.service';
 import { BusinesslogicService } from '../businesslogic.service';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { FirebaseFullService, Filter } from '../firebasefull.service';
+import { Unsubscribe } from 'firebase/auth';
 
 interface PerformanceReference{
   id:string
@@ -39,7 +40,7 @@ interface PerformanceReference{
   templateUrl: './participant-tournament.component.html',
   styleUrl: './participant-tournament.component.css'
 })
-export class ParticipantTournamentComponent {
+export class ParticipantTournamentComponent implements OnDestroy{
 
   tournamentId! :string 
   tournament:TournamentObj| null = null
@@ -53,13 +54,15 @@ export class ParticipantTournamentComponent {
   
   activePanel:string | null = null
 
+  unsubscribe:Unsubscribe | undefined
+
   constructor(
     private activatedRoute: ActivatedRoute
     ,private auth:AuthService
     ,private router:Router
-    ,private firebase:FirebaseService 
+    ,private firebase:FirebaseFullService 
     ,public dateSrv:DateFormatService
-    ,public businesslogic:BusinesslogicService ){
+    ,public business:BusinesslogicService ){
       var thiz = this
       this.activatedRoute.paramMap.subscribe( {
         next(paramMap){
@@ -71,21 +74,38 @@ export class ParticipantTournamentComponent {
   
         })       
   }
+  ngOnDestroy(): void {
+    if( this.unsubscribe ){
+      this.unsubscribe()
+    }   
+  }
 
 
   ngOnInit(): void {
-    this.activePanel = this.businesslogic.getStoredItem("activePanel")
-
+    this.activePanel = this.business.getStoredItem("activePanel")
+    this.business.home = "/" + TournamentCollection.collectionName + "/" + this.tournamentId
   }
 
 
   update(){
+    let thiz = this
+
     if( this.tournamentId != null){
-      this.firebase.getDocument( TournamentCollection.collectionName, this.tournamentId).then( data =>{
-        this.tournament = data as TournamentObj
-        this.readPerformances()
-        this.readProgram()
-      })
+      if( this.unsubscribe ){
+        this.unsubscribe()
+      }      
+      this.unsubscribe = this.firebase.onsnapShotDoc( TournamentCollection.collectionName, this.tournamentId,
+        {
+          next(doc){
+            thiz.tournament = doc.data() as TournamentObj
+            thiz.readPerformances()
+            thiz.readProgram()
+          },
+          error(reason){
+            alert("Error reading tournament")
+          }
+        }
+      )
     }
   }
     
@@ -98,6 +118,7 @@ export class ParticipantTournamentComponent {
     }
     let filter:Array<Filter> = [userFilter]
     this.firebase.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"), filter).then( set =>{
+      this.performances.length = 0
       set.map( doc =>{
         let p = doc.data() as PerformanceObj
 
