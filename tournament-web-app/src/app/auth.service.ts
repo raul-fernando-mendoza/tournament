@@ -159,7 +159,20 @@ export class AuthService {
   }
 
   logout():Promise<void>{
-    return signOut(auth)
+    return new Promise( (resolve, reject)=>{
+      signOut(auth)
+      let unsubscribe = auth.onAuthStateChanged( 
+        (user)=>{
+          if( !user ){
+            unsubscribe()
+            resolve()
+          }
+        },
+        (reason)=>{
+          reject(reason)
+        }
+      )
+    })
   }
 
   LoginEvent(user: any): void {

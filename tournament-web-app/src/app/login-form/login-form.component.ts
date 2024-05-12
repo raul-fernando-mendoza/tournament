@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, Component, Injectable, OnInit } from '@angular/core';
+import { APP_INITIALIZER, Component, Injectable, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -19,7 +19,7 @@ import { environment } from '../../environments/environment';
 
 import { HttpClientModule } from '@angular/common/http';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, Unsubscribe } from 'firebase/auth';
 import { auth } from '../../environments/environment';
 import { BusinesslogicService } from '../businesslogic.service';
 
@@ -52,7 +52,7 @@ import { BusinesslogicService } from '../businesslogic.service';
     },
 ],
 })
-export class LoginFormComponent {
+export class LoginFormComponent implements OnInit,OnDestroy{
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
@@ -74,7 +74,8 @@ export class LoginFormComponent {
   intendedPath
   siteKey = environment.recaptcha.siteKey
 
-  
+  unsubscribe:Unsubscribe | undefined
+
   constructor(
     private breakpointObserver: BreakpointObserver,
     private fb: UntypedFormBuilder, 
@@ -91,14 +92,21 @@ export class LoginFormComponent {
       }
       
   }
+  ngOnDestroy(): void {
+    if( this.unsubscribe ){
+      this.unsubscribe()
+    }
+  }
 
   ngOnInit() {
-    onAuthStateChanged( auth, (user) => {
-      if( this.intendedPath ) {
-        this.navigateIntended()
-      }
-      else{
-        this.router.navigate([this.bussiness.home])
+    this.unsubscribe = onAuthStateChanged( auth, (user) => {
+      if( auth.currentUser ){
+        if( this.intendedPath ) {
+          this.navigateIntended()
+        }
+        else{
+          this.router.navigate([this.bussiness.home])
+        }
       }
     })    
   }
@@ -117,15 +125,8 @@ export class LoginFormComponent {
         var user = this.loginForm.controls["username"].value
         var password = this.loginForm.controls["password"].value
 
-        this.authSrv.loginWithEmail(user, password).then( () =>{
-
-          console.log( "email:" + this.authSrv.getUserEmail() )
-          if( this.intendedPath ){
-            this.navigateIntended()
-          }
-          else{
-            this.router.navigate(['/']);
-          }
+        this.authSrv.loginWithEmail(user, password).then( (user) =>{
+          console.log( "email:" + user.email )
         },
         reason => {
           alert("ERROR: " + reason)
@@ -146,12 +147,8 @@ export class LoginFormComponent {
       var userName = this.loginForm.controls["username"].value
       var password = this.loginForm.controls["password"].value
       this.authSrv.register(userName, password).then( user =>{
-        this.authSrv.loginWithEmail(userName, password).then( (user) =>{
-          this.router.navigate(['/']);
-        },
-        reason => {
-          alert("ERROR: " + reason)
-        })
+        //do not navigate here use the listener 
+        console.log("email:" + user.email)
       })  
     }
     else{
@@ -172,12 +169,7 @@ export class LoginFormComponent {
   signInWithPopup() {
     //alert("going to call login with Login popup")
     this.authSrv.signInWithPopup().then( (User) =>{
-      if( this.intendedPath ){
-        this.navigateIntended()
-      }
-      else{
-        this.router.navigate(['/']);
-      }
+      console.log("signed out completed")
     })
   }    
   resolved(captchaResponse: string | null) {

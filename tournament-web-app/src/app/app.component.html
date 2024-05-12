@@ -6,12 +6,11 @@
 
     <span class="spacer"></span> 
 
-    @if ( isLoggedIn() ){
+    @if ( isLoggedIn ){
         @if ( !(isHandset$ | async) ) {
             <span class="login-name">{{ displayName }}</span>
-            <button mat-button  aria-label="logout" (click)="logout()" *ngIf="isLoggedIn()">logout</button>    
         }
-        
+        <button mat-button  aria-label="logout" (click)="logout()">logout</button>    
     }    
     @else{
         @if ( !(isHandset$ | async) ) {
@@ -25,9 +24,11 @@
 
     <mat-menu #menu="matMenu">
     
-        @if ( isLoggedIn() ){
+        @if ( isLoggedIn ){
             @if ( (isHandset$ | async) ) {
-                <button mat-menu-item  aria-label="logout" (click)="logout()" *ngIf="isLoggedIn()">logout</button> 
+                @if( isLoggedIn ){
+                    <button mat-menu-item  aria-label="logout" (click)="logout()">logout</button> 
+                }
             }
                
         }  

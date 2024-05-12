@@ -10,8 +10,6 @@ import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { DateFormatService } from '../date-format.service';
 import { BusinesslogicService } from '../businesslogic.service';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../../environments/environment';
 
 interface TournamentLink{
   id:string,

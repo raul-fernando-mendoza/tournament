@@ -121,13 +121,14 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
 
     var thiz = this
 
-    this.activatedRoute.paramMap.subscribe( {
-      next(paramMap){
+    this.activatedRoute.paramMap.subscribe( 
+      (paramMap)=>{
        
-        if( paramMap.get('tournamentId') )
+        if( paramMap.get('tournamentId') ){
           thiz.tournamentId = paramMap.get('tournamentId')!
           thiz.update()
         }
+        
 
       })      
 

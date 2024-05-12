@@ -8,7 +8,7 @@
             Fecha:{{ dateSrv.getDate( tournament.eventDate) | date: 'dd/MM/yyyy'}}
         </mat-grid-tile>
         <mat-grid-tile colspan="3">
-            Hora:{{tournament.eventTime}}
+            Hora:{{tournament.eventTime}} 
         </mat-grid-tile>
     </mat-grid-list>
 
@@ -30,18 +30,6 @@
                     }
                 </a>
             </mat-list-item>
-        <!--
-        @if( !p.performance.isAccepted ){
-            <button mat-icon-button (click)="onAcceptInscriptionRequest(e)"><mat-icon>add</mat-icon></button>                    
-        }
-        @else{
-            <button mat-icon-button (click)="onRejectInscriptionRequest(e)"><mat-icon>cancel</mat-icon></button>                    
-            <div class="performances">
-                <app-performance-list [tournamentId]="tournamentId" [tournament]="tournament" [email]="e.inscriptionRequest.email"></app-performance-list>
-            </div>
-        }
-        -->
-
     } 
     @empty{
         <p>No hay solicitudes de presentacion</p>
@@ -111,6 +99,9 @@
     <p>
         <mat-divider></mat-divider>
     </p>
+}
+@else{
+    <mat-spinner></mat-spinner>
 }
   
 

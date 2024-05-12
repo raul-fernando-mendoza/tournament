@@ -1,7 +1,5 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { onAuthStateChanged, updateCurrentUser } from 'firebase/auth';
-import { auth } from '../../environments/environment';
 import { AuthService } from '../auth.service';
 import { BusinesslogicService } from '../businesslogic.service';
 import { FirebaseFullService } from '../firebasefull.service';
@@ -35,20 +33,22 @@ export class TournamentRouterComponent{
     ,private bussiness:BusinesslogicService){
 
     var thiz = this  
-    this.activatedRoute.paramMap.subscribe( {
-      next(paramMap){
+    this.activatedRoute.paramMap.subscribe( 
+      paramMap =>{
         thiz.tournamentId = null
-        if( paramMap.get('tournamentId') )
+        if( paramMap.get('tournamentId') ){
           thiz.tournamentId = paramMap.get('tournamentId')
           thiz.bussiness.home = "/" + TournamentCollection.collectionName + "/" + thiz.tournamentId
           thiz.update()
         }
-    })  
+        else{
+          thiz.update()
+        }
+      }
+    )  
   }
   update(){
-    onAuthStateChanged( auth, (user) => {
-      this.route()
-    })      
+    this.route()
   }
 
   route(){

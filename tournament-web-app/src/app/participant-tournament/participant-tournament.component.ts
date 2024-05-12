@@ -13,7 +13,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { QuillModule } from 'ngx-quill';
 import { DateFormatService } from '../date-format.service';
 import { BusinesslogicService } from '../businesslogic.service';
-
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 interface PerformanceReference{
   id:string
@@ -34,6 +34,7 @@ interface PerformanceReference{
     ,RouterModule    
     ,MatGridListModule
     ,QuillModule
+    ,MatProgressSpinnerModule
   ],
   templateUrl: './participant-tournament.component.html',
   styleUrl: './participant-tournament.component.css'
