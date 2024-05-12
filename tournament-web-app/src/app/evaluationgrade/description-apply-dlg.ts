@@ -1,6 +1,7 @@
 import { Component , Inject} from "@angular/core";
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { QuillModule } from "ngx-quill";
 export interface DescriptionDlgData {
     description: string
 }
@@ -9,7 +10,10 @@ export interface DescriptionDlgData {
     selector: 'description-apply-dlg',
     templateUrl: 'description-apply-dlg.html',
     standalone: true,
-    imports: [MatButtonModule,MatDialogModule]    
+    imports: [MatButtonModule
+      ,MatDialogModule
+      ,QuillModule      
+    ]    
   })
   export class DescriptionApplyDialog { 
     constructor(

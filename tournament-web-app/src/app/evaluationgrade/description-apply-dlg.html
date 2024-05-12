@@ -1,5 +1,7 @@
 <div mat-dialog-content>
-  <p>{{data.description}}</p>
+  <p>
+    <quill-view-html [content]="data.description"></quill-view-html> 
+  </p>  
 
 </div>
 <div mat-dialog-actions>
