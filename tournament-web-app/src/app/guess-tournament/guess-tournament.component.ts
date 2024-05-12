@@ -41,7 +41,7 @@ export class GuessTournamentComponent implements OnInit{
     ,private router:Router
     ,private firebase:FirebaseService 
     ,public dateSrv:DateFormatService  
-    ,public bussiness:BusinesslogicService  
+    ,public business:BusinesslogicService  
   ){
       var thiz = this
       this.activatedRoute.paramMap.subscribe( {
@@ -49,12 +49,14 @@ export class GuessTournamentComponent implements OnInit{
           let tournamentId = paramMap.get('tournamentId')
           if( tournamentId )
             thiz.tournamentId = tournamentId
-            bussiness.home = "/" + TournamentCollection.collectionName + "/" + tournamentId
+            business.home = "/" + TournamentCollection.collectionName + "/" + tournamentId
             thiz.update()
           }
         })       
   }
   ngOnInit(): void {
+    this.business.home = "/" + TournamentCollection.collectionName + "/" + this.tournamentId
+
   }
   update(){
     if( this.tournamentId != null){

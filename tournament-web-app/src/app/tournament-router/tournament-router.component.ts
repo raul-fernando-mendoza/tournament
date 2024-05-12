@@ -38,7 +38,6 @@ export class TournamentRouterComponent{
         thiz.tournamentId = null
         if( paramMap.get('tournamentId') ){
           thiz.tournamentId = paramMap.get('tournamentId')
-          thiz.bussiness.home = "/" + TournamentCollection.collectionName + "/" + thiz.tournamentId
           thiz.update()
         }
         else{
