@@ -33,7 +33,8 @@ interface ProgramRef{
     @Input() tournamentId!:string
     @Input() tournament!:TournamentObj
 
-    unsubscribe:Unsubscribe | undefined = undefined
+    unsubscribe:Unsubscribe | undefined
+    unsubscribePerformances:Unsubscribe | undefined = undefined
 
     programRefs:Array<ProgramRef> = []
 
@@ -43,6 +44,13 @@ interface ProgramRef{
     }
 
     ngAfterViewInit(): void {
+      let thiz = this
+      this.unsubscribe = this.firebase.onsnapShotDoc( TournamentCollection.collectionName, this.tournamentId,{
+        next( doc ){
+          let tournament = doc.data() as TournamentObj
+          thiz.readPerformances()
+        }
+      })
       this.readPerformances()
         
     }
@@ -50,11 +58,18 @@ interface ProgramRef{
       if( this.unsubscribe ){
         this.unsubscribe()
       }
+
+      if( this.unsubscribePerformances ){
+        this.unsubscribePerformances()
+      }
     }
     
     readPerformances(){
-      
-      this.unsubscribe = this.firebase.onsnapShotCollection(
+
+      if( this.unsubscribePerformances ){
+        this.unsubscribePerformances()
+      }      
+      this.unsubscribePerformances = this.firebase.onsnapShotCollection(
         [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") 
         ,{
           'next': (set)=>{
