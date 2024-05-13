@@ -6,6 +6,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { QuillModule } from 'ngx-quill';
 import { AuthService } from '../auth.service';
@@ -27,6 +28,7 @@ import { TournamentCollection, TournamentObj } from '../types';
     ,RouterModule    
     ,MatGridListModule
     ,QuillModule  
+    ,MatProgressBarModule    
   ],
   templateUrl: './guess-tournament.component.html',
   styleUrl: './guess-tournament.component.css'
@@ -62,6 +64,9 @@ export class GuessTournamentComponent implements OnInit{
     if( this.tournamentId != null){
       this.firebase.getDocument( TournamentCollection.collectionName, this.tournamentId).then(data=>{
         this.tournament = data as TournamentObj
+      },
+      reason=>{
+        alert("Error leyendo torneo:" + reason)
       }) 
     }
   }
