@@ -178,13 +178,16 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
   }
 
   onCreateNew(){
-    let id = v4();
+
     let d:Date = this.form.controls.eventDate.value!
 
     
     let eventDate:number = this.dateSrv.getDayId(d)
 
     var label = this.form.controls.label.value!
+
+    let id = this.businesslogic.camelCase(label);
+
     var tags:Array<string> =  []
     const matches = label.match(/(\b[^\s]+\b)/g);
     if( matches ){

@@ -64,4 +64,24 @@ export class BusinesslogicService {
     return minGrades
   }
 
+  camelCase(str:string){
+    let strSpanish = str.toLowerCase()
+                      .replaceAll("año","year")  
+                      .replaceAll("á","a")
+                      .replaceAll("é","e")
+                      .replaceAll("í","i")
+                      .replaceAll("ó","o")
+                      .replaceAll("ú","u")
+                      .replaceAll("ñ","n")
+    let string = strSpanish.toLowerCase().replace(/[^A-Za-z0-9]/g, ' ').split(' ')
+                    .reduce((result, word) => result + this.capitalize(word.toLowerCase()))
+   
+    return string
+  }
+  
+  capitalize(str:string){
+    return str.charAt(0).toUpperCase() + str.toLowerCase().slice(1)
+  }
+  
+
 }
