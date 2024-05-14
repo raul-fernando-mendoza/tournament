@@ -66,17 +66,19 @@ export class BusinesslogicService {
 
   camelCase(str:string){
     let strSpanish = str.toLowerCase()
-                      .replaceAll("año","year")  
                       .replaceAll("á","a")
                       .replaceAll("é","e")
                       .replaceAll("í","i")
                       .replaceAll("ó","o")
                       .replaceAll("ú","u")
-                      .replaceAll("ñ","n")
-    let string = strSpanish.toLowerCase().replace(/[^A-Za-z0-9]/g, ' ').split(' ')
+                      .replace(/\baños\b/g," years ")
+                      .replace(/\baño\b/g," year ")
+                      .replaceAll("ñ","nn")
+
+    let endStr = strSpanish.toLowerCase().replace(/[^A-Za-z0-9]/g, ' ').split(' ')
                     .reduce((result, word) => result + this.capitalize(word.toLowerCase()))
    
-    return string
+    return endStr
   }
   
   capitalize(str:string){
