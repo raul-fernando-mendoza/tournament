@@ -18,9 +18,6 @@
         </mat-card-content>
         <mat-card-actions>
             <button #edited id="edited" mat-button (click)="onSubmit()" [disabled]="!form.valid"><mat-icon>done</mat-icon></button>
-            <a [routerLink]="'../'">
-                <button mat-icon-button><mat-icon>cancel</mat-icon></button>
-            </a>        
         </mat-card-actions>
     </mat-card>   
 }
