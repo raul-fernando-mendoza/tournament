@@ -40,7 +40,9 @@ export class PerformanceNewComponent {
     id:[null],
     label:[""],
     categoryId:["",Validators.required],
-    fullname:["",Validators.required]
+    fullname:["",Validators.required],
+    academy:[""],
+    coreographer:[""]
   })
 
   constructor(
@@ -74,6 +76,8 @@ export class PerformanceNewComponent {
     let label = this.g.controls["label"].value
     let categoryId = this.g.controls["categoryId"].value
     let fullname = this.g.controls["fullname"].value
+    let academy = this.g.controls.academy.value    
+    let coreagrapher = this.g.controls.coreographer.value 
     let email = this.auth.getUserEmail()
 
     let obj:PerformanceObj = {
@@ -84,7 +88,10 @@ export class PerformanceNewComponent {
       grade: 0,
       overwrittenGrade: null,
       isReleased: false,
-      isCanceled: false
+      isCanceled: false,
+      academy: academy ? academy : "",
+      coreographer: coreagrapher ? coreagrapher : "",
+      isDeleted: false
     }
     let id=uuidv4()
     this.firebase.setDocument( [TournamentCollection.collectionName,this.tournamentId,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{

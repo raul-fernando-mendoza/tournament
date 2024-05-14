@@ -15,6 +15,8 @@ import { BusinesslogicService } from '../businesslogic.service';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { FirebaseFullService, Filter } from '../firebasefull.service';
 import { Unsubscribe } from 'firebase/auth';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
 
 interface PerformanceReference{
   id:string
@@ -36,6 +38,8 @@ interface PerformanceReference{
     ,MatGridListModule
     ,QuillModule
     ,MatProgressSpinnerModule
+    ,MatCheckboxModule
+    ,FormsModule
   ],
   templateUrl: './participant-tournament.component.html',
   styleUrl: './participant-tournament.component.css'
@@ -55,6 +59,8 @@ export class ParticipantTournamentComponent implements OnDestroy{
   activePanel:string | null = null
 
   unsubscribe:Unsubscribe | undefined
+
+  isShowDeleted = false
 
   constructor(
     private activatedRoute: ActivatedRoute
@@ -121,7 +127,6 @@ export class ParticipantTournamentComponent implements OnDestroy{
       this.performances.length = 0
       set.map( doc =>{
         let p = doc.data() as PerformanceObj
-
         let pr:PerformanceReference = {
           id: doc.id,
           performance: p,

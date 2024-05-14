@@ -88,6 +88,9 @@ export interface Performance{
     grade?:number,
     overwrittenGrade?:number|null
     isReleased?:boolean
+    academy?:string
+    coreographer?:string
+    isDeleted?:boolean
 }
 export class PerformanceObj implements Performance{
     label!:string 
@@ -98,6 +101,10 @@ export class PerformanceObj implements Performance{
     grade:number=10
     overwrittenGrade:number|null=null
     isReleased:boolean = false
+    academy!:string
+    coreographer!:string 
+    isDeleted!:boolean
+      
 }
 export class PerformanceCollection{
     static readonly collectionName:string = "performance"

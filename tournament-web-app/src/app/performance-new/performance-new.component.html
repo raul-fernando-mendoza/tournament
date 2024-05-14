@@ -22,10 +22,17 @@
                     </mat-option>                 
                 </mat-select>
             </mat-form-field> 
+            <mat-form-field> 
+                <mat-label>Academia</mat-label>  
+                <input matInput  formControlName="academy" >
+            </mat-form-field>  
+            <mat-form-field> 
+                <mat-label>Coreografo</mat-label>  
+                <input matInput  formControlName="coreographer" >
+            </mat-form-field>                             
         </mat-card-content>
         <mat-card-actions>
             <button id="done" name="done" mat-button (click)="onSubmit()" [disabled]="!g.valid"><mat-icon>done</mat-icon></button>
     </mat-card-actions>
     </mat-card>
-
 }

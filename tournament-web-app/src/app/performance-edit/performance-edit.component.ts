@@ -39,6 +39,8 @@ export class PerformanceEditComponent {
 
   isAccepted = false
 
+  canEdit = true
+
   isAdmin = false
 
   g = this.fb.group({
@@ -46,7 +48,9 @@ export class PerformanceEditComponent {
     label:[""],
     categoryId:["",Validators.required],
     fullname:["",Validators.required],
-    status:["en-aprovacion",Validators.required]
+    status:["en-aprovacion",Validators.required],
+    academy:[""],
+    coreographer:[""]
   })
   constructor(
     private activatedRoute: ActivatedRoute
@@ -92,11 +96,19 @@ export class PerformanceEditComponent {
             thiz.g.controls.label.setValue(p.label)
             thiz.g.controls.categoryId.setValue( p.categoryId )  
             thiz.g.controls.fullname.setValue( p.fullname )
+            thiz.g.controls.academy.setValue( p.academy )
+            thiz.g.controls.coreographer.setValue( p.academy )
 
-            if( !thiz.isAdmin ){
+            if( thiz.isAccepted || thiz.performance!.isCanceled ){
+              thiz.canEdit = false
               thiz.g.controls.label.disable()
               thiz.g.controls.categoryId.disable()
               thiz.g.controls.fullname.disable()
+              thiz.g.controls.academy.disable()
+              thiz.g.controls.coreographer.disable()
+            }
+            else{
+              thiz.canEdit = true
             }
           })
         },
@@ -160,7 +172,7 @@ export class PerformanceEditComponent {
     })
   }
   onSubmit(){
-    if( this.isAdmin ){
+    if( this.canEdit ){
       let label = this.g.controls["label"].value
       let categoryId = this.g.controls["categoryId"].value
       let fullname = this.g.controls["fullname"].value
@@ -181,6 +193,20 @@ export class PerformanceEditComponent {
         alert("Error updating performances:" + reason)
       })
     }
+  }  
+  onDelete(){
+    let obj:Performance = {
+      isCanceled:true,
+      isDeleted:true
+    }
+    let id=this.performanceId
+    this.firebase.updateDocument( [TournamentCollection.collectionName,this.tournamentId,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{
+      console.log("performances deleted")
+      this.router.navigate(["../../"], { relativeTo: this.activatedRoute })
+    },
+    reason =>{
+      alert("Error updating performances:" + reason)
+    })
   }  
 
 }

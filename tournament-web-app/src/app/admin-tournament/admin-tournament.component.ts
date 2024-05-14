@@ -31,6 +31,7 @@ import {MatTabGroup, MatTabsModule} from '@angular/material/tabs';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { TournamentEditPodiumComponent } from '../podium/tournament-edit-podium.component';
 import { ProgramListComponent } from '../program-list/program-list.component';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 interface ProgramRef{
   id:string
@@ -73,6 +74,7 @@ interface JurorRef{
   ,MatProgressSpinnerModule
   ,TournamentEditPodiumComponent
   ,ProgramListComponent
+  ,MatCheckboxModule
   ],
   templateUrl: './admin-tournament.component.html',
   styleUrl: './admin-tournament.component.css'
@@ -105,6 +107,7 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
   activePanel:string | null = null
 
 
+  isShowCanceled = false
 
   @ViewChild("tournamentTab", {static: true}) demo3Tab!: MatTabGroup;
 

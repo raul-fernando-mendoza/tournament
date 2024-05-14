@@ -26,18 +26,29 @@
     <mat-tab-group #tournamentTab>
         <mat-tab label="programa">
             @if( pendingRefs.length ||  (pendingRefs.length == 0 && tournament.program.length == 0) ){
-                <h2>Solicitudes de presentacion</h2>
+                
+
+                <div class="bar">
+                    <h2>Solicitudes de presentacion</h2>
+                    <span class="spacer"></span>
+                    <mat-checkbox [(ngModel)]="isShowCanceled">mostrar borrados</mat-checkbox>
+                    <span class="spacer"></span>
+                </div>                
                 <mat-list>
                 @for( p of pendingRefs; track p.id){
-                    <mat-list-item>
-                        <a [routerLink]="['performanceEdit',p.id]">
-                            <span>{{ p.performance.label }}</span>
-                            @if( p.performance.isCanceled ){ 
-                            <span class="cancelado">Cancelado</span> 
-                            } 
-                        </a>
-                        <button mat-raised-button color="primary" (click)="onAccept(p.id)">Aceptar en el programa</button>
-                    </mat-list-item>
+                    @if( !(isShowCanceled==false && p.performance.isCanceled ) ){
+                        <mat-list-item>
+                            <a [routerLink]="['performanceEdit',p.id]">
+                                <span>{{ p.performance.label }}</span>
+                                @if( p.performance.isCanceled ){ 
+                                <span class="cancelado">Cancelado</span> 
+                                } 
+                            </a>
+                            @if( !p.performance.isCanceled ){ 
+                                <button mat-raised-button color="primary" (click)="onAccept(p.id)">Aceptar en el programa</button>
+                            }
+                        </mat-list-item>
+                    }
                 } 
                 @empty{
                     <span>No hay ninguna solicitud pendiente</span>
