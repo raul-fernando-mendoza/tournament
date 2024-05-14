@@ -76,6 +76,9 @@ export class CategoryNewComponent {
         description: description ? description : ""
       }
       this.tournament.categories.push( category )
+
+      this.tournament.categories.sort( (a,b)=>a.label>b.label? 1: -1)
+      
       let obj:Tournament = {
         categories:this.tournament.categories
       }        

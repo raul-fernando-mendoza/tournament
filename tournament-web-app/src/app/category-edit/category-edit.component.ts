@@ -82,6 +82,9 @@ export class CategoryEditComponent {
     if( this.tournament && this.category && label ){
       this.category.label = label
       this.category.description = description ? description : ""
+
+      this.tournament.categories.sort( (a,b)=>a.label>b.label? 1: -1)
+      
       let obj:Tournament = {
         categories:this.tournament.categories
       }        
