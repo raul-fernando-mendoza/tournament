@@ -14,6 +14,7 @@ interface ProgramRef{
   id:string
   performance:PerformanceObj
   medal:string
+  categoryLabel:string
 }
 
 
@@ -79,10 +80,12 @@ interface ProgramRef{
               //check if the performance is in the program
               let idx = this.tournament!.program.findIndex( e => e == doc.id )
               if( performance.isReleased && idx >= 0 ){
+                let category = this.tournament.categories.find( e => e.id == performance.categoryId )
                 let pending:ProgramRef={
                   id: doc.id,
                   performance: performance,
-                  medal: this.bussiness.getMedalForPerformance(this.tournament, performance.grade)
+                  medal: this.bussiness.getMedalForPerformance(this.tournament, performance.grade),
+                  categoryLabel: category ? category.label: ""
                 }
                 this.programRefs.push(pending)
               }

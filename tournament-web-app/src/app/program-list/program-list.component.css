@@ -47,3 +47,9 @@ mat-card{
     margin:5px;
     background-color: yellow;
 }
+.cancel{
+    color:red;
+    font-size: large;
+    margin-left: 1em;
+    margin-right: 1em;
+}

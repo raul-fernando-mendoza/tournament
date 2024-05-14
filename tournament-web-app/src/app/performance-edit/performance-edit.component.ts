@@ -39,6 +39,7 @@ export class PerformanceEditComponent {
 
   isAccepted = false
 
+  isAdmin = false
 
   g = this.fb.group({
     id:[null],
@@ -74,6 +75,10 @@ export class PerformanceEditComponent {
       this.firebase.onsnapShotDoc( TournamentCollection.collectionName, this.tournamentId,{
         next( doc ){
           thiz.tournament = doc.data() as TournamentObj
+          if( thiz.auth.getUserUid() == thiz.tournament.creatorUid ){
+            thiz.isAdmin = true
+          }
+
 
           if( thiz.tournament.program.find( e => e == thiz.performanceId )){
             thiz.isAccepted = true
@@ -87,6 +92,12 @@ export class PerformanceEditComponent {
             thiz.g.controls.label.setValue(p.label)
             thiz.g.controls.categoryId.setValue( p.categoryId )  
             thiz.g.controls.fullname.setValue( p.fullname )
+
+            if( !thiz.isAdmin ){
+              thiz.g.controls.label.disable()
+              thiz.g.controls.categoryId.disable()
+              thiz.g.controls.fullname.disable()
+            }
           })
         },
         error( reason ){
@@ -148,11 +159,28 @@ export class PerformanceEditComponent {
       alert("Error updating performances:" + reason)
     })
   }
-  isAdmin(){
-    if( this.tournament ){
-      return this.tournament.creatorUid == this.auth.getUserUid()
+  onSubmit(){
+    if( this.isAdmin ){
+      let label = this.g.controls["label"].value
+      let categoryId = this.g.controls["categoryId"].value
+      let fullname = this.g.controls["fullname"].value
+      let email = this.auth.getUserEmail()
+
+      let obj:Performance = {
+        categoryId: categoryId!,
+        fullname: fullname!,
+        email: email!,
+        label: label!,
+      }
+      let id=this.performanceId
+      this.firebase.updateDocument( [TournamentCollection.collectionName,this.tournamentId,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{
+        console.log("performances added")
+        this.router.navigate(["../../"], { relativeTo: this.activatedRoute })
+      },
+      reason =>{
+        alert("Error updating performances:" + reason)
+      })
     }
-    return false
-  }
-  
+  }  
+
 }

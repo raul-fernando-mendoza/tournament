@@ -14,9 +14,14 @@
         <mat-expansion-panel-header>
         <mat-panel-title>
             {{idx+1}}.-{{ p.performance.label }}
+            @if( p.performance.isCanceled ){
+                <span class="cancel">Status Cancelado</span>
+            }             
         </mat-panel-title>
         <mat-panel-description>
-            {{ p.performance.fullname }}
+            <span>{{ p.performance.fullname }}</span>
+
+           
 
             @if( p.noEvaluationsFound ){
                 <span class="attention">Por favor adicione examenes!</span>
