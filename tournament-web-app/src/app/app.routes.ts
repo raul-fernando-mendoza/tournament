@@ -1,9 +1,7 @@
 import { CanActivateFn, Router, Routes } from '@angular/router';
 import { LoginFormComponent } from './login-form/login-form.component';
 import { AdminTournamentComponent } from './admin-tournament/admin-tournament.component';
-import { TournamentSearchComponent } from './tournament-search/tournament-search.component';
 import { EvaluationGradeComponent } from './evaluationgrade/evaluationgrade-component';
-import { MedalsListComponent } from './medals-list/medals-list.component';
 import { ProgramListComponent } from './program-list/program-list.component';
 import { WelcomeJurorComponent } from './welcome-juror/welcome-juror.component';
 import { AuthService } from './auth.service';
@@ -111,9 +109,6 @@ export const routes: Routes = [
 //    { path:"tournament/:tournamentId/evaluationGrade/:id",component:EvaluationGradeComponent}, 
     { path:"tournament/:tournamentId/performance/:performanceId/evaluationGrade/:evaluationGradeId",pathMatch:'full',component:EvaluationGradeComponent},
 
-    { path:"tournament/:tournamentId/medals",pathMatch:'full',component:MedalsListComponent},    
-    
-    { path:"participant",pathMatch:'full',component:TournamentSearchComponent},
     { path:"tournamentJuror/:tournamentId",pathMatch:'full',component:WelcomeJurorComponent},
     { path:"tournamentJuror/:tournamentId/performance/:performanceId/evaluationGrade/:evaluationGradeId",pathMatch:'full',component:EvaluationGradeComponent},
 

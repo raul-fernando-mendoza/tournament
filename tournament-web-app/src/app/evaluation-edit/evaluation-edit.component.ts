@@ -8,7 +8,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { QuillModule } from 'ngx-quill';
-import { AspectListComponent } from '../aspect-list/aspect-list.component';
 import { FirebaseService } from '../firebase.service';
 import { Evaluation, Tournament, TournamentCollection, TournamentObj } from '../types';
 
@@ -25,8 +24,7 @@ import { Evaluation, Tournament, TournamentCollection, TournamentObj } from '../
     ,MatInputModule
     ,RouterModule
     ,MatCardModule
-    ,QuillModule 
-    ,AspectListComponent       
+    ,QuillModule     
   ],
   templateUrl: './evaluation-edit.component.html',
   styleUrl: './evaluation-edit.component.css'
