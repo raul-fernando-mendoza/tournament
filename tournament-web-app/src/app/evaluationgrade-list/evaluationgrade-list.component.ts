@@ -10,6 +10,7 @@ import { RouterModule } from '@angular/router';
 import { and, DocumentData, DocumentSnapshot, QueryFieldFilterConstraint, QuerySnapshot, Unsubscribe, where, WhereFilterOp } from 'firebase/firestore';
 import { Filter, FirebaseFullService } from '../firebasefull.service';
 import { AuthService } from '../auth.service';
+import { release } from 'os';
 
 interface EvaluationGradeReference{
   id:string
@@ -75,67 +76,68 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
     if(this.unsubscribeEvaluationGrade){
       this.unsubscribeEvaluationGrade()
     }
-    this.loadJurors()
-    
-    let filter 
-    if( this.isAdmin == true ){
-      //no filter
-    }
-    else{ //force a filter
-      let juror = this.jurors.find( e => e.juror.email == this.auth.getUserEmail())
-      if( juror ){
-        let id:string = juror.id
-        filter = where("jurorId", "==", id)
-      }       
-    }     
-    this.unsubscribeEvaluationGrade = this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId
-                                      , PerformanceCollection.collectionName, this.performanceId
-                                      , EvaluationGradeCollection.collectionName].join("/"),
-      {
-        'next':(snapshot: QuerySnapshot<DocumentData>) =>{
-          this.evaluationGradesReferences.length = 0
-
-          this.isNewGradeAvailable = false
-          let sumGrade = 0
-          let numGrades = 0
-          this.newGrade = 0
-          snapshot.docs.map( doc =>{
-            let evaluationGrade = doc.data() as EvaluationGradeObj
-            let obj:EvaluationGradeReference = {
-              id:doc.id,
-              evaluationGrade:evaluationGrade
-            }
-            this.evaluationGradesReferences.push(obj)
-            if( evaluationGrade.isCompleted ){
-              sumGrade += evaluationGrade.grade
-              numGrades += 1
-            }
-          })
-          if( this.evaluationGradesReferences.length == 0){
-            this.noEvaluationsFound.emit( true )
-          }
-          else{
-            this.noEvaluationsFound.emit( false )
-          }
-          if( numGrades > 0 ){
-            this.newGrade = Number( (sumGrade / numGrades).toFixed(2) )
-            if( this.performance.grade != this.newGrade ){
-              this.isNewGradeAvailable = true
-              this.newGradeAvailable.emit(true)
+    this.loadJurors().then( ()=>{
+      let filter 
+      if( this.isAdmin == true ){
+        //no filter
+      }
+      else{ //force a filter
+        let juror = this.jurors.find( e => e.juror.email == this.auth.getUserEmail())
+        if( juror ){
+          let id:string = juror.id
+          filter = where("jurorId", "==", id)
+        }       
+      }     
+      this.unsubscribeEvaluationGrade = this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId
+                                        , PerformanceCollection.collectionName, this.performanceId
+                                        , EvaluationGradeCollection.collectionName].join("/"),
+        {
+          'next':(snapshot: QuerySnapshot<DocumentData>) =>{
+            this.evaluationGradesReferences.length = 0
+  
+            this.isNewGradeAvailable = false
+            let sumGrade = 0
+            let numGrades = 0
+            this.newGrade = 0
+            snapshot.docs.map( doc =>{
+              let evaluationGrade = doc.data() as EvaluationGradeObj
+              let obj:EvaluationGradeReference = {
+                id:doc.id,
+                evaluationGrade:evaluationGrade
+              }
+              this.evaluationGradesReferences.push(obj)
+              if( evaluationGrade.isCompleted ){
+                sumGrade += evaluationGrade.grade
+                numGrades += 1
+              }
+            })
+            if( this.evaluationGradesReferences.length == 0){
+              this.noEvaluationsFound.emit( true )
             }
             else{
-              this.newGradeAvailable.emit(false)
+              this.noEvaluationsFound.emit( false )
             }
-          }
-        },
-        'error':(reason) =>{
-          alert("there has been an error reading performances:" + reason)
-        },
-        'complete':() =>{
-          console.log("reading program as ended")
-      }
-    },
-    filter)
+            if( numGrades > 0 ){
+              this.newGrade = Number( (sumGrade / numGrades).toFixed(2) )
+              if( this.performance.grade != this.newGrade ){
+                this.isNewGradeAvailable = true
+                this.newGradeAvailable.emit(true)
+              }
+              else{
+                this.newGradeAvailable.emit(false)
+              }
+            }
+          },
+          'error':(reason) =>{
+            alert("there has been an error reading performances:" + reason)
+          },
+          'complete':() =>{
+            console.log("reading program as ended")
+        }
+      },
+      filter)
+    })
+    
   }  
 
   getEvaluationRefence( evaluationId:string, jurorId:string ):EvaluationGradeReference[]{
@@ -197,32 +199,38 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
     }
   }
 
-  loadJurors(){
-    
-    let filter:QueryFieldFilterConstraint | undefined = undefined
-    if( !this.isAdmin ){
-      let email:string | null = this.auth.getUserEmail() 
-      filter = where("email","==", email)      
-    }
-
-    if( this.tournamentId != null){
-      this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId,
-      JurorCollection.collectionName ].join("/"), {
-        'next': (set) =>{
-            this.jurors.length = 0
-            set.docs.forEach( doc =>{
-              let juror = doc.data() as JurorObj
-              let jurorRef:JurorRef={
-                id: doc.id,
-                juror: juror
-              }
-              this.jurors.push( jurorRef )
-            })
-            this.jurors.sort( (a,b) => a.juror.label > b.juror.label ? 1:-1)
-        } 
-      },
-      filter)
-    }
+  loadJurors():Promise<void>{
+    return new Promise( (resolve, reject)=>{
+      let filter:QueryFieldFilterConstraint | undefined = undefined
+      if( !this.isAdmin ){
+        let email:string | null = this.auth.getUserEmail() 
+        filter = where("email","==", email)      
+      }
+  
+      if( this.tournamentId != null){
+        this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId,
+        JurorCollection.collectionName ].join("/"), {
+          'next': (set) =>{
+              this.jurors.length = 0
+              set.docs.forEach( doc =>{
+                let juror = doc.data() as JurorObj
+                let jurorRef:JurorRef={
+                  id: doc.id,
+                  juror: juror
+                }
+                this.jurors.push( jurorRef )
+              })
+              this.jurors.sort( (a,b) => a.juror.label > b.juror.label ? 1:-1)
+              resolve()
+          }, 
+          'error': (reason)=>{
+            alert("error reading jurors:"+ reason )
+            reject()
+          }
+        },
+        filter)
+      }
+    })
   }
 
   onRelease(){
