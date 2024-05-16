@@ -3,6 +3,7 @@
     
     @if( isAdmin && this.performance.isReleased == false && newGrade > 0){
         <span>Nueva Calificacion :{{ newGrade }}</span>
+        <span>calificacion:{{ getMedal(newGrade) }}</span>
         <button mat-raised-button color="primary" (click)="onRelease()">Liberar Calificacion</button>
     }
 </div>

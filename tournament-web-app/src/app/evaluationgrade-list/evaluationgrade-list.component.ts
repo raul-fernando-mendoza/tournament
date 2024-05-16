@@ -11,6 +11,7 @@ import { and, DocumentData, DocumentSnapshot, QueryFieldFilterConstraint, QueryS
 import { Filter, FirebaseFullService } from '../firebasefull.service';
 import { AuthService } from '../auth.service';
 import { release } from 'os';
+import { BusinesslogicService } from '../businesslogic.service';
 
 interface EvaluationGradeReference{
   id:string
@@ -57,7 +58,8 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
 
   constructor(
     private firebase:FirebaseFullService,
-    private auth:AuthService
+    private auth:AuthService,
+    private business:BusinesslogicService
   ){
 
   }
@@ -250,5 +252,9 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
     reason =>{
       alert("Error actualizando la liberacion")
     })
-  }    
+  }   
+  
+  getMedal( newGrade:number ):string{
+    return this.business.getMedalForPerformance(this.tournament!, newGrade)
+  }
 }
