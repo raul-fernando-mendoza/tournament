@@ -91,6 +91,8 @@ export interface Performance{
     academy?:string
     coreographer?:string
     isDeleted?:boolean
+    isRejected?:boolean
+    rejectedReason?:string
 }
 export class PerformanceObj implements Performance{
     label!:string 
@@ -104,7 +106,8 @@ export class PerformanceObj implements Performance{
     academy!:string
     coreographer!:string 
     isDeleted!:boolean
-      
+    isRejected!:boolean
+    rejectedReason:string = ""     
 }
 export class PerformanceCollection{
     static readonly collectionName:string = "performance"

@@ -14,30 +14,32 @@
     <div class="bar">
         <h2>Mis solicitudes de presentacion</h2>
         <span class="spacer"></span>
-        <mat-checkbox [(ngModel)]="isShowDeleted">mostrar borrados</mat-checkbox>
+        <mat-checkbox [(ngModel)]="isShowDeleted">mostrar todos</mat-checkbox>
         <span class="spacer"></span>        
     </div>
 
     <mat-list>
     @for( p of performances; track p.id){
 
-        @if( !(isShowDeleted==false && p.performance.isDeleted ) ){
+        @if( !(isShowDeleted==false && (p.performance.isDeleted || p.performance.isCanceled) ) ){
             <mat-list-item>
                 <a [routerLink]="['performanceEdit',p.id]">
-                    <span>{{ p.performance.label }}</span>
+                    <span class="performance_label">{{ p.performance.label }}</span>
                     @if( p.isInProgram ){
                         <span class="status">Presentacion ha sido aceptada</span>
                     }
+
+                    @if( p.performance.isRejected || p.performance.isCanceled){
+
+                        @if( p.performance.isRejected ){
+                            <span class="status_rejected">Rechazado!</span>
+                        }                    
+                        @if( p.performance.isCanceled ){
+                            <span class="status_canceled">Cancelado!</span>
+                        }                    
+                    }
                     @else{
                         <span class="status">En proceso de aprovacion</span>
-                    }
-                    @if( p.performance.isDeleted ){
-                        <span>Borrado!</span>
-                    }                    
-                    @else{ 
-                        @if( p.performance.isCanceled ){
-                            <span>Cancelado!</span>
-                        }
                     }
 
                 </a>

@@ -12,6 +12,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDialog } from '@angular/material/dialog';
+import { RejectDescriptionApplyDialog } from './reject-description-apply-dlg';
 
 @Component({
   selector: 'app-performance-edit',
@@ -58,6 +60,7 @@ export class PerformanceEditComponent {
     ,private router:Router
     ,private firebase:FirebaseFullService 
     ,private fb:FormBuilder
+    ,private dialog: MatDialog 
     ){
       var thiz = this
       this.activatedRoute.paramMap.subscribe( {
@@ -137,7 +140,7 @@ export class PerformanceEditComponent {
       }
     }
   }  
-
+/*
   onReject(){
     if( this.tournament ){
       let index = this.tournament.program.findIndex( e => e == this.performanceId)
@@ -157,6 +160,7 @@ export class PerformanceEditComponent {
       }
     }
   }  
+  */
   onCancel(){
     let obj:Performance = {
       isCanceled: true
@@ -196,7 +200,6 @@ export class PerformanceEditComponent {
   }  
   onDelete(){
     let obj:Performance = {
-      isCanceled:true,
       isDeleted:true
     }
     let id=this.performanceId
@@ -208,5 +211,36 @@ export class PerformanceEditComponent {
       alert("Error updating performances:" + reason)
     })
   }  
+  onRejected(){
+
+
+    let str = null
+
+    const dialogRef = this.dialog.open(RejectDescriptionApplyDialog, {
+      width: '250px',
+      data: { description: str}
+    }); 
+
+    dialogRef.afterClosed().subscribe (str => {
+      console.log(`Dialog result: ${str}`); 
+      let obj:Performance = {
+        isRejected:true,
+        isDeleted:false,
+        rejectedReason:str
+      }
+      let id=this.performanceId      
+      if( str ){
+        this.firebase.updateDocument( [TournamentCollection.collectionName,this.tournamentId,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{
+          console.log("performances deleted")
+          this.router.navigate(["../../"], { relativeTo: this.activatedRoute })
+        },
+        reason =>{
+          alert("Error updating performances:" + reason)
+        })
+      }      
+    });    
+
+
+  }    
 
 }

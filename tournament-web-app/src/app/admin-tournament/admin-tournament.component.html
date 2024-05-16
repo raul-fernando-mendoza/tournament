@@ -31,20 +31,24 @@
                 <div class="bar">
                     <h2>Solicitudes de presentacion</h2>
                     <span class="spacer"></span>
-                    <mat-checkbox [(ngModel)]="isShowCanceled">mostrar borrados</mat-checkbox>
+                    <mat-checkbox [(ngModel)]="isShowCanceled">mostrar todos</mat-checkbox>
                     <span class="spacer"></span>
                 </div>                
                 <mat-list>
                 @for( p of pendingRefs; track p.id){
-                    @if( !(isShowCanceled==false && p.performance.isCanceled ) ){
+                    @if( !(isShowCanceled==false && (p.performance.isCanceled || p.performance.isRejected)  ) ){
                         <mat-list-item>
                             <a [routerLink]="['performanceEdit',p.id]">
-                                <span>{{ p.performance.label }}</span>
+                                <span class="label">{{ p.performance.label }}</span>
                                 @if( p.performance.isCanceled ){ 
                                 <span class="cancelado">Cancelado</span> 
                                 } 
+                                @if( p.performance.isRejected ){ 
+                                    <span class="cancelado">Rechazado</span> 
+                                } 
+    
                             </a>
-                            @if( !p.performance.isCanceled ){ 
+                            @if( !p.performance.isCanceled && !p.performance.isRejected){ 
                                 <button mat-raised-button color="primary" (click)="onAccept(p.id)">Aceptar en el programa</button>
                             }
                         </mat-list-item>

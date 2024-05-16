@@ -1,8 +1,24 @@
 mat-divider{
     margin:1em;
 }
+
+performance_label{
+    margin: 1em;
+}
+
 .status{
     color:black;
+    font-size: large;
+    margin: 5px;
+}
+
+.status_rejected{
+    color:red;
+    font-size: large;
+    margin: 5px;
+}
+.status_canceled{
+    color:red;
     font-size: large;
     margin: 5px;
 }

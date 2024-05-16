@@ -91,7 +91,9 @@ export class PerformanceNewComponent {
       isCanceled: false,
       academy: academy ? academy : "",
       coreographer: coreagrapher ? coreagrapher : "",
-      isDeleted: false
+      isDeleted: false,
+      isRejected: false,
+      rejectedReason: ''
     }
     let id=uuidv4()
     this.firebase.setDocument( [TournamentCollection.collectionName,this.tournamentId,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{

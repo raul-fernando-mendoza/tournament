@@ -1,19 +1,25 @@
 <a [routerLink]="'../../'"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
-<div class="bar">
     <h1>Editar performance</h1> 
-    <span class="spacer"></span>
-    @if( !isAdmin ){
-        <button mat-icon-button color="warn" (click)="onDelete()"><mat-icon>delete</mat-icon></button>
-    }
-</div>
 
 @if( tournament && performance){
+    <div class="bar">
+
     <h1>{{ tournament.label }}</h1>
+    @if( isAdmin && performance.isRejected == false){
+        <span class="spacer"></span>
+        <button mat-raised-button color="warn" (click)="onRejected()">Rechazar</button>
+    }
+    </div>
+
     <mat-card [formGroup]="g">
         <mat-card-header>
             @if( performance.isCanceled ){
                 <div class="cancel">Status Cancelado</div>
             }
+            @if( performance.isRejected ){
+                <div class="cancel">Status Rechazado</div>
+            }
+
         </mat-card-header>    
         <mat-card-content>
             <mat-form-field> 
@@ -39,15 +45,33 @@
             <mat-form-field> 
                 <mat-label>Coreografo</mat-label>  
                 <input matInput  formControlName="coreographer" >
-            </mat-form-field>               
+            </mat-form-field>  
+            
+            @if( performance.isDeleted == false){
+                <h3>Rejected Reason:</h3>
+                <p>{{ performance.rejectedReason }}</p>
+            }
+    
         </mat-card-content>
         <mat-card-actions>
-            @if( !performance.isCanceled ){
-                <button mat-raised-button color="warn" (click)="onCancel()">Cancelar</button>
-            }
             @if( isAdmin ){
                 <button mat-icon-button color="primary" (click)="onSubmit()"><mat-icon>done</mat-icon></button>
             }
+            @else{
+                @if( performance.isRejected ){
+                    @if( performance.isDeleted == false){
+                        <button mat-raised-button color="primary" (click)="onDelete()">Enterado</button>
+                    }
+                }
+
+                @if( performance.isDeleted == false && performance.isCanceled == false && performance.isRejected == false){
+                    <button mat-raised-button color="warn" (click)="onCancel()">Cancelar</button>
+
+                }
+    
+            }
+
+
         </mat-card-actions>
     </mat-card>
 

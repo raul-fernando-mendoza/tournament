@@ -1,0 +1,12 @@
+<div mat-dialog-content [formGroup]="FG">
+  <h3>Rechazado</h3>
+  <mat-form-field class="description" appearance="fill">
+    <mat-label>causa</mat-label> 
+    <textarea class="sql" matInput maxlength="10000" rows="5" formControlName="description"></textarea>
+  </mat-form-field>      
+
+</div>
+<div mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="FG.controls.description.value" [disabled]="!FG.valid" cdkFocusInitial>Rechazar</button>
+  <button mat-button mat-dialog-close cdkFocusInitial>Cancel</button>
+</div>
