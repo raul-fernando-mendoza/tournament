@@ -3,3 +3,6 @@
     margin-left: 1em;
     margin-right: 1em;
 }
+.row_odd{
+    border-top: 1px solid black;
+}
