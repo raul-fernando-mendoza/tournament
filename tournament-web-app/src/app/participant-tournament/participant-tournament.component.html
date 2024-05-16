@@ -55,9 +55,7 @@
         <button mat-button-icon (click)="onPerformanceNew()"><mat-icon>add</mat-icon></button>
     }
     
-    <mat-divider></mat-divider>  
-    
-    <button mat-raised-button (click)="logout()">Terminar</button>
+   
 
     <mat-divider></mat-divider>             
     <mat-accordion>
@@ -113,10 +111,14 @@
             </mat-list>  
         </mat-expansion-panel>  
         }                     
-    </mat-accordion>    
+    </mat-accordion>  
+    <button mat-raised-button color="primary" (click)="logout()">Terminar</button>        
     <p>
         <mat-divider></mat-divider>
     </p>
+    <mat-divider></mat-divider>  
+    
+  
 }
 @else{
     <mat-spinner></mat-spinner>
