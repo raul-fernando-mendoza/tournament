@@ -9,7 +9,7 @@
 }
 
 <mat-accordion>
-    @for(p of programRefs; track p;let idx = $index, e = $even){
+    @for(p of programRefs; track p.performance;let idx = $index, e = $even){
     <mat-expansion-panel [expanded]="false" hideToggle>
         <mat-expansion-panel-header>
         <mat-panel-title>
@@ -21,7 +21,6 @@
         <mat-panel-description>
             <span>{{ p.performance.fullname }}</span>
 
-           
 
             @if( p.noEvaluationsFound ){
                 <span class="attention">Por favor adicione examenes!</span>
@@ -40,6 +39,10 @@
             <button mat-icon-button (click)="onPerformanceUp(p.id)"><mat-icon>arrow_upward</mat-icon></button>
             <span class="program_number">{{ idx + 1}}</span>
             <button mat-icon-button (click)="onPerformanceDown(p.id)"><mat-icon>arrow_downward</mat-icon></button>
+            <span class="label">Academia:{{p.performance.academy}} </span>
+            <span class="label">Coreografo:{{p.performance.coreographer}}</span>           
+
+
             @if( p.performance.isReleased  ){
                 <span class="score">score:{{ p.performance.grade }}</span>
             }

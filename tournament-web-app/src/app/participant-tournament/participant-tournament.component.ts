@@ -92,6 +92,27 @@ export class ParticipantTournamentComponent implements OnDestroy{
     }    
   }
 
+  logout(){
+
+    let hasActive = false
+    for(let i =0 ; i<this.performances.length; i++){
+      if( this.performances[i].performance.isRejected == false && 
+        this.performances[i].performance.isCanceled == false ){
+          hasActive=true
+        }
+    }
+    if( hasActive ){
+      alert("Sus solicitudes estan siendo atendidas. Gracias")
+      this.auth.logout().then( ()=>{
+        this.router.navigate(['/loginForm'])
+      })
+  
+    }
+    else{
+      alert("Por favor adicione solicitudes")
+    }
+  }  
+
 
   ngOnInit(): void {
     this.activePanel = this.business.getStoredItem("activePanel")

@@ -102,7 +102,7 @@ export class PerformanceEditComponent {
             thiz.g.controls.academy.setValue( p.academy )
             thiz.g.controls.coreographer.setValue( p.academy )
 
-            if( thiz.isAccepted || thiz.performance!.isCanceled ){
+            if( thiz.isAccepted || thiz.performance!.isCanceled || thiz.performance!.isRejected ){
               thiz.canEdit = false
               thiz.g.controls.label.disable()
               thiz.g.controls.categoryId.disable()
@@ -162,6 +162,11 @@ export class PerformanceEditComponent {
   }  
   */
   onCancel(){
+
+    if( !confirm("Esta seguro de querer cancelar:" +  this.performance!.label + ", Esta accion no puede ser revocada") ){
+      return
+    }    
+
     let obj:Performance = {
       isCanceled: true
     }

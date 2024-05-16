@@ -25,21 +25,21 @@
             <mat-list-item>
                 <a [routerLink]="['performanceEdit',p.id]">
                     <span class="performance_label">{{ p.performance.label }}</span>
-                    @if( p.isInProgram ){
-                        <span class="status">Presentacion ha sido aceptada</span>
-                    }
-
                     @if( p.performance.isRejected || p.performance.isCanceled){
-
                         @if( p.performance.isRejected ){
                             <span class="status_rejected">Rechazado!</span>
                         }                    
                         @if( p.performance.isCanceled ){
                             <span class="status_canceled">Cancelado!</span>
-                        }                    
-                    }
+                        }    
+                    }              
                     @else{
-                        <span class="status">En proceso de aprovacion</span>
+                        @if( p.isInProgram ){
+                            <span class="status">Presentacion ha sido aceptada</span>
+                        }                            
+                        @else{
+                            <span class="status">En proceso de aprovacion</span>
+                        }
                     }
 
                 </a>
@@ -54,7 +54,10 @@
     @if( performances.length > 0){
         <button mat-button-icon (click)="onPerformanceNew()"><mat-icon>add</mat-icon></button>
     }
-        
+    
+    <mat-divider></mat-divider>  
+    
+    <button mat-raised-button (click)="logout()">Terminar</button>
 
     <mat-divider></mat-divider>             
     <mat-accordion>
