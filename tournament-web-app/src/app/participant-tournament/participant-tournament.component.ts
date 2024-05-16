@@ -12,11 +12,12 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { QuillModule } from 'ngx-quill';
 import { DateFormatService } from '../date-format.service';
 import { BusinesslogicService } from '../businesslogic.service';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { FirebaseFullService, Filter } from '../firebasefull.service';
 import { Unsubscribe } from 'firebase/auth';
-import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatCheckboxModule} from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
+import { where } from 'firebase/firestore';
 
 interface PerformanceReference{
   id:string
@@ -60,6 +61,8 @@ export class ParticipantTournamentComponent implements OnDestroy{
 
   unsubscribe:Unsubscribe | undefined
 
+  unsubscribePerformances:Unsubscribe | undefined
+
   isShowDeleted = false
 
   constructor(
@@ -84,6 +87,9 @@ export class ParticipantTournamentComponent implements OnDestroy{
     if( this.unsubscribe ){
       this.unsubscribe()
     }   
+    if( this.unsubscribePerformances ){
+      this.unsubscribePerformances()
+    }    
   }
 
 
@@ -117,26 +123,26 @@ export class ParticipantTournamentComponent implements OnDestroy{
     
   readPerformances(){
     this.performances.length = 0
-    let userFilter:Filter = {
-      field: 'email',
-      operator: '==',
-      value: this.auth.getUserEmail()
+    let filter = where("email","==", this.auth.getUserEmail()) 
+    if( this.unsubscribePerformances ){
+      this.unsubscribePerformances()
     }
-    let filter:Array<Filter> = [userFilter]
-    this.firebase.getDocuments( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"), filter).then( set =>{
-      this.performances.length = 0
-      set.map( doc =>{
-        let p = doc.data() as PerformanceObj
-        let pr:PerformanceReference = {
-          id: doc.id,
-          performance: p,
-          isInProgram: this.isInProgram(doc.id)
-        }
-        this.performances.push( pr )
+    this.unsubscribePerformances = this.firebase.onsnapShotCollection( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"),{
+      'next' : set =>{
+        this.performances.length = 0
+        set.docs.map( doc =>{
+          let p = doc.data() as PerformanceObj
+          let pr:PerformanceReference = {
+            id: doc.id,
+            performance: p,
+            isInProgram: this.isInProgram(doc.id)
+          }
+          this.performances.push( pr )
 
-      })
-      this.performances.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
-    })
+        })
+        this.performances.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
+      }
+    }, filter)
   }
 
   readProgram(){
