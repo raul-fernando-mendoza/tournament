@@ -93,6 +93,7 @@ export interface Performance{
     isDeleted?:boolean
     isRejected?:boolean
     rejectedReason?:string
+    city?:string
 }
 export class PerformanceObj implements Performance{
     label!:string 
@@ -107,7 +108,8 @@ export class PerformanceObj implements Performance{
     coreographer!:string 
     isDeleted!:boolean
     isRejected!:boolean
-    rejectedReason:string = ""     
+    rejectedReason:string = ""
+    city:string = ""     
 }
 export class PerformanceCollection{
     static readonly collectionName:string = "performance"
