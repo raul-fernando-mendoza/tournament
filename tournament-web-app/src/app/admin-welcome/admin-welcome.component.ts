@@ -69,6 +69,9 @@ export class AdminTournamentWelcomeComponent implements OnInit{
         }
         this.tournamentLinks!.push(tl)
       })
+    },
+    reason=>{
+      alert("Error reading list of tournaments")
     })
   }
 }

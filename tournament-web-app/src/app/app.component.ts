@@ -70,7 +70,7 @@ export class AppComponent implements OnInit, OnDestroy{
       if (user) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/auth.user
-        console.log( "login true")
+        console.log( "App component login: true")
         this.isLoggedIn = true
         const uid = user.uid;
         this.authService.getDisplayName().then( displayName=>{
@@ -78,7 +78,7 @@ export class AppComponent implements OnInit, OnDestroy{
         })
         // ...
       } else {
-        console.log( "login false")
+        console.log( "App component login: false")
         this.isLoggedIn = false
         this.displayName = ""
       }

@@ -40,42 +40,42 @@ export function loginGuard(
   }
 
 export const routes: Routes = [
-    { path:"loginForm/:intendedPath",component:LoginFormComponent}, 
-    { path:"loginForm",component:LoginFormComponent},    
-    { path:"registerForm",component:LoginFormComponent},
+    { path:"loginForm/:intendedPath",pathMatch:'full',component:LoginFormComponent}, 
+    { path:"loginForm",pathMatch:'full',component:LoginFormComponent},    
+    { path:"registerForm",pathMatch:'full',component:LoginFormComponent},
 
     //{ path:"organizer",pathMatch:'full',component:AdminTournamentWelcomeComponent, canActivate: [loginGuard('loginForm/organizer')]},
 
-    { path:"tournamentSetup/:id",component:AdminTournamentSetupComponent},  
-    { path:"tournamentSetup/:tournamentId/categoryNew",component:CategoryNewComponent},
-    { path:"tournamentSetup/:tournamentId/category/:categoryId",component:CategoryEditComponent},
+    { path:"tournamentSetup/:id",pathMatch:'full',component:AdminTournamentSetupComponent},  
+    { path:"tournamentSetup/:tournamentId/categoryNew",pathMatch:'full',component:CategoryNewComponent},
+    { path:"tournamentSetup/:tournamentId/category/:categoryId",pathMatch:'full',component:CategoryEditComponent},
 
-    { path:"tournamentSetup/:tournamentId/evaluationNew",component:EvaluationNewComponent},
-    { path:"tournamentSetup/:tournamentId/evaluation/:evaluationId",component:EvaluationEditComponent},
+    { path:"tournamentSetup/:tournamentId/evaluationNew",pathMatch:'full',component:EvaluationNewComponent},
+    { path:"tournamentSetup/:tournamentId/evaluation/:evaluationId",pathMatch:'full',component:EvaluationEditComponent},
     
-    { path:"tournamentSetup/:tournamentId/evaluationNew",component:EvaluationNewComponent},
-    { path:"tournamentSetup/:tournamentId/evaluation/:evaluationId",component:EvaluationEditComponent},
-    { path:"tournamentSetup/:tournamentId/evaluation/:evaluationId/aspectNew",component:AspectNewComponent},
-    { path:"tournamentSetup/:tournamentId/evaluation/:evaluationId/aspect/:aspectId",component:AspectEditComponent},
+    { path:"tournamentSetup/:tournamentId/evaluationNew",pathMatch:'full',component:EvaluationNewComponent},
+    { path:"tournamentSetup/:tournamentId/evaluation/:evaluationId",pathMatch:'full',component:EvaluationEditComponent},
+    { path:"tournamentSetup/:tournamentId/evaluation/:evaluationId/aspectNew",pathMatch:'full',component:AspectNewComponent},
+    { path:"tournamentSetup/:tournamentId/evaluation/:evaluationId/aspect/:aspectId",pathMatch:'full',component:AspectEditComponent},
 
-    { path:"tournamentSetup/:tournamentId/jurorNew",component:JurorNewComponent},
-    { path:"tournamentSetup/:tournamentId/juror/:jurorId",component:JurorEditComponent},
+    { path:"tournamentSetup/:tournamentId/jurorNew",pathMatch:'full',component:JurorNewComponent},
+    { path:"tournamentSetup/:tournamentId/juror/:jurorId",pathMatch:'full',component:JurorEditComponent},
 
-    { path:"tournamentSetup/:tournamentId/medalNew",component:MedalNewComponent},
-    { path:"tournamentSetup/:tournamentId/medal/:medalId",component:MedalEditComponent},
+    { path:"tournamentSetup/:tournamentId/medalNew",pathMatch:'full',component:MedalNewComponent},
+    { path:"tournamentSetup/:tournamentId/medal/:medalId",pathMatch:'full',component:MedalEditComponent},
 
-    { path:"tournament/:tournamentId",component:TournamentRouterComponent},
+    { path:"tournament/:tournamentId",pathMatch:'full',component:TournamentRouterComponent},
     
-    { path:"tournamentGuess/:tournamentId",component:GuessTournamentComponent},
+    { path:"tournamentGuess/:tournamentId",pathMatch:'full',component:GuessTournamentComponent},
 
     
-    { path:"tournamentAdmin/:tournamentId",component:AdminTournamentComponent},
+    { path:"tournamentAdmin/:tournamentId",pathMatch:'full',component:AdminTournamentComponent},
     
-    { path:"tournamentAdmin/:tournamentId/categoryNew",component:CategoryNewComponent},
-    { path:"tournamentAdmin/:tournamentId/category/:categoryId",component:CategoryEditComponent},
+    { path:"tournamentAdmin/:tournamentId/categoryNew",pathMatch:'full',component:CategoryNewComponent},
+    { path:"tournamentAdmin/:tournamentId/category/:categoryId",pathMatch:'full',component:CategoryEditComponent},
 
-    { path:"tournamentAdmin/:tournamentId/evaluationNew",component:EvaluationNewComponent},
-    { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId",component:EvaluationEditComponent},
+    { path:"tournamentAdmin/:tournamentId/evaluationNew",pathMatch:'full',component:EvaluationNewComponent},
+    { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId",pathMatch:'full',component:EvaluationEditComponent},
     
     { path:"tournamentAdmin/:tournamentId/evaluationNew",pathMatch:'full',component:EvaluationNewComponent},
     { path:"tournamentAdmin/:tournamentId/evaluation/:evaluationId",pathMatch:'full',component:EvaluationEditComponent},

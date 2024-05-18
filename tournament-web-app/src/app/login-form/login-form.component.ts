@@ -101,6 +101,7 @@ export class LoginFormComponent implements OnInit,OnDestroy{
   ngOnInit() {
     this.unsubscribe = onAuthStateChanged( auth, (user) => {
       if( auth.currentUser ){
+        console.log("login current user:" + auth.currentUser)
         if( this.intendedPath ) {
           this.navigateIntended()
         }
