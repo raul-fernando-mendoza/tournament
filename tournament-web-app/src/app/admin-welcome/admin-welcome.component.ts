@@ -46,7 +46,9 @@ export class AdminTournamentWelcomeComponent implements OnInit{
 
   }
   ngOnInit(): void {
+    if( this.auth.isloggedIn() ){
       this.update()
+    }
   }
 
   update(){

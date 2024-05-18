@@ -97,7 +97,7 @@ export class FirebaseService {
         resolve( data.docs )
       },
       reason =>{
-        alert("ERROR:" + reason)
+        alert("ERROR getDocuments:" + reason)
       })
     })
      
@@ -252,7 +252,7 @@ export class FirebaseService {
           console.log("update property")
         },
         reason=>{
-          alert("ERROR:" + reason)
+          alert("ERROR onSelectionChange:" + reason)
         })
       }
       else{
