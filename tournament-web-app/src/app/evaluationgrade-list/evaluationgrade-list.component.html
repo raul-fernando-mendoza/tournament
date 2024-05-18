@@ -1,10 +1,11 @@
 <div class="bar">
     <span>Examenes</span>
-    
     @if( isAdmin && this.performance.isReleased == false && newGrade > 0){
-        <span>Nueva Calificacion :{{ newGrade }}</span>
-        <span>calificacion:{{ getMedal(newGrade) }}</span>
+        <span class="spacer"></span>
+        <span>Nueva Calificacion :<b>{{ newGrade }}</b></span>
+        <span>Premio:<b>{{ getMedal(newGrade) }}</b></span>
         <button mat-raised-button color="primary" (click)="onRelease()">Liberar Calificacion</button>
+        <span class="spacer"></span>
     }
 </div>
 

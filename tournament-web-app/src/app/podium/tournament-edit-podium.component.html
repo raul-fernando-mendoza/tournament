@@ -2,29 +2,29 @@
 
 <mat-grid-list cols="10" rowHeight="3em">
     <mat-grid-tile [style.background]="'lightblue'">lugar</mat-grid-tile>
-    <mat-grid-tile colspan=3 [style.background]="'lightblue'">Performance/Academia</mat-grid-tile>
-    <mat-grid-tile colspan=3 [style.background]="'lightblue'">Bailarin/coreografo</mat-grid-tile>
-    <mat-grid-tile colspan=2 [style.background]="'lightblue'">Premio/Categoria</mat-grid-tile>
-    <mat-grid-tile [style.background]="'lightblue'">Calificacion</mat-grid-tile>
+    <mat-grid-tile colspan=3 [style.background]="'lightblue'">Academia/Coreografia</mat-grid-tile>
+    <mat-grid-tile colspan=2 [style.background]="'lightblue'">Ciudad/Ejecutantes</mat-grid-tile>
+    <mat-grid-tile colspan=3 [style.background]="'lightblue'">coreografo/Categoria</mat-grid-tile>
+    <mat-grid-tile [style.background]="'lightblue'">Calificacion/premio</mat-grid-tile>
 
     @for( p of programRefs; track p.id; let idx = $index, even = $even){
         
     <mat-grid-tile [ngClass]="'row_odd'">{{ idx + 1}}  </mat-grid-tile>
-    <mat-grid-tile [ngClass]="'row_odd'" colspan=3>
+    <mat-grid-tile [ngClass]="'row_odd'" colspan="3">{{ p.performance.academy }}</mat-grid-tile>
+    <mat-grid-tile [ngClass]="'row_odd'" colspan="2">{{ p.performance.city }}</mat-grid-tile>
+    <mat-grid-tile [ngClass]="'row_odd'" colspan="3">{{ p.performance.coreographer }}</mat-grid-tile>    
+    <mat-grid-tile [ngClass]="'row_odd'" >{{ p.performance.grade }}</mat-grid-tile>
+
+
+    <mat-grid-tile ></mat-grid-tile>
+    <mat-grid-tile colspan=3>
         <span>{{ p.performance.label }}</span>
         @if( p.performance.isCanceled ){
             <span class="cancel">Status Cancelado</span>
         }  
     </mat-grid-tile>
-    <mat-grid-tile [ngClass]="'row_odd'" colspan=3>{{ p.performance.fullname }}</mat-grid-tile>
-    <mat-grid-tile [ngClass]="'row_odd'" colspan=2>{{ p.medal }}</mat-grid-tile>
-    <mat-grid-tile [ngClass]="'row_odd'" >{{ p.performance.grade }}</mat-grid-tile>
-
-    <mat-grid-tile ></mat-grid-tile>
-    <mat-grid-tile colspan="3">{{ p.performance.academy }}</mat-grid-tile>
-    <mat-grid-tile colspan="3">{{ p.performance.coreographer }}</mat-grid-tile>    
-    <mat-grid-tile colspan="2">{{ p.categoryLabel }}</mat-grid-tile>
-    <mat-grid-tile ></mat-grid-tile>
-
+    <mat-grid-tile colspan="2">{{ p.performance.fullname }}</mat-grid-tile>
+    <mat-grid-tile colspan="3">{{ p.categoryLabel }}</mat-grid-tile>
+    <mat-grid-tile>{{ p.medal }}</mat-grid-tile>
     }
 </mat-grid-list>

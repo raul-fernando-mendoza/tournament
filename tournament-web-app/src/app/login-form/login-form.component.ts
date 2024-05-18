@@ -130,7 +130,7 @@ export class LoginFormComponent implements OnInit,OnDestroy{
           console.log( "email:" + user.email )
         },
         reason => {
-          alert("ERROR: " + reason)
+          alert("ERROR: onLoginWithEmail " + reason)
         })
     }
     else{

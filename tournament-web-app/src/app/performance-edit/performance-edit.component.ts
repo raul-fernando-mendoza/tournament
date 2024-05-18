@@ -52,7 +52,8 @@ export class PerformanceEditComponent {
     fullname:["",Validators.required],
     status:["en-aprovacion",Validators.required],
     academy:[""],
-    coreographer:[""]
+    coreographer:[""],
+    city:["city"]
   })
   constructor(
     private activatedRoute: ActivatedRoute
@@ -101,6 +102,7 @@ export class PerformanceEditComponent {
             thiz.g.controls.fullname.setValue( p.fullname )
             thiz.g.controls.academy.setValue( p.academy )
             thiz.g.controls.coreographer.setValue( p.academy )
+            thiz.g.controls.city.setValue( p.city )
 
             if( thiz.isAccepted || thiz.performance!.isCanceled || thiz.performance!.isRejected ){
               thiz.canEdit = false
@@ -109,6 +111,7 @@ export class PerformanceEditComponent {
               thiz.g.controls.fullname.disable()
               thiz.g.controls.academy.disable()
               thiz.g.controls.coreographer.disable()
+              thiz.g.controls.city.disable()
             }
             else{
               thiz.canEdit = true
@@ -140,27 +143,6 @@ export class PerformanceEditComponent {
       }
     }
   }  
-/*
-  onReject(){
-    if( this.tournament ){
-      let index = this.tournament.program.findIndex( e => e == this.performanceId)
-      if( (index >= 0) ){
-        this.tournament.program.splice(index, 1)
-        let obj:Tournament = {
-          program:this.tournament.program
-        }
-        this.firebase.updateDocument( 
-          TournamentCollection.collectionName,this.tournamentId, obj).then( ()=>{
-          console.log("performances program update")
-          this.router.navigate(["../../"], { relativeTo: this.activatedRoute })
-        },
-        reason =>{
-            alert("Error updating performances:" + reason)
-        })
-      }
-    }
-  }  
-  */
   onCancel(){
 
     if( !confirm("Esta seguro de querer cancelar:" +  this.performance!.label + ", Esta accion no puede ser revocada") ){
@@ -182,9 +164,12 @@ export class PerformanceEditComponent {
   }
   onSubmit(){
     if( this.canEdit ){
-      let label = this.g.controls["label"].value
-      let categoryId = this.g.controls["categoryId"].value
-      let fullname = this.g.controls["fullname"].value
+      let label = this.g.controls.label.value
+      let categoryId = this.g.controls.categoryId.value
+      let fullname = this.g.controls.fullname.value
+      let academy = this.g.controls.academy.value
+      let coreographer = this.g.controls.coreographer.value
+      let city = this.g.controls.city.value
       let email = this.auth.getUserEmail()
 
       let obj:Performance = {
@@ -192,6 +177,9 @@ export class PerformanceEditComponent {
         fullname: fullname!,
         email: email!,
         label: label!,
+        academy: academy ? academy : "",
+        coreographer: coreographer ? coreographer : "",
+        city:city ? city : ""
       }
       let id=this.performanceId
       this.firebase.updateDocument( [TournamentCollection.collectionName,this.tournamentId,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{

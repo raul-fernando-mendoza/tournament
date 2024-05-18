@@ -46,7 +46,7 @@ mat-card{
     margin-bottom:auto;
 }
 .attention{
-    margin:5px;
+    margin-left:5em;
     background-color: yellow;
 }
 .cancel{

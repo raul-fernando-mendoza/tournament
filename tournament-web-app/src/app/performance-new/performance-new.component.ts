@@ -42,7 +42,8 @@ export class PerformanceNewComponent {
     categoryId:["",Validators.required],
     fullname:["",Validators.required],
     academy:[""],
-    coreographer:[""]
+    coreographer:[""],
+    city:[""]
   })
 
   constructor(
@@ -73,11 +74,12 @@ export class PerformanceNewComponent {
   }  
 
   onSubmit(){
-    let label = this.g.controls["label"].value
-    let categoryId = this.g.controls["categoryId"].value
-    let fullname = this.g.controls["fullname"].value
+    let label = this.g.controls.label.value
+    let categoryId = this.g.controls.categoryId.value
+    let fullname = this.g.controls.fullname.value
     let academy = this.g.controls.academy.value    
     let coreagrapher = this.g.controls.coreographer.value 
+    let city = this.g.controls.city.value 
     let email = this.auth.getUserEmail()
 
     let obj:PerformanceObj = {
@@ -93,7 +95,8 @@ export class PerformanceNewComponent {
       coreographer: coreagrapher ? coreagrapher : "",
       isDeleted: false,
       isRejected: false,
-      rejectedReason: ''
+      rejectedReason: '',
+      city: city ? city : ""
     }
     let id=uuidv4()
     this.firebase.setDocument( [TournamentCollection.collectionName,this.tournamentId,PerformanceCollection.collectionName].join("/"), id, obj).then( ()=>{
