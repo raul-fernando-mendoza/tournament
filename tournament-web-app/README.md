@@ -43,3 +43,22 @@ in the angular.json add
 recaptcha:
 add the path in 
 https://www.google.com/recaptcha/admin/site/690039338
+
+**************** namecheap.com 
+add the following 
+Type: TXT record
+host: @
+value: hosting-site=rax-tournament-de
+TTL: automatic
+
+Type: A Record
+Host: @
+value: 199.36.158.100
+TTL:Automatic
+
+Type: A Record
+Host: www
+value: 199.36.158.100
+TTL:Automatic
+
+*********************
