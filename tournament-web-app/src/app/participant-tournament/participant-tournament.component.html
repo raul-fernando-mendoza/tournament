@@ -12,9 +12,11 @@
     </mat-grid-list>
 
     <div class="bar">
-        <h2>Mis solicitudes de presentacion</h2>
+        <h2>Inscripciones</h2>
         <span class="spacer"></span>
-        <mat-checkbox [(ngModel)]="isShowDeleted">mostrar todos</mat-checkbox>
+        @if( performances.length > 0){
+            <mat-checkbox [(ngModel)]="isShowDeleted">mostrar todos</mat-checkbox>
+        }
         <span class="spacer"></span>        
     </div>
 
@@ -46,55 +48,13 @@
             </mat-list-item>
         }
     } 
-    @empty{
-        <p>No hay solicitudes de presentacion</p>
-        <button mat-raised-button color="primary" (click)="onPerformanceNew()">Crear una solicitud de presentacion</button>
-    } 
     </mat-list>
-    @if( performances.length > 0){
-        <button mat-button-icon (click)="onPerformanceNew()"><mat-icon>add</mat-icon></button>
-    }
+    <button mat-raised-button color="primary" (click)="onPerformanceNew()">Registrar coreografia</button>
     
    
-
+    @if( tournament.isProgramReleased ){ 
     <mat-divider></mat-divider>             
     <mat-accordion>
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>Categorias</mat-panel-title>
-            </mat-expansion-panel-header>    
-                <mat-accordion>
-                @for( category of tournament.categories; track category){
-                    <mat-expansion-panel>
-                        <mat-expansion-panel-header>
-                            <mat-panel-title>{{category.label}}</mat-panel-title>
-                        </mat-expansion-panel-header>
-                        <p>
-                            <quill-view-html [content]="category.description"></quill-view-html> 
-                        </p>
-                    </mat-expansion-panel>
-                } 
-                </mat-accordion>                 
-        </mat-expansion-panel>
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>Premiacion</mat-panel-title>
-            </mat-expansion-panel-header>    
-            <mat-accordion>
-                    @for( medal of tournament.medals; track medal){
-                        <mat-expansion-panel>
-                            <mat-expansion-panel-header>
-                                <mat-panel-title>{{medal.label}}</mat-panel-title>
-                            </mat-expansion-panel-header>
-                            <p>
-                                <quill-view-html [content]="medal.description"></quill-view-html> 
-                            </p>
-                        </mat-expansion-panel>
-                    } 
-                </mat-accordion> 
-                
-        </mat-expansion-panel>  
-        @if( tournament.isProgramReleased ){ 
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Programa</mat-panel-title>
@@ -110,14 +70,8 @@
                 }                             
             </mat-list>  
         </mat-expansion-panel>  
-        }                     
     </mat-accordion>  
-    <button mat-raised-button color="primary" (click)="logout()">Terminar</button>        
-    <p>
-        <mat-divider></mat-divider>
-    </p>
-    <mat-divider></mat-divider>  
-    
+    }                     
   
 }
 @else{

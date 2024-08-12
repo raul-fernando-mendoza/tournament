@@ -93,7 +93,7 @@ export class AppComponent implements OnInit, OnDestroy{
     this.router.navigate(['/registerForm',{"isRegister":true}])
   }  
   home(){
-    this.router.navigate(['/'])
+    this.router.navigate([this.bussiness.home])
   }  
   logout(){
     this.authService.logout().then( ()=>{

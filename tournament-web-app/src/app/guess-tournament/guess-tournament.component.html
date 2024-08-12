@@ -11,11 +11,7 @@
             Hora:{{tournament.eventTime}}
         </mat-grid-tile>
     </mat-grid-list>
-    <div class="bar">
-        <span class="spacer"></span>
-        <button mat-raised-button color="primary" (click)="onWantToParticipate()">Quiero participar</button>
-        <span class="spacer"></span>
-    </div>
+
     <mat-accordion>
         <mat-expansion-panel>
             <mat-expansion-panel-header>
@@ -74,6 +70,11 @@
     <p>
         <mat-divider></mat-divider>
     </p>
+    <div class="bar">
+        <span class="spacer"></span>
+        <button mat-raised-button color="primary" (click)="onWantToParticipate()">Entrar</button>
+        <span class="spacer"></span>
+    </div>    
 }     
 @else{
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>    

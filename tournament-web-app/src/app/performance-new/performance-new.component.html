@@ -1,13 +1,18 @@
 <a routerLink="../"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
-<h1>Nuevo performance</h1>    
+<h1>Nueva coreografía</h1>    
 @if( tournament ){
-    <h1>{{ tournament.label }}</h1>
+    <div class="bar">
+        <span class="spacer"></span>
+        <span><h1>{{ tournament.label }}</h1></span>
+        <span class="spacer"></span>
+    </div>
+    
     <mat-card [formGroup]="g">
         <mat-card-header>
         </mat-card-header>    
         <mat-card-content>
             <mat-form-field> 
-                <mat-label>Nombre del performance</mat-label>  
+                <mat-label>Nombre de la coreografía</mat-label>  
                 <input matInput formControlName="label" >
             </mat-form-field>
             <mat-form-field> 
