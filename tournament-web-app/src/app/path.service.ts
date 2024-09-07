@@ -29,10 +29,13 @@ export class PathService {
     return newUrl
   } 
   
-  getEncodedPath( path:string, id:string | null = null){
+  getEncodedPath( path:string, id:string | null = null):string{
     if( id == null){
       return encodeURIComponent(path)
     }
     return encodeURIComponent(path + "/" + id)
+  }
+  getDecodePath(path:string):string{
+    return decodeURIComponent(path);
   }
 }

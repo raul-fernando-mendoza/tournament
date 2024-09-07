@@ -44,6 +44,9 @@ recaptcha:
 add the path in 
 https://www.google.com/recaptcha/admin/site/690039338
 
+
+https://yurigentili.it/adding-google-recaptcha-v3-on-angular-without-external-modules/
+
 **************** namecheap.com 
 add the following 
 Type: TXT record

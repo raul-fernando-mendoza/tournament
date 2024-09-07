@@ -2,7 +2,8 @@
 <mat-toolbar color="accent">
     <button (click)="home()" mat-icon-button>
         <mat-icon>home</mat-icon>
-    </button>             
+    </button>  
+    <span>{{bussiness?.home}}</span>           
 
     <span class="spacer"></span> 
 
@@ -12,13 +13,6 @@
         }
         <button mat-button  aria-label="logout" (click)="logout()">logout</button>    
     }    
-    @else{
-        @if ( !(isHandset$ | async) ) {
-            <button mat-button  aria-label="login" (click)="login()" >Ingresar</button>
-            <button mat-button  aria-label="register" (click)="Register()">Registrarte</button>  
-        }
-    }
-
     <button mat-icon-button [matMenuTriggerFor]="menu"><mat-icon>menu</mat-icon></button>
 
 

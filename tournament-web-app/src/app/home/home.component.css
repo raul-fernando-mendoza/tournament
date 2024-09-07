@@ -1,4 +1,18 @@
-mat-card{
-    width:80%;
-    margin-left: 10%;
+
+mat-grid-list{
+    margin-left: 1em;  
+    margin-top: 0;
+    margin-bottom: 0; 
+    padding: 0; 
+}
+
+
+/* mat-grid-list{
+    background-color: green;
+}
+mat-grid-tile{
+    background-color: greenyellow;
+} */
+.header-container{
+    width:100%;
 }
