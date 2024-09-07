@@ -116,7 +116,7 @@ export class ParticipantTournamentComponent implements OnDestroy{
 
   ngOnInit(): void {
     this.activePanel = this.business.getStoredItem("activePanel")
-    this.business.home = "/" + TournamentCollection.collectionName + "/" + this.tournamentId
+    this.business.home = TournamentCollection.collectionName + "/" + this.tournamentId
   }
 
 

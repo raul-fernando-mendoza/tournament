@@ -1,13 +1,11 @@
-import { APP_INITIALIZER, Component, Injectable, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, APP_INITIALIZER, Component, ElementRef, Injectable, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth.service';
-import { RecaptchaModule, RecaptchaFormsModule, RECAPTCHA_SETTINGS, RecaptchaSettings } from "ng-recaptcha";
-
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -17,11 +15,15 @@ import { MatDividerModule} from '@angular/material/divider';
 
 import { environment } from '../../environments/environment';
 
-import { HttpClientModule } from '@angular/common/http';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { onAuthStateChanged, Unsubscribe } from 'firebase/auth';
 import { auth } from '../../environments/environment';
 import { BusinesslogicService } from '../businesslogic.service';
+import { RecaptchaService } from '../recaptcha.service';
+import { compileClassMetadata } from '@angular/compiler';
+import { resolve } from 'node:path';
+
+declare var grecaptcha: any;
 
 @Component({
   selector: 'app-login-form',
@@ -37,22 +39,13 @@ import { BusinesslogicService } from '../businesslogic.service';
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatDividerModule,
-    RecaptchaModule,
-    HttpClientModule,
-    RecaptchaFormsModule
+    MatDividerModule
   ]    
   ,providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-US' },
-    {
-        provide: RECAPTCHA_SETTINGS,
-        useValue: {
-            siteKey: environment.recaptcha.siteKey,
-        } as RecaptchaSettings,
-    },
-],
+  ]
 })
-export class LoginFormComponent implements OnInit,OnDestroy{
+export class LoginFormComponent implements OnInit,OnDestroy,AfterViewInit{
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
@@ -62,8 +55,7 @@ export class LoginFormComponent implements OnInit,OnDestroy{
 
   loginForm = this.fb.group({
     username: [null, Validators.required],
-    password: [null, Validators.required],
-    recaptchaReactive:[null, Validators.required]
+    password: [null, Validators.required]
   });
   
   isRegister = false
@@ -76,13 +68,20 @@ export class LoginFormComponent implements OnInit,OnDestroy{
 
   unsubscribe:Unsubscribe | undefined
 
+  private subscription: Subscription|null = null;
+
+ 
+
+  addedStyle:HTMLStyleElement|null = null
+
   constructor(
     private breakpointObserver: BreakpointObserver,
     private fb: UntypedFormBuilder, 
     private route: ActivatedRoute, 
     private router: Router, 
     private authSrv:AuthService,
-    private bussiness:BusinesslogicService
+    private bussiness:BusinesslogicService,
+    private recaptchaService:RecaptchaService
     ) {
       
       this.isRegister = ( this.route.snapshot.paramMap.get('isRegister') == "true" )
@@ -92,10 +91,18 @@ export class LoginFormComponent implements OnInit,OnDestroy{
       }
       
   }
+  ngAfterViewInit(): void {
+    let el1:any = document.getElementsByClassName('grecaptcha-badge')[0]
+
+  }
   ngOnDestroy(): void {
     if( this.unsubscribe ){
       this.unsubscribe()
     }
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }    
+    this.recaptchaService.hideRecaptcha()
   }
 
   ngOnInit() {
@@ -106,13 +113,28 @@ export class LoginFormComponent implements OnInit,OnDestroy{
           this.navigateIntended()
         }
         else{
-          this.router.navigate([this.bussiness.home])
+          this.router.navigate(["/",this.bussiness.home])
         }
       }
-    })    
+    })  
+
+    this.recaptchaService.showRecaptcha();    
   }
 
-  
+  loadRecaptchaStyle() {
+    const styleTag = document.createElement('style');
+
+    // Step 2: Add CSS rules to the style element
+    styleTag.innerHTML = `
+    .grecaptcha-badge { 
+      visibility: visible !important;
+    }
+    `;
+    
+    // Step 3: Append the style tag to the document's head
+    this.addedStyle = document.head.appendChild(styleTag);
+  }
+
   navigateIntended(){
     if( this.intendedPath ){
       let url:string = decodeURIComponent( this.intendedPath )
@@ -120,27 +142,29 @@ export class LoginFormComponent implements OnInit,OnDestroy{
     }
   }
   onLoginWithEmail(){
-    
-    if( this.loginForm.valid ){
-        
-        var user = this.loginForm.controls["username"].value
-        var password = this.loginForm.controls["password"].value
+    this.recaptchaService.validateCaptcha("loginWithEmail").then( isHuman=>{
+      if(isHuman){
+        if( this.loginForm.valid ){
+          
+          var user = this.loginForm.controls["username"].value
+          var password = this.loginForm.controls["password"].value
 
-        this.authSrv.loginWithEmail(user, password).then( (user) =>{
-          console.log( "email:" + user.email )
-        },
-        reason => {
-          alert("ERROR: onLoginWithEmail " + reason)
-        })
-    }
-    else{
-      let msg =  "ERROR: usuario o password son incorrectos"
-      if( this.loginForm.controls["recaptchaReactive"].valid == false){
-        msg = "ERROR: por favor complete el captcha"
+          this.authSrv.loginWithEmail(user, password).then( (user) =>{
+            console.log( "email:" + user.email )
+          },
+          reason => {
+            alert("ERROR: onLoginWithEmail " + reason)
+          })
+        }
+        else{
+          let msg =  "ERROR: usuario o password son incorrectos"
+          alert( msg )
+        }
       }
-      alert( msg )
-    }
-    
+    },
+    reason=>{
+      alert("Error calling captcha:"+reason)
+    })
   }
 
   register(){
@@ -154,9 +178,6 @@ export class LoginFormComponent implements OnInit,OnDestroy{
     }
     else{
       let msg =  "ERROR: usuario o password son incorrectos"
-      if( this.loginForm.controls["recaptchaReactive"].valid == false){
-        msg = "ERROR: por favor complete el captcha"
-      }
       alert( msg )
     }        
   }
@@ -172,8 +193,6 @@ export class LoginFormComponent implements OnInit,OnDestroy{
     this.authSrv.signInWithPopup().then( (User) =>{
       console.log("signed out completed")
     })
-  }    
-  resolved(captchaResponse: string | null) {
-    console.log(`Resolved captcha with response: ${captchaResponse}`);
-  }
+  } 
+      
 }

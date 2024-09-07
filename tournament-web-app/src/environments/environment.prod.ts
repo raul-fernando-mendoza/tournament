@@ -24,9 +24,9 @@ export const storage:FirebaseStorage = getStorage(app)
 export var environment = { 
   production: true,
   recaptcha: {
-    siteKey: '6Lex834pAAAAADczET5_Obatn3ntaSKx0Qm2YdLh',
-    secretKey:'6Lex834pAAAAAMXJffhKNI01JAPxFXn_Tc5JR1G9',
-    url:'https://www.google.com/recaptcha/api/siteverify'
+    siteKey: '6Lep2dkpAAAAAHSgbegNP9Vg87VzHYSgrZ3NU6dY',
+    secretKey:'6Lep2dkpAAAAAPjhhH8AN5wigYkfB-AGilBapRfu',
+    url:'https://us-central1-rax-tournament-dev.cloudfunctions.net/captchaserver'
   },   
 }
 

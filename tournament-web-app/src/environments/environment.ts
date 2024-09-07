@@ -27,9 +27,10 @@ connectStorageEmulator(storage,'localhost', 9199)
 export var environment = { 
   production: false,
   recaptcha: {
-    siteKey: '6LcqKiEpAAAAAPSO6OqkR2sNGfsLjJayy__Xr97H',
-    secretKey:'6LcqKiEpAAAAABZ3Cchdp6XUoY5YstMTUqETlXLu',
-    url:'https://www.google.com/recaptcha/api/siteverify'
+    siteKey: '6Lep2dkpAAAAAHSgbegNP9Vg87VzHYSgrZ3NU6dY',
+    secretKey:'6Lep2dkpAAAAAPjhhH8AN5wigYkfB-AGilBapRfu',
+    url:'http://localhost:3000/your-page.html'
+    //url:'https://us-central1-rax-tournament-dev.cloudfunctions.net/captchaserver'
   },  
 }
 

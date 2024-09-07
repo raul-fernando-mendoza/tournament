@@ -1,0 +1,14 @@
+curl -m 70 -X POST https://us-central1-thoth-dev-346022.cloudfunctions.net/captcha-server \
+-H "Authorization: bearer $(gcloud auth print-identity-token)" \
+-H "Content-Type: application/json" \
+-d '{
+    "message": "Hello World",
+    "siteKey":"heloo"
+}'
+
+//only runs on linux
+curl -m 70 -X POST -H "Content-Type:application/json" -d "{\"siteKey\":\"6Lep2dkpAAAAAHSgbegNP9Vg87VzHYSgrZ3NU6dY\",\"response\":\"hola\"}" https://us-central1-rax-tournament-dev.cloudfunctions.net/captchaserver
+curl -m 70 -X POST -H "Content-Type:application/json" -d "{\"siteKey\":\"6Lep2dkpAAAAAHSgbegNP9Vg87VzHYSgrZ3NU6dY\",\"response\":\"hola\"}" https://api.miscompetencias.com/captcha-server
+
+//in windows 
+curl  https://us-central1-thoth-dev-346022.cloudfunctions.net/captcha-server

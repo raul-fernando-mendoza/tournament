@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { AuthService } from './auth.service';
@@ -14,6 +14,7 @@ import { onAuthStateChanged, Unsubscribe } from 'firebase/auth';
 import { auth } from '../environments/environment';
 import {MatMenuModule} from '@angular/material/menu';
 import { BusinesslogicService } from './businesslogic.service';
+import { PathService } from './path.service';
 
 
 
@@ -54,6 +55,7 @@ export class AppComponent implements OnInit, OnDestroy{
     , private route: ActivatedRoute
     , private authService: AuthService
     , public bussiness:BusinesslogicService
+    , public pathSrv:PathService
   ) {
 
 
@@ -87,17 +89,17 @@ export class AppComponent implements OnInit, OnDestroy{
   }
   
   login(){
-    this.router.navigate(['/loginForm'])
+    this.router.navigate(["/","loginForm",this.pathSrv.getDecodePath(this.bussiness.home)])
   }
   Register(){
-    this.router.navigate(['/registerForm',{"isRegister":true}])
+    this.router.navigate(['/registerForm',this.pathSrv.getDecodePath(this.bussiness.home), {"isRegister":true}])
   }  
   home(){
-    this.router.navigate([this.bussiness.home])
+    this.router.navigate(["/"+this.pathSrv.getDecodePath(this.bussiness.home)])
   }  
   logout(){
     this.authService.logout().then( ()=>{
-      this.router.navigate(['/loginForm'])
+      this.router.navigate(["/","loginForm",this.pathSrv.getDecodePath(this.bussiness.home)])
     })
   }
   isEmailVerified(){

@@ -16,7 +16,7 @@ export class AuthService {
   private loginSubject : Subject<any>;
   constructor(
   ) { 
-    this.loginSubject = new Subject<boolean>();
+    this.loginSubject = new Subject<any>();
   }
   
   register(email:string,password:string):Promise<User> {
@@ -160,18 +160,22 @@ export class AuthService {
 
   logout():Promise<void>{
     return new Promise( (resolve, reject)=>{
-      signOut(auth)
-      let unsubscribe = auth.onAuthStateChanged( 
-        (user)=>{
-          if( !user ){
-            unsubscribe()
-            resolve()
-          }
-        },
-        (reason)=>{
-          reject(reason)
+/*
+      let unsubscribe = auth.onAuthStateChanged( user =>{
+        auth.currentUser
+        if( !user ){
+          unsubscribe()
+          resolve()
         }
-      )
+      })
+*/
+      signOut(auth).then( ()=>{
+        auth.currentUser
+        resolve()
+      },
+      reason=>{
+        reject(reason)
+      })
     })
   }
 
