@@ -18,7 +18,6 @@ import { PathService } from './path.service';
 
 
 
-
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -31,7 +30,8 @@ import { PathService } from './path.service';
     MatToolbarModule,
     MatButtonModule,
     RouterModule,
-    MatMenuModule
+    MatMenuModule,
+    RouterModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -99,7 +99,13 @@ export class AppComponent implements OnInit, OnDestroy{
   }  
   logout(){
     this.authService.logout().then( ()=>{
-      this.router.navigate(["/","loginForm",this.pathSrv.getDecodePath(this.bussiness.home)])
+      if(this.pathSrv.getDecodePath(this.bussiness.home).startsWith('tournamentAdmin')){
+        this.bussiness.home = '/'
+        this.router.navigate(["/"])
+      }
+      else{
+        this.router.navigate([this.pathSrv.getDecodePath(this.bussiness.home)])
+      }
     })
   }
   isEmailVerified(){

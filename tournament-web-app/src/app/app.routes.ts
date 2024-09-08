@@ -25,6 +25,8 @@ import { PerformanceNewComponent } from './performance-new/performance-new.compo
 import { PerformanceEditComponent } from './performance-edit/performance-edit.component';
 import { NotfoundComponent } from './notfound/notfound.component';
 import { HomeComponent } from './home/home.component';
+import { AboutComponent } from './about/about.component';
+import { PrivacyComponent } from './privacy/privacy.component';
 
 export function loginGuard(
     redirectRoute: string
@@ -114,6 +116,10 @@ export const routes: Routes = [
     { path:"tournamentJuror/:tournamentId/performance/:performanceId/evaluationGrade/:evaluationGradeId",pathMatch:'full',component:EvaluationGradeComponent},
 
     { path:"tournamentAdmin",pathMatch:'full',component:AdminTournamentWelcomeComponent, canActivate: [loginGuard('/loginForm/tournamentAdmin')]},
+
+    { path:"about",pathMatch:'full',component:AboutComponent},
+
+    { path:"privacy",pathMatch:'full',component:PrivacyComponent},
 
     { path:"",pathMatch:'full',component:HomeComponent},
 

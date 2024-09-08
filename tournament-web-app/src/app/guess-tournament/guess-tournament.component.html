@@ -70,11 +70,13 @@
     <p>
         <mat-divider></mat-divider>
     </p>
-    <div class="bar">
-        <span class="spacer"></span>
-        <button mat-raised-button color="primary" (click)="onWantToParticipate()">Entrar</button>
-        <span class="spacer"></span>
-    </div>    
+
+    <div>
+        <img class="google-image" (click)="signInWithPopup()" src="/assets/btn_google_signin_small.png" >
+    </div>
+    <div>
+        <button mat-raised-button color="primary" (click)="onWantToParticipate()">Ingresa con un email</button>
+    </div>
 }     
 @else{
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>    

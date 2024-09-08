@@ -2,7 +2,7 @@
 <mat-toolbar color="accent">
     <button (click)="home()" mat-icon-button>
         <mat-icon>home</mat-icon>
-    </button>  
+    </button> 
     
 
     <span class="spacer"></span> 
@@ -32,12 +32,19 @@
                 <button mat-menu-item  aria-label="register" (click)="Register()">Registrarte</button>  
             }
         }          
-            <button mat-menu-item >
-                Nosotros
-            </button>       
-            <button mat-menu-item >
-                privacidad
-            </button>  
+            
+                
+            <a routerLink="about">
+                <button mat-menu-item >
+                    Nosotros
+                </button>
+            </a>    
+
+            <a routerLink="privacy">
+                <button mat-menu-item >
+                    Privacidad
+                </button>
+            </a>                                  
     </mat-menu>             
 </mat-toolbar>
 <router-outlet></router-outlet>

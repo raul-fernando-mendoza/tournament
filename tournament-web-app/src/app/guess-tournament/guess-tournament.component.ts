@@ -14,6 +14,8 @@ import { BusinesslogicService } from '../businesslogic.service';
 import { DateFormatService } from '../date-format.service';
 import { FirebaseService } from '../firebase.service';
 import { TournamentCollection, TournamentObj } from '../types';
+import { onAuthStateChanged, Unsubscribe, User } from "firebase/auth";
+import { auth } from '../../environments/environment';
 
 @Component({
   selector: 'app-guess-tournament',
@@ -37,13 +39,15 @@ export class GuessTournamentComponent implements OnInit{
 
   tournamentId:string|null = null
   tournament:TournamentObj|null = null
+  unsubscribe:Unsubscribe|null = null  
 
   constructor(
     private activatedRoute: ActivatedRoute
     ,private router:Router
     ,private firebase:FirebaseService 
     ,public dateSrv:DateFormatService  
-    ,public business:BusinesslogicService  
+    ,public business:BusinesslogicService
+    ,private authSrv:AuthService  
   ){
       var thiz = this
       this.activatedRoute.paramMap.subscribe( {
@@ -58,7 +62,12 @@ export class GuessTournamentComponent implements OnInit{
   }
   ngOnInit(): void {
     this.business.home = "/" + TournamentCollection.collectionName + "/" + this.tournamentId
-
+    this.unsubscribe = onAuthStateChanged( auth, (user) => {
+      if( auth.currentUser ){
+        console.log("login current user:" + auth.currentUser)
+        this.router.navigate([this.business.home])
+      }
+    }) 
   }
   update(){
     if( this.tournamentId != null){
@@ -75,4 +84,11 @@ export class GuessTournamentComponent implements OnInit{
     let url = encodeURIComponent( parts.join("/") )
     this.router.navigate(['/loginForm', url])
   }
+
+  signInWithPopup() {
+    //alert("going to call login with Login popup")
+    this.authSrv.signInWithPopup().then( (User) =>{
+      console.log("signed in completed")
+    })
+  }  
 }

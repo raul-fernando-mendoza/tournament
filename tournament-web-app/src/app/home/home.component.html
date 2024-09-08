@@ -12,29 +12,13 @@
     </mat-grid-tile>
 </mat-grid-list>
 
-<mat-card class="example-card">
-    <mat-card-header>
-        <mat-card-title-group>
-            <mat-card-title>Que puedes realizar en MisCompetencias.com</mat-card-title>
-        </mat-card-title-group>
-    </mat-card-header>
-    
-    <mat-card-content>
-        <p>nos enorgullece proporcionar una plataforma integral para la automatizacion de evaluaciónes de concursos, competencias y torneos. Nuestra finalidad es facilitar la organización y ejecución de eventos de manera eficiente, asegurando una experiencia sin complicaciones tanto para los organizadores como para los participantes</p>
-        <mat-list role="list">
-            <mat-list-item role="listitem">Crear mis propios eventos y premios.</mat-list-item>
-            <mat-list-item role="listitem">Crear un link de invitacion para mis participantes.</mat-list-item>
-            <mat-list-item role="listitem">Aceptar o rechazar propuesta de participacion.</mat-list-item>
-            <mat-list-item role="listitem">Crear y asignar criterios de calificacion para mis jueces.</mat-list-item>
-            <mat-list-item role="listitem">Recibir calificaciones de mis jueces y promediar automaticamente.</mat-list-item>
-            <mat-list-item role="listitem">Asignacion automatica de lugares y premios.</mat-list-item>
-        </mat-list>
-    </mat-card-content>
 
-    <mat-card-actions>
-        <a routerLink="/tournamentAdmin">
-            <button mat-raised-button color="primary">Ingresar</button>
-        </a> 
-    </mat-card-actions>
-</mat-card>
-<script src="https://www.google.com/recaptcha/api.js?render=6Lep2dkpAAAAAHSgbegNP9Vg87VzHYSgrZ3NU6dY"></script>
+<div>
+<img class="google-image" (click)="signInWithPopup()" src="/assets/btn_google_signin_small.png" >
+</div>
+<div>
+    <a routerLink="/tournamentAdmin">
+        <button mat-raised-button color="primary">Ingresa con un email</button>
+    </a> 
+</div>
+
