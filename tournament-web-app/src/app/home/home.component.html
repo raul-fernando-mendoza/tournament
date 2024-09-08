@@ -1,4 +1,3 @@
-
 <mat-grid-list cols="4" >
     <mat-grid-tile colspan="3">
         <div class="header-container">
@@ -8,13 +7,17 @@
         
     </mat-grid-tile>
     <mat-grid-tile colspan="1">
-        <img mat-card-lg-image src="/assets/medals_640.jpg" alt="miscompetencias">
+        <mat-card>
+            <mat-card-header>
+                <img mat-card-lg-image src="/assets/medals_640.jpg" alt="miscompetencias">
+            </mat-card-header>
+        </mat-card>
     </mat-grid-tile>
 </mat-grid-list>
 
 
 <div>
-<img class="google-image" (click)="signInWithPopup()" src="/assets/btn_google_signin_small.png" >
+<img (click)="signInWithPopup()" src="/assets/btn_google_signin_small.png" >
 </div>
 <div>
     <a routerLink="/tournamentAdmin">

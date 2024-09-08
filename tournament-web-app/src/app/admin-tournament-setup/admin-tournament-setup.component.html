@@ -46,10 +46,10 @@
                 </mat-grid-list>
             </form>
             @if( !tournamentId ){
-                <button mat-button matStepperNext (click)="onCreateNew()">Next</button>              
+                <button mat-button matStepperNext (click)="onCreateNew()">Siguiente</button>              
             }
             @else{
-                <button mat-button matStepperNext>Next</button>  
+                <button mat-button matStepperNext>Siguiente</button>  
             }
         </mat-step>
         <mat-step [stepControl]="firstCategory" errorMessage="Una categoria es requerida.">
@@ -76,8 +76,8 @@
                         </a>       
                     }
                 </mat-list>     
-                <button mat-button matStepperPrevious>Back</button>
-                <button mat-button matStepperNext>Next</button>                   
+                <button mat-button matStepperPrevious>Anterior</button>
+                <button mat-button matStepperNext>Siguiente</button>                   
             }
         </mat-step>
         <mat-step [stepControl]="firstEvaluation" errorMessage="Una Evaluacion es requerida.">
@@ -103,8 +103,8 @@
                         </a>       
                     }                    
                 </mat-list>
-                <button mat-button matStepperPrevious>Back</button>
-                <button mat-button matStepperNext>Next</button> 
+                <button mat-button matStepperPrevious>Anterior</button>
+                <button mat-button matStepperNext>Siguiente</button> 
             }                
         </mat-step>
         <mat-step [stepControl]="firstJuror" errorMessage="un jurado es requerido.">
@@ -128,8 +128,8 @@
                         </a>       
                     }                
                 </mat-list>  
-                <button mat-button matStepperPrevious>Back</button>
-                <button mat-button matStepperNext>Next</button>  
+                <button mat-button matStepperPrevious>Anterior</button>
+                <button mat-button matStepperNext>Siguiente</button>  
             }               
         </mat-step>  
         <mat-step [stepControl]="firstMedal" errorMessage="un premio es requerido.">
@@ -153,8 +153,8 @@
                         </a>       
                     }                
                 </mat-list>  
-                <button mat-button matStepperPrevious>Back</button>
-                <button mat-button matStepperNext>Next</button>                 
+                <button mat-button matStepperPrevious>Anterior</button>
+                <button mat-button matStepperNext>Siguiente</button>                 
             }
         </mat-step>  
         <mat-step errorMessage="faltan datos.">
@@ -187,9 +187,9 @@
             }
             </div>  
 
-            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button matStepperPrevious>Anterior</button>
             @if( isSetupCompleted() ){          
-                <button mat-button matStepperNext (click)="SetupEnded()">Next</button>                 
+                <button mat-button matStepperNext (click)="SetupEnded()">Siguiente</button>                 
             }
         </mat-step>  
 

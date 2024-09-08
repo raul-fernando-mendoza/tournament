@@ -45,7 +45,7 @@ declare var grecaptcha: any;
     { provide: MAT_DATE_LOCALE, useValue: 'en-US' },
   ]
 })
-export class LoginFormComponent implements OnInit,OnDestroy,AfterViewInit{
+export class LoginFormComponent implements OnInit,OnDestroy{
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
@@ -90,10 +90,6 @@ export class LoginFormComponent implements OnInit,OnDestroy,AfterViewInit{
         this.intendedPath = this.route.snapshot.paramMap.get('intendedPath')
       }
       
-  }
-  ngAfterViewInit(): void {
-    let el1:any = document.getElementsByClassName('grecaptcha-badge')[0]
-
   }
   ngOnDestroy(): void {
     if( this.unsubscribe ){
