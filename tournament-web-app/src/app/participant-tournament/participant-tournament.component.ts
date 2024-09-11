@@ -18,6 +18,7 @@ import { Unsubscribe } from 'firebase/auth';
 import { MatCheckboxModule} from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { where } from 'firebase/firestore';
+import {MatChipsModule} from '@angular/material/chips';
 
 interface PerformanceReference{
   id:string
@@ -41,6 +42,8 @@ interface PerformanceReference{
     ,MatProgressSpinnerModule
     ,MatCheckboxModule
     ,FormsModule
+    ,MatGridListModule
+    ,MatChipsModule
   ],
   templateUrl: './participant-tournament.component.html',
   styleUrl: './participant-tournament.component.css'
@@ -57,13 +60,13 @@ export class ParticipantTournamentComponent implements OnDestroy{
 
   program:Array<PerformanceReference> = []  
   
-  activePanel:string | null = null
-
   unsubscribe:Unsubscribe | undefined
 
   unsubscribePerformances:Unsubscribe | undefined
 
   isShowDeleted = false
+
+  hasDeletedOrCancel:boolean = false
 
   constructor(
     private activatedRoute: ActivatedRoute
@@ -115,7 +118,6 @@ export class ParticipantTournamentComponent implements OnDestroy{
 
 
   ngOnInit(): void {
-    this.activePanel = this.business.getStoredItem("activePanel")
     this.business.home = TournamentCollection.collectionName + "/" + this.tournamentId
   }
 
@@ -126,11 +128,14 @@ export class ParticipantTournamentComponent implements OnDestroy{
     if( this.tournamentId != null){
       if( this.unsubscribe ){
         this.unsubscribe()
-      }      
+      }    
+      console.debug("reading tournament")  
       this.unsubscribe = this.firebase.onsnapShotDoc( TournamentCollection.collectionName, this.tournamentId,
         {
           next(doc){
+            
             thiz.tournament = doc.data() as TournamentObj
+            console.debug("tournamen found:" + thiz.tournament.label)
             thiz.readPerformances()
             thiz.readProgram()
           },
@@ -148,17 +153,23 @@ export class ParticipantTournamentComponent implements OnDestroy{
     if( this.unsubscribePerformances ){
       this.unsubscribePerformances()
     }
+    console.debug("reading performances")
     this.unsubscribePerformances = this.firebase.onsnapShotCollection( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"),{
       'next' : set =>{
         this.performances.length = 0
+        this.hasDeletedOrCancel = false
         set.docs.map( doc =>{
           let p = doc.data() as PerformanceObj
+          console.debug("performance found:" + p.label)
           let pr:PerformanceReference = {
             id: doc.id,
             performance: p,
             isInProgram: this.isInProgram(doc.id)
           }
           this.performances.push( pr )
+          if( p.isCanceled || p.isDeleted ){
+            this.hasDeletedOrCancel = true
+          }
 
         })
         this.performances.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
@@ -174,6 +185,7 @@ export class ParticipantTournamentComponent implements OnDestroy{
         console.log("reading program:" + programId)
         this.firebase.getDocument( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/") , programId).then( (data)=>{
           let performance = data as PerformanceObj
+          console.debug("program read:" + performance.label)
           let pr:PerformanceReference = {
             id: programId,
             performance: performance,
@@ -199,6 +211,8 @@ export class ParticipantTournamentComponent implements OnDestroy{
   onPerformanceNew(){
     this.router.navigate(["performanceNew"], {relativeTo: this.activatedRoute})
   }
+
+ 
 }
 
 

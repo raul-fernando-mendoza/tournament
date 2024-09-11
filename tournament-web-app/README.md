@@ -65,3 +65,18 @@ value: 199.36.158.100
 TTL:Automatic
 
 *********************
+
+to use the custom domain on the popup login:
+
+in environment.prod.ts
+const firebaseConfig = {
+  ...
+  authDomain: "miscompetencias.com",
+
+in gcp cloud console go to APIs & Services
+  ->OAuth 2.0 Client IDs
+    -Web client (auto created by Google Service)
+      ->Authorized JavaScript origins
+        -> add https://miscompetencias.com
+      ->Authorized redirect URIs
+        ->add https://miscompetencias.com/__/auth/handler

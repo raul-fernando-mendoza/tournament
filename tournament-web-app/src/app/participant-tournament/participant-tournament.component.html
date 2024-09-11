@@ -1,54 +1,61 @@
-<h1>Torneo</h1>    
 @if( tournament ){
-    <mat-grid-list cols="5" rowHeight="2em">
-        <mat-grid-tile colspan="3">{{ tournament.label }}</mat-grid-tile>
-        <mat-grid-tile colspan="2" rowspan="3"><img mat-card-lg-image [src]="tournament.imageUrl" ></mat-grid-tile>
-        <mat-grid-tile colspan="3">
-            Fecha:{{ dateSrv.getDate( tournament.eventDate) | date: 'dd/MM/yyyy'}}
-        </mat-grid-tile>
-        <mat-grid-tile colspan="3">
-            Hora:{{tournament.eventTime}} 
-        </mat-grid-tile>
-    </mat-grid-list>
+    <span>
+        <div>
+            <h2>{{ tournament.label }}</h2>
+            <div class="tournament-detail">
+                <h3>Fecha:{{ dateSrv.getDate( tournament.eventDate) | date: 'dd/MM/yyyy'}}</h3>
+                <h4>Hora:{{tournament.eventTime}}</h4>                
+            </div>
+
+        </div>
+    </span>
+
+   
 
     <div class="bar">
-        <h2>Inscripciones</h2>
+        <h1>Coreografias:</h1>
         <span class="spacer"></span>
-        @if( performances.length > 0){
-            <mat-checkbox [(ngModel)]="isShowDeleted">mostrar todos</mat-checkbox>
+        @if( hasDeletedOrCancel ){
+            <mat-checkbox [(ngModel)]="isShowDeleted">mostrar todas</mat-checkbox>
         }
         <span class="spacer"></span>        
     </div>
 
-    <mat-list>
+    <mat-grid-list cols="2" rowHeight="3em">
     @for( p of performances; track p.id){
-
         @if( !(isShowDeleted==false && (p.performance.isDeleted || p.performance.isCanceled) ) ){
-            <mat-list-item>
-                <a [routerLink]="['performanceEdit',p.id]">
-                    <span class="performance_label">{{ p.performance.label }}</span>
+            <mat-grid-tile>
+                <span class="performance_label">
+                <a  [routerLink]="['performanceEdit',p.id]">
+                   <button mat-button>{{ p.performance.label }}</button> 
+                </a>
+                </span>
+            </mat-grid-tile>
+            <mat-grid-tile> 
+                <span class="performance_status">
+                    <mat-chip-set>
                     @if( p.performance.isRejected || p.performance.isCanceled){
                         @if( p.performance.isRejected ){
-                            <span class="status_rejected">Rechazado!</span>
+                            <mat-chip-option disabled>Rechazado!</mat-chip-option>                            
                         }                    
                         @if( p.performance.isCanceled ){
-                            <span class="status_canceled">Cancelado!</span>
+                            <mat-chip-option disabled>Cancelado!</mat-chip-option>
                         }    
                     }              
                     @else{
                         @if( p.isInProgram ){
-                            <span class="status">Presentacion ha sido aceptada</span>
+                            <mat-chip-option selected disabled>Aceptada</mat-chip-option>
                         }                            
                         @else{
-                            <span class="status">En proceso de aprovacion</span>
+                            <mat-chip-option disabled>En aprovación</mat-chip-option>
                         }
                     }
-
-                </a>
-            </mat-list-item>
+                    </mat-chip-set>
+                </span>
+            </mat-grid-tile>
         }
     } 
-    </mat-list>
+    </mat-grid-list> 
     <button mat-raised-button color="primary" (click)="onPerformanceNew()">Registrar coreografia</button>
     
    

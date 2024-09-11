@@ -32,6 +32,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { TournamentEditPodiumComponent } from '../podium/tournament-edit-podium.component';
 import { ProgramListComponent } from '../program-list/program-list.component';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
 
 interface ProgramRef{
   id:string
@@ -75,6 +76,7 @@ interface JurorRef{
   ,TournamentEditPodiumComponent
   ,ProgramListComponent
   ,MatCheckboxModule
+  ,MatChipsModule
   ],
   templateUrl: './admin-tournament.component.html',
   styleUrl: './admin-tournament.component.css'
@@ -110,6 +112,12 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
   isShowCanceled = false
 
   @ViewChild("tournamentTab", {static: true}) demo3Tab!: MatTabGroup;
+
+  isShowDeleted = false
+
+  hasDeletedOrCancel:boolean=false
+
+  hasPending = false
 
   constructor(
      private activatedRoute: ActivatedRoute
@@ -222,6 +230,8 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
       ,{
         'next': (set)=>{
           this.pendingRefs.length = 0
+          this.hasDeletedOrCancel = false
+          this.hasPending = false
           set.docs.map( doc =>{
             let performance = doc.data() as PerformanceObj
             //check if the performance is in the program
@@ -230,8 +240,15 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
               let pending:PerformanceReference={
                 id: doc.id,
                 performance: performance,
+                isInProgram: this.isInProgram(doc.id)
               }
               this.pendingRefs.push(pending)
+              if( performance.isDeleted || performance.isCanceled || performance.isDeleted ){
+                this.hasDeletedOrCancel = true
+              }   
+              else{
+                this.hasPending = true
+              }           
             }
           })
           this.pendingRefs.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
@@ -378,4 +395,12 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
    let origin = this.document.location.origin;
     return origin + '/tournament/' + this.tournamentId;
   }
+  isInProgram( id:string ):boolean{
+    if(  this.tournament!.program.find( e => e == id) ){
+      return true
+    }
+    else{
+      return false
+    }
+  }  
 }

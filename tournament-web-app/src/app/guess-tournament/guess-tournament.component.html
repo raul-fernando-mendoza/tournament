@@ -1,16 +1,24 @@
 <a routerLink="/participant"><button mat-icon-button><mat-icon>arrow_back</mat-icon></button></a>
-<h1>Torneo</h1>    
+<h1>Invitacion:</h1>   
 @if( tournament ){
-    <mat-grid-list cols="5" rowHeight="2em">
-        <mat-grid-tile colspan="3">{{ tournament.label }}</mat-grid-tile>
-        <mat-grid-tile colspan="2" rowspan="3"><img mat-card-lg-image [src]="tournament.imageUrl" ></mat-grid-tile>
-        <mat-grid-tile colspan="3">
-            Fecha:{{ dateSrv.getDate( tournament.eventDate) | date: 'dd/MM/yyyy'}}
-        </mat-grid-tile>
-        <mat-grid-tile colspan="3">
-            Hora:{{tournament.eventTime}}
-        </mat-grid-tile>
-    </mat-grid-list>
+
+<div class="bar">
+    <span>
+        <div>
+            <h2>{{ tournament.label }}</h2>
+            <div class="tournament-detail">
+                <h3>Fecha:{{ dateSrv.getDate( tournament.eventDate) | date: 'dd/MM/yyyy'}}</h3>
+                <h4>Hora:{{tournament.eventTime}}</h4>                
+            </div>
+
+        </div>
+    </span>
+    <span>            
+        @if(tournament.imageUrl){
+            <img mat-card-lg-image [src]="tournament.imageUrl" > 
+        }
+    </span>
+</div>
 
     <mat-accordion>
         <mat-expansion-panel>
@@ -47,25 +55,6 @@
                     } 
                 </mat-accordion> 
         </mat-expansion-panel>  
-<!--
-        @if( tournament.isProgramReleased ){ 
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>Programa</mat-panel-title>
-            </mat-expansion-panel-header>  
-            <mat-list>
-                @for( p of tournament.program; track p){
-                    <mat-list-item>
-                    {{ p.performance.label }}
-                    </mat-list-item>
-                }    
-                @empty{
-                    <h3>No se han adicionado performances al programa</h3>
-                }                             
-            </mat-list>  
-        </mat-expansion-panel>  
-        }                 
-    -->        
     </mat-accordion>    
     <p>
         <mat-divider></mat-divider>

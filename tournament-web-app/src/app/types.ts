@@ -155,4 +155,5 @@ export class InscriptionRequestCollection{
 export interface PerformanceReference{
     id:string
     performance:PerformanceObj
+    isInProgram:boolean
 }

@@ -7,7 +7,7 @@ import { FirebaseStorage, getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDUc-FKXKaMmtu9f4m-mu27VxV01IwOC9Y",
-  authDomain: "rax-tournament-dev.firebaseapp.com",
+  authDomain: "miscompetencias.com",
   projectId: "rax-tournament-dev",
   storageBucket: "rax-tournament-dev.appspot.com",
   messagingSenderId: "1037635511206",

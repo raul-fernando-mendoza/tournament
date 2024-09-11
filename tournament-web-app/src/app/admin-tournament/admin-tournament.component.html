@@ -21,44 +21,62 @@
 }
 
 
+<div class="bar">
+    <h1>Solicitudes de Coreografias:</h1>
+    <span class="spacer"></span>
+    @if( hasDeletedOrCancel ){
+        <mat-checkbox [(ngModel)]="isShowDeleted">mostrar todas</mat-checkbox>
+    }
+    <span class="spacer"></span>        
+</div>
+
+<mat-grid-list class="request-grid" cols="2" rowHeight="3em">
+    <mat-grid-tile class="request-grid-title">Titulo</mat-grid-tile>
+    <mat-grid-tile class="request-grid-title">Estatus</mat-grid-tile>
+    @for( p of pendingRefs; track p.id){
+        @if( !(isShowDeleted==false && (p.performance.isDeleted || p.performance.isRejected || p.performance.isCanceled) ) ){
+            <mat-grid-tile>
+                <span class="performance_label">
+                <a  [routerLink]="['performanceEdit',p.id]">
+                   <button mat-button>{{ p.performance.label }}</button> 
+                </a>
+                </span>
+            </mat-grid-tile>
+            <mat-grid-tile> 
+                <span class="performance_status">
+                    <mat-chip-set>
+                    @if( p.performance.isRejected || p.performance.isCanceled){
+                        @if( p.performance.isRejected ){
+                            <mat-chip-option disabled>Rechazado!</mat-chip-option>                            
+                        }                    
+                        @if( p.performance.isCanceled ){
+                            <mat-chip-option disabled>Cancelado!</mat-chip-option>
+                        }    
+                    }              
+                    @else{
+                        @if( p.isInProgram ){
+                            <mat-chip-option selected disabled>Aceptada</mat-chip-option>
+                        }                            
+                        @else{
+                            <button mat-raised-button color="primary" (click)="onAccept(p.id)">Aceptar en el programa</button>
+                        }
+                    }
+                    </mat-chip-set>
+                </span>
+            </mat-grid-tile>
+        }
+    } 
+    </mat-grid-list> 
+    @if(!hasPending){
+        <span>No hay ninguna solicitud pendiente</span>
+    }
+    <mat-divider></mat-divider>
+
 @if( tournamentId && tournament ){
 
     <mat-tab-group #tournamentTab>
         <mat-tab label="programa">
-            @if( pendingRefs.length ||  (pendingRefs.length == 0 && tournament.program.length == 0) ){
                 
-
-                <div class="bar">
-                    <h2>Solicitudes de presentacion</h2>
-                    <span class="spacer"></span>
-                    <mat-checkbox [(ngModel)]="isShowCanceled">mostrar todos</mat-checkbox>
-                    <span class="spacer"></span>
-                </div>                
-                <mat-list>
-                @for( p of pendingRefs; track p.id){
-                    @if( !(isShowCanceled==false && (p.performance.isCanceled || p.performance.isRejected)  ) ){
-                        <mat-list-item>
-                            <a [routerLink]="['performanceEdit',p.id]">
-                                <span class="label">{{ p.performance.label }}</span>
-                                @if( p.performance.isCanceled ){ 
-                                <span class="cancelado">Cancelado</span> 
-                                } 
-                                @if( p.performance.isRejected ){ 
-                                    <span class="cancelado">Rechazado</span> 
-                                } 
-    
-                            </a>
-                            @if( !p.performance.isCanceled && !p.performance.isRejected){ 
-                                <button mat-raised-button color="primary" (click)="onAccept(p.id)">Aceptar en el programa</button>
-                            }
-                        </mat-list-item>
-                    }
-                } 
-                @empty{
-                    <span>No hay ninguna solicitud pendiente</span>
-                }
-                </mat-list>  
-            }    
             <app-program-list [tournamentId]="tournamentId" [tournament]="tournament"></app-program-list>
                   
         </mat-tab>
