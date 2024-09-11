@@ -42,7 +42,11 @@ export class BusinesslogicService {
       tournament.evaluations.length > 0 &&
       tournament.medals.length > 0 )
     {
-      isSetupCompleted = true
+      tournament.evaluations.map( e =>{
+        if(e.aspects.length > 0){
+          isSetupCompleted = true
+        }
+      })      
     }
     return isSetupCompleted
   }

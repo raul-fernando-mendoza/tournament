@@ -617,6 +617,13 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
       if( !(tournament.evaluations.length > 0) ){
         errors.push("Por favor adicione una evaluacion");
       }
+
+      this.tournament.evaluations.map( e =>{
+        if(e.aspects.length == 0){
+          errors.push("Por favor adicione un aspecto a la categoria:" + e.label);
+        }
+      })
+
       if( !(tournament.medals.length > 0)){
         errors.push("Por favor adicione un premio");
       }
