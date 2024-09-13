@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../firebase.service';
-import { AspectGrade, EvaluationGradeCollection, EvaluationGradeObj, Juror, JurorCollection, JurorObj, Performance, PerformanceCollection, PerformanceObj, TournamentCollection, TournamentObj  } from '../types';
+import { AspectGrade, EvaluationGradeCollection, EvaluationGradeObj, Juror,  Performance, PerformanceCollection, PerformanceObj, TournamentCollection, TournamentObj  } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,12 +16,6 @@ import { BusinesslogicService } from '../businesslogic.service';
 interface EvaluationGradeReference{
   id:string
   evaluationGrade:EvaluationGradeObj
-}
-
-interface JurorRef{
-  id:string
-  juror:JurorObj
-
 }
 
 @Component({
@@ -49,8 +43,7 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
   evaluationGradesReferences:Array<EvaluationGradeReference> = []  
 
   isAdmin = false
-  jurors:Array<JurorRef> = []
-
+  
   newGrade = 0.0
   isNewGradeAvailable = false
 
@@ -78,13 +71,13 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
     if(this.unsubscribeEvaluationGrade){
       this.unsubscribeEvaluationGrade()
     }
-    this.loadJurors().then( ()=>{
+   
       let filter 
       if( this.isAdmin == true ){
         //no filter
       }
       else{ //force a filter
-        let juror = this.jurors.find( e => e.juror.email == this.auth.getUserEmail())
+        let juror = this.tournament.jurors.find( e => e.email == this.auth.getUserEmail())
         if( juror ){
           let id:string = juror.id
           filter = where("jurorId", "==", id)
@@ -138,7 +131,7 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
         }
       },
       filter)
-    })
+ 
     
   }  
 
@@ -199,40 +192,6 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
         alert("ERROR removing evaluationGrade" + reason)
       })
     }
-  }
-
-  loadJurors():Promise<void>{
-    return new Promise( (resolve, reject)=>{
-      let filter:QueryFieldFilterConstraint | undefined = undefined
-      if( !this.isAdmin ){
-        let email:string | null = this.auth.getUserEmail() 
-        filter = where("email","==", email)      
-      }
-  
-      if( this.tournamentId != null){
-        this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId,
-        JurorCollection.collectionName ].join("/"), {
-          'next': (set) =>{
-              this.jurors.length = 0
-              set.docs.forEach( doc =>{
-                let juror = doc.data() as JurorObj
-                let jurorRef:JurorRef={
-                  id: doc.id,
-                  juror: juror
-                }
-                this.jurors.push( jurorRef )
-              })
-              this.jurors.sort( (a,b) => a.juror.label > b.juror.label ? 1:-1)
-              resolve()
-          }, 
-          'error': (reason)=>{
-            alert("error reading jurors:"+ reason )
-            reject()
-          }
-        },
-        filter)
-      }
-    })
   }
 
   onRelease(){

@@ -12,14 +12,14 @@
 <mat-grid-list cols="3" rowHeight="3em"> 
 @if( tournament && performance ){
     @for( e of tournament.evaluations; track e){
-        @for(j of jurors;track j; let j_idx = $index){
+        @for(j of tournament.jurors;track j; let j_idx = $index){
             @if( !isAdmin ){
                 @if( getEvaluationRefence(e.id,j.id).length > 0){
                     @if( j_idx == 0){
                     <mat-grid-tile colspan="3" [style.background]="'lightblue'">{{e.label}}</mat-grid-tile>
                     }
                     @for(r of getEvaluationRefence(e.id,j.id); track r;){
-                        <mat-grid-tile>{{j.juror.label}}</mat-grid-tile>                
+                        <mat-grid-tile>{{j.label}}</mat-grid-tile>                
                         <mat-grid-tile>
                             @if( !r.evaluationGrade.isCompleted ){
                                 @if( !performance.isReleased ){
@@ -46,7 +46,7 @@
                     <mat-grid-tile colspan="3" [style.background]="'lightblue'">{{e.label}}</mat-grid-tile>
                 }
                 @for(r of getEvaluationRefence(e.id,j.id); track r;){
-                    <mat-grid-tile>{{j.juror.label}}</mat-grid-tile>
+                    <mat-grid-tile>{{j.label}}</mat-grid-tile>
                     <mat-grid-tile>
                         @if( !r.evaluationGrade.isCompleted ){
                             @if( !performance.isReleased ){
@@ -66,7 +66,7 @@
                 }
                 @empty{
                     @if( !performance.isReleased ){
-                        <mat-grid-tile>{{j.juror.label}}</mat-grid-tile>
+                        <mat-grid-tile>{{j.label}}</mat-grid-tile>
                         <mat-grid-tile>
                             
                         </mat-grid-tile>                        

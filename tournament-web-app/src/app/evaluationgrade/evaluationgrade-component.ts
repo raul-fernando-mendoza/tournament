@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../firebase.service';
-import { EvaluationGradeObj, TournamentCollection, EvaluationGradeCollection, PerformanceCollection, PerformanceObj, EvaluationGrade, TournamentObj, JurorCollection, JurorObj} from '../types'
+import { EvaluationGradeObj, TournamentCollection, EvaluationGradeCollection, PerformanceCollection, PerformanceObj, EvaluationGrade, TournamentObj, Juror} from '../types'
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
@@ -46,7 +46,7 @@ export class EvaluationGradeComponent implements OnInit{
   tournament!:TournamentObj
   performance!:PerformanceObj
   evaluationGrade!:EvaluationGradeObj
-  juror!:JurorObj
+  juror!:Juror
 
   collection = EvaluationGradeCollection.collectionName
   submitting = false
@@ -123,22 +123,13 @@ export class EvaluationGradeComponent implements OnInit{
         ,EvaluationGradeCollection.collectionName].join("/"),
         this.evaluationGradeId).then( data =>{
           this.evaluationGrade = data as EvaluationGradeObj
-        })
-    })
-    .then( ()=>{
-      return this.firebaseService.getDocument(
-        [TournamentCollection.collectionName,this.tournamentId
-        ,JurorCollection.collectionName].join("/"),
-        this.evaluationGrade.jurorId).then( data =>{
-          this.juror = data as JurorObj
           let currentEmail = this.auth.getUserEmail()
+          let juror = this.tournament.jurors.find(j => j.id == this.evaluationGrade.jurorId)
   
-          if( this.performance.isReleased == false && (this.juror.email == currentEmail || this.isAdmin )){
+          if( this.performance.isReleased == false && ( juror?.email == currentEmail || this.isAdmin )){
             this.canEdit = true
-          }
-
-  
-
+          }  
+          
           this.aspects.controls.length = 0
           this.evaluationGrade.aspectGrades.map( aspect =>{
             let newControl = this.fb.control([aspect.grade])
@@ -146,14 +137,12 @@ export class EvaluationGradeComponent implements OnInit{
               newControl.disable()
             }
             this.aspects.push(newControl);
-          })
-        },
-        reason=>{
-          alert("Error: reading evaluationGrade:" + reason )
-      }) 
-  
+          })          
+        }
+        ,reason =>{
+          alert("Error reading evaluation")
+        })               
     })
-   
   }
   onCancel(){
     this.router.navigate(['/' + `${TournamentCollection.collectionName}/${this.tournamentId}/${PerformanceCollection.collectionName}/${this.performanceId}`])

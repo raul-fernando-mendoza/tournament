@@ -2,7 +2,7 @@ import { AfterViewInit, Component, Inject, OnDestroy, OnInit, ViewChild } from '
 import { CommonModule , DOCUMENT, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Filter } from '../firebase.service';
-import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, Juror, InscriptionRequest, InscriptionRequestCollection, PerformanceReference, JurorCollection, JurorObj} from '../types'
+import { Performance,  PerformanceCollection, PerformanceObj, Tournament , TournamentCollection, TournamentObj, PerformanceReference} from '../types'
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -40,11 +40,6 @@ interface ProgramRef{
   noEvaluationsFound:boolean
   newGradeAvailable:boolean
   medal:string
-}
-
-interface JurorRef{
-  id:string
-  juror:JurorObj
 }
 
 @Component({
@@ -99,8 +94,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
     imagePath:[""]
   })
   pendingRefs:Array<PerformanceReference> = []  
-
-  jurors:Array<JurorRef> = []
 
   unsubscribe:Unsubscribe | undefined = undefined
   unsubscribePerformances:Unsubscribe | undefined = undefined
@@ -186,7 +179,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
         if( this.auth.getUserUid()!= null){
           this.isLoggedIn = true
         }
-        this.loadJurors()
         this.readPerformances()
         
         
@@ -198,25 +190,6 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
         console.log("reading program as ended")
       }        
     })
-  }
-  loadJurors(){
-    if( this.tournamentId != null){
-      this.firebase.onsnapShotCollection( [TournamentCollection.collectionName, this.tournamentId,
-      JurorCollection.collectionName ].join("/"), {
-        'next': (set) =>{
-            this.jurors.length = 0
-            set.docs.forEach( doc =>{
-              let juror = doc.data() as JurorObj
-              let jurorRef:JurorRef={
-                id: doc.id,
-                juror: juror
-              }
-              this.jurors.push( jurorRef )
-            })
-            this.jurors.sort( (a,b) => a.juror.label > b.juror.label ? 1:-1)
-        } 
-      })
-    }
   }
 
 

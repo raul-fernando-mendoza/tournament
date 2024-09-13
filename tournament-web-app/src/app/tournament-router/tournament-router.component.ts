@@ -3,13 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { BusinesslogicService } from '../businesslogic.service';
 import { FirebaseFullService } from '../firebasefull.service';
-import { JurorCollection, JurorObj, TournamentCollection, TournamentObj } from '../types';
+import { TournamentCollection, TournamentObj } from '../types';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
-interface JurorRef{
-  id:string
-  juror:JurorObj
-}
 
 @Component({
   selector: 'app-tournament-router',
@@ -22,7 +18,6 @@ export class TournamentRouterComponent{
   
   tournamentId :string | null= null
   tournament:TournamentObj | null =null
-  jurors:Array<JurorRef> = []
   displayName =""
 
   constructor( 
@@ -61,16 +56,14 @@ export class TournamentRouterComponent{
             this.router.navigate(["/tournamentAdmin/",this.tournamentId])  
           }
           else{
-            this.loadJurors().then( ()=>{
               let email = this.authService.getUserEmail() 
-              let juror = this.jurors.find( e => e.juror.email == email)
+              let juror = this.tournament.jurors.find( j => j.email == email)
               if( juror ){
                 this.router.navigate(["/tournamentJuror/",this.tournamentId])  
               }
               else{
                 this.router.navigate(["/tournamentParticipant/",this.tournamentId])  
               }
-            })
           }
         }  
       })
@@ -89,32 +82,6 @@ export class TournamentRouterComponent{
       })
     })
   }  
-  loadJurors():Promise<void>{
-    return new Promise<void>( (resolve,reject) =>{
-      if( this.tournamentId != null){
-        this.firebase.getDocuments( [TournamentCollection.collectionName, this.tournamentId,
-        JurorCollection.collectionName ].join("/") ).then( (set)=>{
-              this.jurors.length = 0
-              set.forEach( doc =>{
-                let juror = doc.data() as JurorObj
-                let jurorRef:JurorRef={
-                  id: doc.id,
-                  juror: juror
-                }
-                this.jurors.push( jurorRef )
-              })
-              this.jurors.sort( (a,b) => a.juror.label > b.juror.label ? 1:-1)
-              resolve()
-          },
-          (reason)=>{
-            alert("Error reading jurors:" + reason)
-            reject(reason)
-          } 
-        )
-        
-      }
-    })
-  }
 
 
 }

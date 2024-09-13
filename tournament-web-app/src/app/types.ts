@@ -27,17 +27,10 @@ export interface Evaluation{
 }
 
 export interface Juror{
-    label?:string
-    email?:string
+    id:string
+    label:string
+    email:string
 }
-export class JurorObj{
-    label!:string
-    email!:string    
-}
-export class JurorCollection{
-    static readonly collectionName:string = 'juror';
-}
-
 
 export interface Dictionary<T>{
     [key:string]:T;
@@ -58,6 +51,7 @@ export interface Tournament{
     categories?:Array<Category>
     medals?:Array<Medal>
     evaluations?:Array<Evaluation>
+    jurors?:Array<Juror>
 }
 export class TournamentObj implements Tournament{
     label!:string
@@ -74,6 +68,7 @@ export class TournamentObj implements Tournament{
     categories:Array<Category> = []
     medals:Array<Medal> = []
     evaluations:Array<Evaluation> = []
+    jurors:Array<Juror> = []
 }
 export class TournamentCollection{
     static readonly collectionName:string = 'tournament';

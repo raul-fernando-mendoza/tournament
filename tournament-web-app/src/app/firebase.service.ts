@@ -111,7 +111,7 @@ export class FirebaseService {
   }  
 
 
-  unionArrayElementDoc( collectionPath:string, key:string, value:string  ):Promise<void>{
+  unionArrayElementDoc( collectionPath:string, key:string, value:any  ):Promise<void>{
     var obj:{ [key:string]:any } = {}
     obj["updateon"] = new Date()
     obj[key] = arrayUnion(value)

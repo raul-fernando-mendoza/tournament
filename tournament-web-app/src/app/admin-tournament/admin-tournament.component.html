@@ -191,15 +191,15 @@
                         Jurados
                       </mat-panel-title>
                     </mat-expansion-panel-header>
-                    @if( jurors.length ){
+                    @if( tournament.jurors.length ){
                         <a [routerLink]="['jurorNew']">
                             <button mat-button-icon><mat-icon>add</mat-icon></button>
                         </a>                   
                         }
                         <mat-list>
-                        @for( j of jurors; track j.id){
+                        @for( j of tournament.jurors; track j.id){
                             <a [routerLink]="['juror',j.id]">
-                                <mat-list-item>{{j.juror.label}}</mat-list-item>
+                                <mat-list-item>{{j.label}}</mat-list-item>
                             </a>
                         }
                         @empty{

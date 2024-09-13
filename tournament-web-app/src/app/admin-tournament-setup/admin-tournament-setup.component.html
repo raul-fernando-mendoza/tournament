@@ -111,14 +111,14 @@
             <ng-template matStepLabel>Jurado</ng-template>   
             @if( tournamentId && tournament ){
                 <mat-list>
-                    @if( jurors.length ){
+                    @if( tournament.jurors.length ){
                     <a [routerLink]="['jurorNew']">
                         <button mat-button-icon><mat-icon>add</mat-icon></button>
                     </a>                   
                     }
-                    @for( j of jurors; track j.id){
+                    @for( j of tournament.jurors; track j.id){
                         <a [routerLink]="['juror',j.id]">
-                            <mat-list-item>{{j.juror.label}}</mat-list-item>
+                            <mat-list-item>{{j.label}}</mat-list-item>
                         </a>
                     }
                     @empty{
@@ -129,7 +129,7 @@
                     }                
                 </mat-list>  
                 <button mat-button matStepperPrevious>Anterior</button>
-                <button mat-raised-button color="primary" [disabled]="!jurors.length" matStepperNext>Siguiente</button>  
+                <button mat-raised-button color="primary" [disabled]="!tournament.jurors.length" matStepperNext>Siguiente</button>  
             }               
         </mat-step>  
         <mat-step [stepControl]="firstMedal" errorMessage="un premio es requerido.">

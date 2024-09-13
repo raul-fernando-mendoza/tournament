@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Route, Router, RouterModule } from '@angular/router';
 import { QuillModule } from 'ngx-quill';
 import { FirebaseService } from '../firebase.service';
-import { Juror, JurorCollection, Tournament, TournamentCollection, TournamentObj } from '../types';
+import { Juror, TournamentCollection, TournamentObj } from '../types';
 import { v4 as uuidv4, v4 } from 'uuid';
 
 @Component({
@@ -73,17 +73,16 @@ export class JurorNewComponent {
     let id = uuidv4()
 
     if( this.tournament && label && email){
-      let obj:Juror={
+      let juror:Juror={
+        id:id,
         label: label,
         email: email
       }
-      
+      this.tournament.jurors.push( juror )
      
-      this.firebaseService.setDocument( [TournamentCollection.collectionName,this.tournamentId,
-        JurorCollection.collectionName].join("/"), id, obj).then( ()=>{
+      this.firebaseService.unionArrayElementDoc( [TournamentCollection.collectionName,this.tournamentId].join("/"), "jurors", juror).then( ()=>{
         console.log("juror ha sido adicionado")
         this.router.navigate(['../'], { relativeTo: this.activatedRoute })
-
       },
       reason =>{
         alert("Error adicionando juror:" + reason)
