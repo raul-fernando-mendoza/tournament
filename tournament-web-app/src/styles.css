@@ -27,3 +27,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .grecaptcha-badge { 
     visibility: hidden !important;
 }
+
+.cell-text{
+    width:100%;
+    text-align: left; 
+}
+.cell-number{
+    width:100%;
+    text-align: right; 
+}

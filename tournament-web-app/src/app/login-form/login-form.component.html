@@ -36,7 +36,6 @@
             </mat-form-field>
           </div>
         </div>
-       
       </mat-card-content>
  
       <mat-card-actions>
@@ -45,6 +44,12 @@
         <button mat-button color="warn" (click)="onPasswordResetEmail()" *ngIf="!isRegister">Olvide mi password</button>
 
       </mat-card-actions>
+
+      <mat-divider></mat-divider>
+      @if( !isRegister ){
+        <button mat-button  aria-label="register" (click)="Register()">Registrarte</button>  
+      }
+      
       
     </mat-card>
   </form>

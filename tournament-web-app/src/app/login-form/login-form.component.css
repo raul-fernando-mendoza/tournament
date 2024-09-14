@@ -91,3 +91,6 @@ re-captcha.is-invalid > div {
   max-width: 40%;
 }
 
+mat-divider{
+  margin-bottom: 2em;
+}

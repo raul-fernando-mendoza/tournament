@@ -1,26 +1,28 @@
-<h1>Welcome Juror</h1>
+<h1>Bienvenido Juez</h1>
 @if( tournament ){
     <mat-tab-group #tournamentTab>
-        <mat-tab label="programa">    
-            <mat-accordion>
+        <mat-tab label="programa"> 
                 @for(p of programRefs; track p;let idx = $index, e = $even){
-                <mat-expansion-panel [expanded]="false" hideToggle>
-                    <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        {{idx+1}}.-{{ p.performance.label }}
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        {{ p.performance.fullname }}
-                        @if( p.performance.isCanceled ){
-                            <span class="cancel">Status Cancelado</span>
-                        }                          
-                        <span class="medal">{{ p.medal }}</span>
-                    </mat-panel-description>
-                    </mat-expansion-panel-header>
-                    <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance"></app-evaluationgrade-list> 
-                </mat-expansion-panel>
+                    <mat-grid-list cols="4" rowHeight="3em">
+                        <mat-grid-tile >
+                            <span class="cell-text performance-label">{{idx+1}}.-{{ p.performance.label }}</span>
+                        </mat-grid-tile>
+                        <mat-grid-tile class="header">
+                            <span class="cell-text">{{ p.performance.fullname }}</span>
+                        </mat-grid-tile>
+                        <mat-grid-tile>
+                            @if( p.performance.isCanceled ){
+                                <span class="cancel">Status Cancelado</span>
+                            }
+                        </mat-grid-tile>
+                        <mat-grid-tile>                          
+                            <span class="medal">{{ p.medal }}</span>
+                        </mat-grid-tile>                    
+                    </mat-grid-list> 
+                    <app-evaluationgrade-list [tournamentId]="tournamentId" [tournament]="tournament" [performanceId]="p.id" [performance]="p.performance"></app-evaluationgrade-list>
+                    <mat-divider></mat-divider>
                 }
-            </mat-accordion>
+             
         </mat-tab>    
         <mat-tab label="podium">
             <app-tournament-edit-podium [tournamentId]="tournamentId" [tournament]="tournament"></app-tournament-edit-podium>

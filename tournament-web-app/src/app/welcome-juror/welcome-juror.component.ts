@@ -13,6 +13,7 @@ import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluation
 import { FirebaseFullService, Filter } from '../firebasefull.service';
 import { TournamentEditPodiumComponent } from '../podium/tournament-edit-podium.component';
 import { PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj } from '../types';
+import { MatDividerModule } from '@angular/material/divider';
 
 interface ProgramRef{
   id:string
@@ -33,6 +34,7 @@ interface ProgramRef{
     ,MatExpansionModule  
     ,TournamentEditPodiumComponent  
     ,MatTabsModule
+    ,MatDividerModule
   ],
   templateUrl: './welcome-juror.component.html',
   styleUrl: './welcome-juror.component.css'

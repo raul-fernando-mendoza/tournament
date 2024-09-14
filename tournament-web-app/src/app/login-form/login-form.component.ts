@@ -22,6 +22,7 @@ import { BusinesslogicService } from '../businesslogic.service';
 import { RecaptchaService } from '../recaptcha.service';
 import { compileClassMetadata } from '@angular/compiler';
 import { resolve } from 'node:path';
+import { PathService } from '../path.service';
 
 declare var grecaptcha: any;
 
@@ -81,7 +82,8 @@ export class LoginFormComponent implements OnInit,OnDestroy{
     private router: Router, 
     private authSrv:AuthService,
     private bussiness:BusinesslogicService,
-    private recaptchaService:RecaptchaService
+    private recaptchaService:RecaptchaService,
+    private pathSrv:PathService
     ) {
       
       this.isRegister = ( this.route.snapshot.paramMap.get('isRegister') == "true" )
@@ -190,5 +192,13 @@ export class LoginFormComponent implements OnInit,OnDestroy{
       console.log("signed out completed")
     })
   } 
-      
+  Register(){
+    if( this.intendedPath ){
+      this.router.navigate(['/registerForm',this.intendedPath, {"isRegister":true}])
+    }
+    else{
+      this.router.navigate(['/registerForm', {"isRegister":true}])  
+    }
+    
+  }        
 }

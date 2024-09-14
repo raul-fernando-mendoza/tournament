@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../firebase.service';
-import { AspectGrade, EvaluationGradeCollection, EvaluationGradeObj, Juror,  Performance, PerformanceCollection, PerformanceObj, TournamentCollection, TournamentObj  } from '../types';
+import { AspectGrade, Evaluation, EvaluationGradeCollection, EvaluationGradeObj, Juror,  Performance, PerformanceCollection, PerformanceObj, TournamentCollection, TournamentObj  } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +16,15 @@ import { BusinesslogicService } from '../businesslogic.service';
 interface EvaluationGradeReference{
   id:string
   evaluationGrade:EvaluationGradeObj
+}
+
+interface JurorRow{
+  p:Performance
+  e:Evaluation
+  e_index:number
+  r:EvaluationGradeReference
+  j:Juror
+  j_index:number
 }
 
 @Component({
@@ -122,6 +131,7 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
                 this.newGradeAvailable.emit(false)
               }
             }
+            this.getJurorData()
           },
           'error':(reason) =>{
             alert("there has been an error reading performances:" + reason)
@@ -215,5 +225,33 @@ export class EvaluationgradeListComponent implements OnDestroy, AfterViewInit {
   
   getMedal( newGrade:number ):string{
     return this.business.getMedalForPerformance(this.tournament!, newGrade)
+  }
+
+  jurorTable:Array<JurorRow> = []
+
+  getJurorData(){
+    this.jurorTable.length = 0
+    if( this.tournament && this.performance ){
+      for( let e_index=0; e_index<this.tournament.evaluations.length; e_index++ ){
+        let e = this.tournament.evaluations[e_index]
+        for(let j_index=0; j_index<this.tournament.jurors.length; j_index++){
+          let j = this.tournament.jurors[j_index]
+          if( !this.isAdmin ){
+            let references = this.getEvaluationRefence(e.id,j.id)
+            for(let r of references){
+              let row:JurorRow ={
+                p: this.performance,
+                e: e,
+                e_index: e_index,
+                r: r,
+                j: j,
+                j_index: j_index
+              }
+              this.jurorTable.push(row)
+            }
+          }
+        }
+      }
+    }
   }
 }

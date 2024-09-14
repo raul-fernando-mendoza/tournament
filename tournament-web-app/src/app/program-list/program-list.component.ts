@@ -1,16 +1,11 @@
 import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import {  EvaluationGradeCollection, EvaluationGradeObj, Performance, PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj, PerformanceReference } from '../types';
+import { PerformanceCollection, PerformanceObj, Tournament, TournamentCollection, TournamentObj, PerformanceReference } from '../types';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { FirebaseService } from '../firebase.service';
 import { Unsubscribe } from 'firebase/auth';
-import { doc, DocumentData, QuerySnapshot } from 'firebase/firestore';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
 import { AuthService } from '../auth.service';
 import {MatExpansionModule} from '@angular/material/expansion';
@@ -24,8 +19,6 @@ interface ProgramRef{
   newGradeAvailable:boolean
   medal:string
 }
-
-
 
 @Component({
   selector: 'app-program-list',

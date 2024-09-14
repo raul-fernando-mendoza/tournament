@@ -46,6 +46,7 @@ export const routes: Routes = [
     { path:"loginForm/:intendedPath",pathMatch:'full',component:LoginFormComponent}, 
     { path:"loginForm",pathMatch:'full',component:LoginFormComponent},    
     { path:"registerForm",pathMatch:'full',component:LoginFormComponent},
+    { path:"registerForm/:intendedPath",pathMatch:'prefix',component:LoginFormComponent},
 
     //{ path:"organizer",pathMatch:'full',component:AdminTournamentWelcomeComponent, canActivate: [loginGuard('loginForm/organizer')]},
 
