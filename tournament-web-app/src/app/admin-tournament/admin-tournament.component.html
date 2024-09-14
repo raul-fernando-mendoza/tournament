@@ -23,13 +23,15 @@
 
 <div class="bar">
     <h1>Solicitudes de Coreografias:</h1>
-    <span class="spacer"></span>
+    
     @if( hasDeletedOrCancel ){
+        <span class="spacer"></span>
         <mat-checkbox [(ngModel)]="isShowDeleted">mostrar todas</mat-checkbox>
     }
     <span class="spacer"></span>        
 </div>
 
+@if( pendingRefs.length ){
 <mat-grid-list class="request-grid" cols="2" rowHeight="3em">
     <mat-grid-tile class="request-grid-title">Titulo</mat-grid-tile>
     <mat-grid-tile class="request-grid-title">Estatus</mat-grid-tile>
@@ -71,6 +73,10 @@
         <span>No hay ninguna solicitud pendiente</span>
     }
     <mat-divider></mat-divider>
+}
+@else{
+    <span>No hay ninguna solicitud pendiente</span> 
+}
 
 @if( tournamentId && tournament ){
 

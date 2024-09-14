@@ -5,20 +5,19 @@ import { PerformanceCollection, PerformanceObj, TournamentCollection, Tournament
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { QuillModule } from 'ngx-quill';
 import { DateFormatService } from '../date-format.service';
 import { BusinesslogicService } from '../businesslogic.service';
 import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { FirebaseFullService, Filter } from '../firebasefull.service';
 import { Unsubscribe } from 'firebase/auth';
-import { MatCheckboxModule} from '@angular/material/checkbox';
-import { FormsModule } from '@angular/forms';
 import { where } from 'firebase/firestore';
 import {MatChipsModule} from '@angular/material/chips';
+import { BehaviorSubject } from 'rxjs';
+import {MatButtonToggleChange, MatButtonToggleModule} from '@angular/material/button-toggle';
+import { MatCardModule } from '@angular/material/card';
+import { MatTabsModule } from '@angular/material/tabs';
 
 interface PerformanceReference{
   id:string
@@ -33,17 +32,14 @@ interface PerformanceReference{
     CommonModule
     ,MatIconModule
     ,MatButtonModule 
-    ,MatDividerModule 
-    ,MatListModule    
-    ,MatExpansionModule
+    ,MatCardModule
+    ,MatListModule   
+    ,MatTabsModule 
     ,RouterModule    
     ,MatGridListModule
-    ,QuillModule
     ,MatProgressSpinnerModule
-    ,MatCheckboxModule
-    ,FormsModule
-    ,MatGridListModule
     ,MatChipsModule
+    ,MatButtonToggleModule
   ],
   templateUrl: './participant-tournament.component.html',
   styleUrl: './participant-tournament.component.css'
@@ -56,7 +52,7 @@ export class ParticipantTournamentComponent implements OnDestroy{
   isInscriptionInProgress = false
   isLoggedIn = false
 
-  performances:Array<PerformanceReference> = []
+  performanceReferences:Array<PerformanceReference> = []
 
   program:Array<PerformanceReference> = []  
   
@@ -98,9 +94,9 @@ export class ParticipantTournamentComponent implements OnDestroy{
   logout(){
 
     let hasActive = false
-    for(let i =0 ; i<this.performances.length; i++){
-      if( this.performances[i].performance.isRejected == false && 
-        this.performances[i].performance.isCanceled == false ){
+    for(let i =0 ; i<this.performanceReferences.length; i++){
+      if( this.performanceReferences[i].performance.isRejected == false && 
+        this.performanceReferences[i].performance.isCanceled == false ){
           hasActive=true
         }
     }
@@ -148,7 +144,7 @@ export class ParticipantTournamentComponent implements OnDestroy{
   }
     
   readPerformances(){
-    this.performances.length = 0
+    this.performanceReferences.length = 0
     let filter = where("email","==", this.auth.getUserEmail()) 
     if( this.unsubscribePerformances ){
       this.unsubscribePerformances()
@@ -156,7 +152,7 @@ export class ParticipantTournamentComponent implements OnDestroy{
     console.debug("reading performances")
     this.unsubscribePerformances = this.firebase.onsnapShotCollection( [TournamentCollection.collectionName,this.tournamentId, PerformanceCollection.collectionName].join("/"),{
       'next' : set =>{
-        this.performances.length = 0
+        this.performanceReferences.length = 0
         this.hasDeletedOrCancel = false
         set.docs.map( doc =>{
           let p = doc.data() as PerformanceObj
@@ -166,13 +162,14 @@ export class ParticipantTournamentComponent implements OnDestroy{
             performance: p,
             isInProgram: this.isInProgram(doc.id)
           }
-          this.performances.push( pr )
+          this.performanceReferences.push( pr )
           if( p.isCanceled || p.isDeleted ){
             this.hasDeletedOrCancel = true
           }
 
         })
-        this.performances.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
+        this.performanceReferences.sort( (a,b) => a.performance.label > b.performance.label ? 1 : -1)
+        this.applyFilter()
       }
     }, filter)
   }
@@ -211,6 +208,39 @@ export class ParticipantTournamentComponent implements OnDestroy{
   onPerformanceNew(){
     this.router.navigate(["performanceNew"], {relativeTo: this.activatedRoute})
   }
+
+
+  isFilterValid( p:PerformanceObj ){
+    let result:boolean = true
+    if( this.isShowDeleted==false ){
+      if ( p.isDeleted || p.isCanceled ){
+        result=false;
+      }
+    }
+    return result
+  }
+
+  
+  performanceReferencesFiltered$ = new BehaviorSubject(new Array<PerformanceReference>() );
+
+  //set the display filter list
+  applyFilter(){
+    let performanceReferencesFiltered:Array<PerformanceReference> = []
+    performanceReferencesFiltered.length = 0
+    this.performanceReferences.map( pr =>{
+      if( this.isFilterValid( pr.performance ) ){
+        performanceReferencesFiltered.push(pr)
+      }
+    })
+    this.performanceReferencesFiltered$.next(performanceReferencesFiltered)
+  }
+
+  onShowDeleted(e:MatButtonToggleChange){
+    this.isShowDeleted = e.source.checked
+    this.applyFilter()
+  }
+
+  
 
  
 }

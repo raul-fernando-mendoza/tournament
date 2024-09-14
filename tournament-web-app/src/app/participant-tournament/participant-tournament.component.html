@@ -6,83 +6,84 @@
                 <h3>Fecha:{{ dateSrv.getDate( tournament.eventDate) | date: 'dd/MM/yyyy'}}</h3>
                 <h4>Hora:{{tournament.eventTime}}</h4>                
             </div>
-
         </div>
     </span>
 
-   
-
-    <div class="bar">
-        <h1>Coreografias:</h1>
-        <span class="spacer"></span>
-        @if( hasDeletedOrCancel ){
-            <mat-checkbox [(ngModel)]="isShowDeleted">mostrar todas</mat-checkbox>
-        }
-        <span class="spacer"></span>        
-    </div>
-
-    <mat-grid-list cols="2" rowHeight="3em">
-    @for( p of performances; track p.id){
-        @if( !(isShowDeleted==false && (p.performance.isDeleted || p.performance.isCanceled) ) ){
-            <mat-grid-tile>
-                <span class="performance_label">
-                <a  [routerLink]="['performanceEdit',p.id]">
-                   <button mat-button>{{ p.performance.label }}</button> 
-                </a>
-                </span>
-            </mat-grid-tile>
-            <mat-grid-tile> 
-                <span class="performance_status">
-                    <mat-chip-set>
-                    @if( p.performance.isRejected || p.performance.isCanceled){
-                        @if( p.performance.isRejected ){
-                            <mat-chip-option disabled>Rechazado!</mat-chip-option>                            
-                        }                    
-                        @if( p.performance.isCanceled ){
-                            <mat-chip-option disabled>Cancelado!</mat-chip-option>
-                        }    
-                    }              
-                    @else{
-                        @if( p.isInProgram ){
-                            <mat-chip-option selected disabled>Aceptada</mat-chip-option>
-                        }                            
-                        @else{
-                            <mat-chip-option disabled>En aprovación</mat-chip-option>
+    <mat-tab-group>
+        <mat-tab label="Coreografias">  
+            <mat-card>
+                    <mat-card-content>
+                        @if( hasDeletedOrCancel ){
+                            <div class="bar">
+                                <div class="spacer"></div>
+                                <mat-button-toggle-group  multiple>
+                                <mat-button-toggle value="isShowDeleted" [checked]="isShowDeleted" (change)="onShowDeleted($event)">mostrar todas</mat-button-toggle>            
+                                </mat-button-toggle-group>
+                            </div>
+                        }              
+                    
+                        <mat-grid-list cols="2" rowHeight="3em">
+                        @for( p of (performanceReferencesFiltered$ | async); track p.id){
+                            <mat-grid-tile>
+                                <span class="cell-text">
+                                <a  [routerLink]="['performanceEdit',p.id]">
+                                    <button mat-button>{{ p.performance.label }}</button> 
+                                </a>
+                                </span>
+                            </mat-grid-tile>
+                            <mat-grid-tile> 
+                                <span class="cell-text">
+                                    <mat-chip-set>
+                                        @if( p.performance.isRejected || p.performance.isCanceled){
+                                            @if( p.performance.isRejected ){
+                                                <mat-chip>Rechazado!</mat-chip>                            
+                                            }                    
+                                            @if( p.performance.isCanceled ){
+                                                <mat-chip>Cancelado!</mat-chip>
+                                            }    
+                                        }              
+                                        @else{
+                                            @if( p.isInProgram ){
+                                                <mat-chip>Aceptada</mat-chip>
+                                            }                            
+                                            @else{
+                                                <mat-chip>En aprovación</mat-chip>
+                                            }
+                                        }
+                                        </mat-chip-set>
+                                </span>
+                            </mat-grid-tile>
+                        } 
+                        @empty{
+                            <mat-chip>No hay ninguna coreografia</mat-chip>
                         }
-                    }
-                    </mat-chip-set>
-                </span>
-            </mat-grid-tile>
+                        </mat-grid-list> 
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-raised-button color="primary" (click)="onPerformanceNew()">Registrar coreografia</button>
+                    </mat-card-actions>
+            </mat-card> 
+        
+        </mat-tab>
+        @if( tournament.isProgramReleased ){ 
+            <mat-tab label="Programa">
+                <mat-list>
+                    @for( p of program; track p; let idx = $index){
+                        <mat-list-item>
+                            {{idx+1}}:{{ p.performance.label }}
+                        </mat-list-item>
+                    }    
+                    @empty{
+                        <h3>No se han adicionado performances al programa</h3>
+                    }                             
+                </mat-list>  
+            </mat-tab>
         }
-    } 
-    </mat-grid-list> 
-    <button mat-raised-button color="primary" (click)="onPerformanceNew()">Registrar coreografia</button>
-    
-   
-    @if( tournament.isProgramReleased ){ 
-    <mat-divider></mat-divider>             
-    <mat-accordion>
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>Programa</mat-panel-title>
-            </mat-expansion-panel-header>  
-            <mat-list>
-                @for( p of program; track p){
-                    <mat-list-item>
-                    {{ p.performance.label }}
-                    </mat-list-item>
-                }    
-                @empty{
-                    <h3>No se han adicionado performances al programa</h3>
-                }                             
-            </mat-list>  
-        </mat-expansion-panel>  
-    </mat-accordion>  
-    }                     
-  
+    </mat-tab-group>               
 }
 @else{
     <mat-spinner></mat-spinner>
-}
+} 
+
   
 
