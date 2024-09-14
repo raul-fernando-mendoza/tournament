@@ -213,6 +213,7 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
     },
     reason =>{
       alert("Error guardando documento:" + reason)
+      this.selectTab()
     })
 
   }
@@ -318,11 +319,11 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
           selectedIndex = 4
       }
       
-      if( this.tournamentStepper ){
-        this.tournamentStepper.selectedIndex = selectedIndex
-      }
-    }
 
+    }
+    if( this.tournamentStepper ){
+      this.tournamentStepper.selectedIndex = selectedIndex
+    }
   }
 
   
