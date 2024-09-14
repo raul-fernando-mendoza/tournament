@@ -40,7 +40,7 @@ export interface Tournament{
     label?:string
     eventDate?:number
     eventTime?:string
-    place?:string
+    place?:string|null
     active?:boolean
     tags?:Array<string>
     creatorUid?:string
@@ -57,7 +57,7 @@ export class TournamentObj implements Tournament{
     label!:string
     eventDate!: number 
     eventTime!: string 
-    place?:string
+    place:string | null = null
     active: boolean = false
     tags?: string[] 
     creatorUid!: string 

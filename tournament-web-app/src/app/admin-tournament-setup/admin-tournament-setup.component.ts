@@ -192,6 +192,7 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
       label: label,
       eventDate: eventDate,
       eventTime: this.form.controls.eventTime.value!,
+      place:this.form.controls.place.value,
       imageUrl: this.form.controls.imageUrl.value,
       imagePath: this.form.controls.imagePath.value,
       active: true,
@@ -205,13 +206,15 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
       jurors: []
     }
 
-    this.firebase.setDocument( TournamentCollection.collectionName, id, tournament).then( ()=>{
+
+    this.firebase.createNewDocument( TournamentCollection.collectionName, id, tournament).then( ()=>{
       this.tournamentId = id
       this.router.navigate(['/tournamentSetup',id])
     },
     reason =>{
       alert("Error guardando documento:" + reason)
     })
+
   }
 
 
@@ -269,6 +272,8 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
     let hasError : boolean = false
 
     if( this.tournament ){
+
+      selectedIndex = 1
           
       if( this.tournament.categories.length > 0 ){
         this.firstCategory.setValue( this.tournament.categories[0].label )

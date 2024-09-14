@@ -43,6 +43,26 @@ export class FirebaseFullService {
     }
     return onSnapshot( q , observer )  
   }  
+  createNewDocument(collectionPath:string, id:string, obj:{ [key: string]: any }):Promise<void>{
+    return new Promise<any>(( resolve, reject) =>{
+      var ref = doc( fulldb,collectionPath, id )
+      getDoc( ref ).then( docSnap =>{
+        if( docSnap.exists() ){
+          reject( "El documento ya existe" )
+        }
+        else{
+          obj["createon"] = new Date()
+          obj["updateon"] = new Date()
+          setDoc( doc(fulldb, collectionPath , id), obj).then( doc =>{
+            resolve(doc)
+          },
+          reason=>{
+            reject( reason )
+          })
+        }
+      })
+    })
+  }  
   
   setDocument(collectionPath:string, id:string, obj:{ [key: string]: any }):Promise<void>{
     obj["createon"] = new Date()
