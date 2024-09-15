@@ -44,9 +44,10 @@ p{
 
 .tournament-url-container{
     background-color: lightblue;
-    padding: 15px;
+    padding: 2px;
     margin: 1em;
     display:flex;
+    font-size: small;
 }
 .copy-content{
     margin-left: 5px;
