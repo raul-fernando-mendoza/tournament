@@ -10,6 +10,7 @@ import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { DateFormatService } from '../date-format.service';
 import { BusinesslogicService } from '../businesslogic.service';
+import {MatBadgeModule} from '@angular/material/badge';
 
 interface TournamentLink{
   id:string,
@@ -27,6 +28,7 @@ interface TournamentLink{
     ,MatProgressBarModule
     ,RouterModule  
     ,MatCardModule  
+    ,MatBadgeModule
   ],
   templateUrl: './admin-welcome.component.html',
   styleUrl: './admin-welcome.component.css'

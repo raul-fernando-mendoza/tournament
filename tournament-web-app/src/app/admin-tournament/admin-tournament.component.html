@@ -13,6 +13,7 @@
         <span> 
             <h3>{{ getTournamentPath() }}</h3>
         </span>
+        <button class="copy-content" mat-button-icon (click)="onCopyToClipboard()"><mat-icon>content_copy</mat-icon></button>
         <span class="spacer"></span>
     </div>  
 }
@@ -157,7 +158,7 @@
                                 </mat-list-item>
                             }
                             @empty{
-                                <p>Usted necesita por lo menos una categoria; por favor adicione una</p>
+                                <p>Usted necesita por lo menos una categoria; adicione una</p>
                                 <a [routerLink]="['categoryNew']">
                                     <button mat-button-icon><mat-icon>add</mat-icon></button>
                                 </a>       
@@ -184,7 +185,7 @@
                                 </mat-list-item>    
                             } 
                             @empty{
-                                <p>Usted necesita por lo menos una evaluacion; por favor adicione una</p>
+                                <p>Usted necesita por lo menos una evaluacion; adicione una</p>
                                 <a [routerLink]="['evaluationNew']">
                                     <button mat-button-icon><mat-icon>add</mat-icon></button>
                                 </a>       
@@ -209,7 +210,7 @@
                             </a>
                         }
                         @empty{
-                            <p>Usted necesita por lo menos un jurado; por favor adicione uno</p>
+                            <p>Usted necesita por lo menos un jurado; adicione uno</p>
                             <a [routerLink]="['jurorNew']">
                                 <button mat-button-icon><mat-icon>add</mat-icon></button>
                             </a>       
@@ -234,7 +235,7 @@
                             </a>
                         }
                         @empty{
-                            <p>Usted necesita por lo menos un premio; por favor adicione uno</p>
+                            <p>Usted necesita por lo menos un premio; adicione uno</p>
                             <a [routerLink]="['medalNew']">
                                 <button mat-button-icon><mat-icon>add</mat-icon></button>
                             </a>       

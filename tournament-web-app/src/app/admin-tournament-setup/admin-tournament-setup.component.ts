@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule  } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Filter } from '../firebase.service';
@@ -33,6 +33,10 @@ import { v4 } from 'uuid';
 import {AsyncPipe} from '@angular/common';
 import { map, Observable } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
+import {ClipboardModule} from '@angular/cdk/clipboard';
+import {Clipboard} from "@angular/cdk/clipboard"
+import {MatSnackBarModule} from '@angular/material/snack-bar';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 interface PerformanceReference{
   id:string
@@ -78,6 +82,7 @@ interface InscriptionRequestLink{
   ,MatStepperModule
   ,MatListModule
   ,AsyncPipe
+  ,ClipboardModule  
   ],
   templateUrl: './admin-tournament-setup.component.html',
   styleUrl: './admin-tournament-setup.component.css'
@@ -127,6 +132,8 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
   activePanel:string | null = null
 
   stepperOrientation: Observable<StepperOrientation>; 
+
+  private _snackBar = inject(MatSnackBar);
   
   constructor(
      private activatedRoute: ActivatedRoute
@@ -138,6 +145,7 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
     ,public businesslogic:BusinesslogicService
     ,public dateSrv:DateFormatService
     ,breakpointObserver: BreakpointObserver
+    ,private clipboard: Clipboard
     ,@Inject(DOCUMENT) private document: any
     ){
 
@@ -534,21 +542,21 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
       let tournament = this.tournament
       
       if( !(this.tournament.categories.length > 0) ){
-        errors.push("Por favor adicione una categoria");
+        errors.push("Adicione una categoria");
         
       }
       if( !(tournament.evaluations.length > 0) ){
-        errors.push("Por favor adicione una evaluacion");
+        errors.push("Adicione una evaluacion");
       }
 
       this.tournament.evaluations.map( e =>{
         if(e.aspects.length == 0){
-          errors.push("Por favor adicione un aspecto a la categoria:" + e.label);
+          errors.push("Adicione un aspecto a la categoria:" + e.label);
         }
       })
 
       if( !(tournament.medals.length > 0)){
-        errors.push("Por favor adicione un premio");
+        errors.push("Adicione un premio");
       }
     }
     return errors
@@ -559,7 +567,7 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
       this.router.navigate(["/tournament",this.tournamentId])
     }
     else{
-      alert("La informaicon is incompleta por favor revise y vuelva a intentar")
+      alert("La informaicon is incompleta revise y vuelva a intentar")
     }
   }
 
@@ -569,5 +577,13 @@ export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
  
     return origin + '/tournament/' + this.tournamentId;
 
+  }  
+  onCopyToClipboard(){
+    if(  this.clipboard.copy(this.getTournamentPath()) ){
+      this.openSnackBar("la invitacion ha sido copiada al portapapeles","Continuar")
+    }
+  }  
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action);
   }  
 }

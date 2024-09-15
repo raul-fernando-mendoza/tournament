@@ -13,7 +13,9 @@
                             <a routerLink="/tournament/{{tl.id}}">{{tl.tournament.label}}</a>
                         }
                         @else{
-                            <a routerLink="/tournamentSetup/{{tl.id}}">{{tl.tournament.label}} - in progress</a>
+                            <a routerLink="/tournamentSetup/{{tl.id}}">
+                                <div matBadge="!" matBadgeSize="large" matBadgeOverlap="false" matBadgePosition="after">{{tl.tournament.label}}</div>
+                            </a>
                         }
                     </mat-card-title>
                 </mat-card-header>

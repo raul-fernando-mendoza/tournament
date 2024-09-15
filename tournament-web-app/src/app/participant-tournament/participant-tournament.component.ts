@@ -108,7 +108,7 @@ export class ParticipantTournamentComponent implements OnDestroy{
   
     }
     else{
-      alert("Por favor adicione solicitudes")
+      alert("Adicione solicitudes")
     }
   }  
 

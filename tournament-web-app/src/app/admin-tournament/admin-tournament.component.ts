@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule , DOCUMENT, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Filter } from '../firebase.service';
@@ -13,7 +13,6 @@ import { MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule} from '@angular/material/core';
 import { AuthService } from '../auth.service';
 import { NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
-import { PathService } from '../path.service';
 import { BusinesslogicService } from '../businesslogic.service';
 import { MatGridListModule} from '@angular/material/grid-list';
 import { EvaluationgradeListComponent } from '../evaluationgrade-list/evaluationgrade-list.component';
@@ -33,6 +32,10 @@ import { TournamentEditPodiumComponent } from '../podium/tournament-edit-podium.
 import { ProgramListComponent } from '../program-list/program-list.component';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
+import {ClipboardModule} from '@angular/cdk/clipboard';
+import {Clipboard} from "@angular/cdk/clipboard"
+import {MatSnackBarModule} from '@angular/material/snack-bar';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 interface ProgramRef{
   id:string
@@ -72,6 +75,8 @@ interface ProgramRef{
   ,ProgramListComponent
   ,MatCheckboxModule
   ,MatChipsModule
+  ,ClipboardModule 
+  ,MatSnackBarModule   
   ],
   templateUrl: './admin-tournament.component.html',
   styleUrl: './admin-tournament.component.css'
@@ -112,17 +117,18 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
 
   hasPending = false
 
+  private _snackBar = inject(MatSnackBar);
+
   constructor(
      private activatedRoute: ActivatedRoute
     ,private firebase:FirebaseFullService 
     ,private fb:FormBuilder
     ,private auth:AuthService
     ,private router: Router
-    ,private pathService:PathService
     ,private business:BusinesslogicService
     ,private dateSrv:DateFormatService
+    ,private clipboard: Clipboard
     ,@Inject(DOCUMENT) private document: any){
-
     var thiz = this
 
     this.activatedRoute.paramMap.subscribe( 
@@ -375,5 +381,13 @@ export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewIni
     else{
       return false
     }
+  } 
+  onCopyToClipboard(){
+    if(  this.clipboard.copy(this.getTournamentPath()) ){
+      this.openSnackBar("la invitacion ha sido copiada al portapapeles","Continuar")
+    }
+  }  
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action);
   }  
 }

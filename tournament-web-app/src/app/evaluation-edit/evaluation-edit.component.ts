@@ -92,7 +92,7 @@ export class EvaluationEditComponent {
           this.router.navigate(['../../'], { relativeTo: this.activatedRoute })
         }
         else{
-          alert( "Por favor adicione por lo menos un aspecto a calificar" )
+          alert( "Adicione por lo menos un aspecto a calificar" )
         }
 
       },
