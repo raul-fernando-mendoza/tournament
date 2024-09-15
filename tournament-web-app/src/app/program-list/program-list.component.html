@@ -23,13 +23,13 @@
 
 
             @if( p.noEvaluationsFound ){
-                <span class="attention">Por favor adicione examenes!</span>
+                <mat-chip ><span class="attention">Por favor adicione examenes!</span></mat-chip>
             }
             @if( p.performance.isReleased == false && p.newGradeAvailable ){
-                <span class="attention">Nueva calificacion disponible!</span>
+                <mat-chip ><span class="attention">Nueva calificacion disponible!</span></mat-chip>
             }       
             @if( p.performance.isReleased == true  ){
-                <span class="released">Liberado:{{p.performance.grade}}</span>
+                <mat-chip ><span class="released">Liberado:{{p.performance.grade}}</span></mat-chip>
             }   
             <span class="medal">{{ p.medal }}</span>
             
@@ -44,10 +44,10 @@
 
 
             @if( p.performance.isReleased  ){
-                <span class="score">score:{{ p.performance.grade }}</span>
+                <mat-chip ><span class="score">score:{{ p.performance.grade }}</span></mat-chip>
             }
             @if( p.performance.isReleased  ){
-                <span>{{ p.medal }}</span>
+                <mat-chip><span>{{ p.medal }}</span></mat-chip>
             }
             <span class="spacer"></span>
             <button mat-icon-button color="warn" (click)="onReject(p.id)"><mat-icon>remove_circle</mat-icon></button>

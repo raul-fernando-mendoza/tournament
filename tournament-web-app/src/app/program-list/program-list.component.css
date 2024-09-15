@@ -26,7 +26,6 @@ mat-card{
 }
 
 .released{
-    margin-left: 2em;
     color:green;
 }
 .medal{
@@ -35,7 +34,6 @@ mat-card{
     margin-left: 2em;   
 }
 .program{
-    margin-bottom: 5px;
     border: 1px solid black;
 }
 .program-bar{
@@ -46,12 +44,9 @@ mat-card{
     margin-bottom:auto;
 }
 .attention{
-    margin-left:5em;
     background-color: yellow;
 }
 .cancel{
-    color:red;
-    font-size: large;
-    margin-left: 1em;
-    margin-right: 1em;
+    background-color: yellow;
+
 }

@@ -11,6 +11,7 @@ import { AuthService } from '../auth.service';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { Filter, FirebaseFullService } from '../firebasefull.service';
 import { BusinesslogicService } from '../businesslogic.service';
+import { MatChipsModule } from '@angular/material/chips';
 
 interface ProgramRef{
   id:string
@@ -26,7 +27,8 @@ interface ProgramRef{
   imports: [
     CommonModule
     ,MatIconModule
-    ,MatButtonModule      
+    ,MatButtonModule  
+    ,MatChipsModule    
     ,RouterModule
     ,MatGridListModule
     ,EvaluationgradeListComponent
