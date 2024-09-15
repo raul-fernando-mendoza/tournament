@@ -32,8 +32,8 @@ import { auth } from '../../environments/environment';
     ,QuillModule  
     ,MatProgressBarModule    
   ],
-  templateUrl: './guess-tournament.component.html',
-  styleUrl: './guess-tournament.component.css'
+  templateUrl: './tournament-guess.component.html',
+  styleUrl: './tournament-guess.component.css'
 })
 export class GuessTournamentComponent implements OnInit{
 

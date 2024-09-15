@@ -1,13 +1,13 @@
-import { ActivatedRoute, ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, Routes } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, Routes } from '@angular/router';
 import { LoginFormComponent } from './login-form/login-form.component';
-import { AdminTournamentComponent } from './admin-tournament/admin-tournament.component';
+import { TournamentAdminComponent } from './tournament-admin/tournament-admin.component';
 import { EvaluationGradeComponent } from './evaluationgrade/evaluationgrade-component';
 import { ProgramListComponent } from './program-list/program-list.component';
 import { WelcomeJurorComponent } from './welcome-juror/welcome-juror.component';
 import { AuthService } from './auth.service';
 import { inject } from '@angular/core';
-import { AdminTournamentWelcomeComponent } from './admin-welcome/admin-welcome.component';
-import { ParticipantTournamentComponent } from './participant-tournament/participant-tournament.component';
+import { AdminTournamentWelcomeComponent } from './welcome-admin/admin-welcome.component';
+import { ParticipantTournamentComponent } from './tournament-participant/participant-tournament.component';
 import { CategoryNewComponent } from './category-new/category-new.component';
 import { CategoryEditComponent } from './category-edit/category-edit.component';
 import { EvaluationEditComponent } from './evaluation-edit/evaluation-edit.component';
@@ -18,9 +18,9 @@ import { JurorNewComponent } from './juror-new/juror-new.component';
 import { JurorEditComponent } from './juror-edit/juror-edit.component';
 import { MedalNewComponent } from './medal-new/medal-new.component';
 import { MedalEditComponent } from './medal-edit/medal-edit.component';
-import { AdminTournamentSetupComponent } from './admin-tournament-setup/admin-tournament-setup.component';
+import { AdminTournamentSetupComponent } from './tournament-setup/tournament-setup.component';
 import { TournamentRouterComponent } from './tournament-router/tournament-router.component';
-import { GuessTournamentComponent } from './guess-tournament/guess-tournament.component';
+import { GuessTournamentComponent } from './tournament-guess/tournament-guess.component';
 import { PerformanceNewComponent } from './performance-new/performance-new.component';
 import { PerformanceEditComponent } from './performance-edit/performance-edit.component';
 import { NotfoundComponent } from './notfound/notfound.component';
@@ -106,7 +106,7 @@ export const routes: Routes = [
 
 
     
-    { path:"tournamentAdmin/:tournamentId",pathMatch:'full',component:AdminTournamentComponent, canActivate: [loginGuard('/loginForm/tournamentAdmin')]},
+    { path:"tournamentAdmin/:tournamentId",pathMatch:'full',component:TournamentAdminComponent, canActivate: [loginGuard('/loginForm/tournamentAdmin')]},
     
     { path:"tournamentAdmin/:tournamentId/categoryNew",pathMatch:'full',component:CategoryNewComponent, canActivate: [loginGuard('/loginForm/tournamentAdmin')]},
     { path:"tournamentAdmin/:tournamentId/category/:categoryId",pathMatch:'full',component:CategoryEditComponent, canActivate: [loginGuard('/loginForm/tournamentAdmin')]},

@@ -78,10 +78,10 @@ interface ProgramRef{
   ,ClipboardModule 
   ,MatSnackBarModule   
   ],
-  templateUrl: './admin-tournament.component.html',
-  styleUrl: './admin-tournament.component.css'
+  templateUrl: './tournament-admin.component.html',
+  styleUrl: './tournament-admin.component.css'
 })
-export class AdminTournamentComponent implements OnInit, OnDestroy, AfterViewInit{
+export class TournamentAdminComponent implements OnInit, OnDestroy, AfterViewInit{
 
   tournamentId! :string 
   tournament:TournamentObj| null = null

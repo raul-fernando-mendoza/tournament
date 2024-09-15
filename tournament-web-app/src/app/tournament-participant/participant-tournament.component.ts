@@ -41,8 +41,8 @@ interface PerformanceReference{
     ,MatChipsModule
     ,MatButtonToggleModule
   ],
-  templateUrl: './participant-tournament.component.html',
-  styleUrl: './participant-tournament.component.css'
+  templateUrl: './tournament-participant.component.html',
+  styleUrl: './tournament-participant.component.css'
 })
 export class ParticipantTournamentComponent implements OnDestroy{
 

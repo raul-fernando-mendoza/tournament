@@ -84,8 +84,8 @@ interface InscriptionRequestLink{
   ,AsyncPipe
   ,ClipboardModule  
   ],
-  templateUrl: './admin-tournament-setup.component.html',
-  styleUrl: './admin-tournament-setup.component.css'
+  templateUrl: './tournament-setup.component.html',
+  styleUrl: './tournament-setup.component.css'
 })
 export class AdminTournamentSetupComponent implements OnInit, OnDestroy{
 
