@@ -47,7 +47,6 @@ p{
     padding: 2px;
     margin: 1em;
     font-size: small;
-    display:flex;
 }
 .cancelado{
     color:red;
